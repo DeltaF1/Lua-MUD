@@ -32,6 +32,10 @@ return {
 			local parts = split(data)
 			--for w in data:gmatch("[^ ]+") do table.insert(parts, w) end
 			
+			-- replace parts like "@here" or "@me" with names of objects?
+			
+			
+			
 			local cmd = parts[1]
 			local verb
 			local key

@@ -98,7 +98,7 @@ local t = {
 				msg = msg..data:match("[^ ]+ (.+)")
 			end
 			
-			msg = msg:gsub("(%a+)", function(v) return player.pronouns[v] end)
+			msg = msg:gsub("(%a+)", function(v) return player.pronouns[v:lower()] end)
 			
 			player.room:broadcast(player.name.." "..msg)
 		end,
@@ -134,6 +134,51 @@ local t = {
 			
 			-- HAVE MERCY ON MY SOUL
 			player:send(tostring(err or result))
+		end
+	},
+	set = {
+		f = function(player, parts, data)
+			if #parts < 2 then
+				return {"error", "Please supply an object to modify"}
+			elseif #parts < 3 then
+				return {"error", "Please supply what value you want to change"}
+			elseif #parts < 4 then
+				return {"error", "Please supply a new value"}
+			end
+			
+			local obj = player.room:search(parts[2])
+			if not obj then
+				return "object not found!"
+			end
+			
+			-- set hobo pronouns.myself "xirself"
+			
+			local key = parts[3]
+			local k
+			local keyparts = {}
+			for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
+			
+			for i, part in ipairs(keyparts) do
+				print("Setting at "..part)
+				k = part
+				if i == #keyparts then break end
+				if type(obj[part]) == "table" then
+					obj = obj[part]
+				elseif i ~= #keyparts then
+					return player:send("Invalid keypath "..key)
+				end
+				
+			end
+			print("Setting "..(obj.name or tostring(obj)).." at "..k)
+			
+			local payload = data:match("%S+ %S+ %S+ (.+)")
+			
+			payload = "return "..payload
+			
+			-- PLEASE SANDBOX THIS FOR THE LOVE OF GOD
+			local newval = loadstring(payload)()
+			
+			obj[k] = newval
 		end
 	}
 }

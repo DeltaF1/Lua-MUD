@@ -35,6 +35,7 @@ tremove = function(t, i)
 	for j = #t, 1, -1 do
 		if t[j] == i then table.remove(t, j) end
 	end
+	return t
 end
 
 function broadcast(s)

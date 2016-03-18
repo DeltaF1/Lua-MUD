@@ -146,7 +146,14 @@ local t = {
 				return {"error", "Please supply a new value"}
 			end
 			
-			local obj = player.room:search(parts[2])
+			local name = parts[2]
+			if name == "@here" then
+				obj = player.room
+			elseif name == "@me" then
+				obj = player
+			else
+				obj = player.room:search(name)
+			end
 			if not obj then
 				return "object not found!"
 			end
@@ -179,6 +186,33 @@ local t = {
 			local newval = loadstring(payload)()
 			
 			obj[k] = newval
+		end
+	},
+	
+	inspect = {
+		f = function(player, parts)
+			if #parts < 2 then
+				return {"error", "Please supply an object to inspect"}
+			end
+			local obj
+			
+			local name = parts[2]
+			if name == "@here" then
+				obj = player.room
+			elseif name == "@me" then
+				obj = player
+			else
+				obj = player.room:search(name)
+			end
+			
+			if not obj then return player:send("Object not found") end
+			
+			player:send(ser(obj))
+		end
+	},
+	social = {
+		f = function(player, parts)
+			
 		end
 	}
 }

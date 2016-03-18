@@ -98,7 +98,7 @@ local t = {
 				msg = msg..data:match("[^ ]+ (.+)")
 			end
 			
-			msg = msg:gsub("([%a^ ]+)", function(v) return player.pronouns[v] end)
+			msg = msg:gsub("(%a+)", function(v) return player.pronouns[v] end)
 			
 			player.room:broadcast(player.name.." "..msg)
 		end,

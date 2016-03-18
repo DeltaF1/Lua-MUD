@@ -13,7 +13,12 @@ pronouns = {
 		mine = "hers",
 		myself = "herself"
 	},
-	
+	neutral = {
+		i = "they",
+		my = "their",
+		mine = "theirs",
+		myself = "themself"
+	}
 }
 
 Player.__index = Player
@@ -23,7 +28,7 @@ Player.default = function()
 		name = "",
 		aliases = {},
 		colour = "green",
-		pronouns = 
+		pronouns = pronouns.female
 	}
 end
 

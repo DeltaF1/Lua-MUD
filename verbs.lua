@@ -90,14 +90,21 @@ local t = {
 				if #parts < 2 then
 					return {"error", "Please supply a phrase to emote"}
 				end
+				msg = data:match("[^ ]+ (.+)")
 			else
-				msg = parts[1]:gsub("%.(%a+)", "%1s").." " --Adds an s. e.g. .walk briskly becomes "walks briskly"
+				-- for verb in gmatch(%.%S+) do verb..s or verb[conjugations]
+				
+				-- ShinMojo @ sindome.org ([^aeiouy]|qu)y$"-> "$1ies" and (x|ch|ss|sh)$ -> "$1es"
+				msg = data:gsub("%.(%a+)", function(v)
+					
+					return v.."s"
+				) --Adds an s. e.g. .walk briskly becomes "walks briskly"
 			end
-			
+			--[[
 			if #parts >= 2 then
 				msg = msg..data:match("[^ ]+ (.+)")
 			end
-			
+			--]]
 			msg = msg:gsub("(%a+)", function(v) return player.pronouns[v:lower()] end)
 			
 			player.room:broadcast(player.name.." "..msg)

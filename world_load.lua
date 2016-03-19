@@ -2,15 +2,16 @@ local t = {}
 
 function split(s, sep)
 	local t = {}
-	local sep = sep or " "
-	for i in string.gmatch(s, "%S+") do print("adding part "..i);table.insert(t, i) end
+	local sep = sep or " "..NEWL
+	
+	-- For every substring made up of non separator characters, add to t
+	for i in string.gmatch(s, "[^"..sep.."]+") do print("adding part "..i);table.insert(t, i) end
 	return t
 end
 
 function files(dir)
-	print("Listing files in "..dir)
 	local s = io.popen("dir "..dir.." /b /a-d"):read("*all")
-	print("s = "..s)
+
 	return split(s)
 end
 
@@ -32,47 +33,42 @@ function t.load_rooms()
 	
 	local env = getfenv()
 	
-	
-	
-	
+	-- For every file in the /rooms subdirectory
 	for i, v in ipairs(roomfiles) do
 		local filename = v
 		local G = {}
-		print("file = "..v)
-		--v = string.match(v, "%w+")
-		print("v = "..v)
 		
-		
+		-- Load the file into a function
 		local f = loadfile("rooms\\"..v)
+		
+		-- Set the environment of the function, so that every global function is saved into the 'G' table
 		setfenv(f, G)
 		f()
 		
+		-- For every global variable created in the room file
 		for k,v in pairs(G) do
-			print("Loading room of identifier "..k)
+			-- If there is already a room with that identifier
 			if rooms[k] then
 				error("Room identifier conflict: "..k)
 			end
 			
+			-- Add the room to the rooms table
 			rooms[k] = v
+			
+			-- Store the room's identifier and filename for later reserialization
 			v.identifier = k
 			v.filename = filename
 			
-			for defk,def in pairs(Room.default()) do
-				v[defk] = v[defk] or def
-			end
-			
-			setmetatable(v, Room)
-			
-			print("Set metatable of "..k)
+			v = Room.new(v)
 			
 			--parse room for do_xxx_str 
 		end
 	end
 	
-	
-	
+	-- For every room
 	for i,v in pairs(rooms) do
 		for k,e in pairs(v.exits) do
+			-- Try and load rooms by identifier. e.g. t.exits = { north = "some_identifier" }; t.exits["north"] = rooms["some_identifier"]
 			local room = rooms[e]
 			if not room then error("Room identifier not found: "..e) end
 			print("Turned identifier "..e.." into room: "..room.name)

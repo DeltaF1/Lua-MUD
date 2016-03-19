@@ -28,16 +28,24 @@ Player.default = function()
 		name = "",
 		aliases = {},
 		colour = "green",
+		desc = "A person with no distinguishing features, their blank face devoid of any human emotions",
 		pronouns = pronouns.female
 	}
 end
 
 Player.new = function(o)
+	-- Either create a new object, or turn existing table into an instance
 	local o = o or {}
+	
+	-- Fill in missing values
 	for k,v in pairs(Player.default()) do
 		o[k] = o[k] or v
 	end
 	return setmetatable(o, Player)
+end
+
+Player.do_look = function(self, player)
+	return self.desc
 end
 
 Player.send = function(self, msg)
@@ -47,7 +55,10 @@ end
 Player.sendraw = function(self, msg)
 	
 	local newmsg = string.gsub(msg, "([%w_]+)", function(v)
+		-- For every word, search the room for an object with that name
 		local obj = self.room:search(v)
+		
+		-- If that name means an object, highlight it
 		if obj then
 			return colour("%{"..(obj.colour or "green").."}"..v)
 		end 

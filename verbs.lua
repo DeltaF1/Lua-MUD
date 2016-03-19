@@ -26,8 +26,14 @@ local t = {
 	},
 	look = {
 		f = function(player, parts)
-			--use parts to get item to look at
-			player.sock:send(player.room:do_look(player)..NEWL)
+			local obj
+			if #parts < 2 then
+				obj = player.room
+			else
+				obj = player.room:search(parts[2])
+			end
+			if not obj then return player:send("Could not find "..parts[2]) end
+			player:send(obj:do_look(player))
 		end
 	},
 	go = {
@@ -137,7 +143,6 @@ local t = {
 			error("STOP COMMAND")
 		end
 	},
-	
 	run = {
 		f = function(player, parts, data)
 			-- NOT SAFE
@@ -211,6 +216,10 @@ local t = {
 			
 			-- PLEASE SANDBOX THIS FOR THE LOVE OF GOD
 			local newval = loadstring(payload)()
+			
+			if type(newval) == "function" then
+				obj[k.."_str"] = payload
+			end
 			
 			obj[k] = newval
 		end

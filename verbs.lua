@@ -92,13 +92,7 @@ local t = {
 				end
 				msg = data:match("[^ ]+ (.+)")
 			else
-				-- for verb in gmatch(%.%S+) do verb..s or verb[conjugations]
-				
-				-- ShinMojo @ sindome.org ([^aeiouy]|qu)y$"-> "$1ies" and (x|ch|ss|sh)$ -> "$1es"
-				msg = data:gsub("%.(%a+)", function(v)
-					
-					return v.."s"
-				) --Adds an s. e.g. .walk briskly becomes "walks briskly"
+				msg = data
 			end
 			--[[
 			if #parts >= 2 then
@@ -107,7 +101,31 @@ local t = {
 			--]]
 			msg = msg:gsub("(%a+)", function(v) return player.pronouns[v:lower()] end)
 			
-			player.room:broadcast(player.name.." "..msg)
+			msg = player.name.." "..msg
+			
+			for i,p in ipairs(player.room.players) do
+				local newmsg = msg:gsub("%.(%a+)", function(v)
+					-- for verb in gmatch(%.%S+) do verb..s or verb[conjugations]
+				
+					-- ShinMojo @ sindome.org ([^aeiouy]|qu)y$"-> "$1ies" and (x|ch|ss|sh)$ -> "$1es"
+					--Adds an s. e.g. .walk briskly becomes "walks briskly"
+					-- v = v:gsub(ShinMojo pattern (need RegEx or custom pattern builder))
+					if p == player then return v end-- secondPersonOfVerb(v)
+					return v.."s"
+				end):gsub(
+					p.name, "you"
+				):gsub(
+					"([%.%?%!]) (%a)", function(punctuation, letter) return punctuation.." "..letter:upper() end
+				)
+				
+				
+				newmsg = newmsg
+				
+				
+				
+				p:send(newmsg)
+				--player:send(msg)
+			end
 		end,
 		aliases = {
 			"%.", "/me",
@@ -174,6 +192,8 @@ local t = {
 			
 			for i, part in ipairs(keyparts) do
 				print("Setting at "..part)
+				local num = part:match("#(%d+)")
+				if num then part = tonumber(num) end
 				k = part
 				if i == #keyparts then break end
 				if type(obj[part]) == "table" then

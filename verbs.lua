@@ -247,12 +247,20 @@ local t = {
 			
 			if not obj then return player:send("Object not found") end
 			
-			player:send(ser(obj))
+			player:send(ser(obj, NEWL))
 		end
 	},
 	social = {
 		f = function(player, parts)
 			
+		end
+	},
+	save = {
+		f = function(player, parts)
+			for _,v in pairs(players) do
+				v:send("Saving world...")
+			end
+			world_save.save_rooms(rooms)
 		end
 	}
 }

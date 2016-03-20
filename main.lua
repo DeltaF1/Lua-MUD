@@ -146,12 +146,14 @@ while true do
 		end
 				
 		--save the world!
-	
+		
 		--on player quit, save the player's data
 		--	so, we only need to deal with currently connected players
 		
 		--also, save room/items
 		--	serialize, keep do_xxx_str
+		
+		world_save.save_rooms(rooms)
 		
 		break
 	end

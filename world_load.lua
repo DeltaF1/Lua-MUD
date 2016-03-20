@@ -1,14 +1,5 @@
 local t = {}
 
-function split(s, sep)
-	local t = {}
-	local sep = sep or " "..NEWL
-	
-	-- For every substring made up of non separator characters, add to t
-	for i in string.gmatch(s, "[^"..sep.."]+") do print("adding part "..i);table.insert(t, i) end
-	return t
-end
-
 function files(dir)
 	local s = io.popen("dir "..dir.." /b /a-d"):read("*all")
 

@@ -3,12 +3,13 @@ local pairs = pairs
 local table = table
 
 -- Serialize a table
-function ser(obj, indent, tables)
+function ser(obj, newl, indent, tables)
 	-- Previously serialized tables, to prevent stack overflows
+	local newl = newl or "\n"
 	local tables = tables or {}
 	local indent = indent or 1
 	local indentStr = string.rep("  ", indent)
-	local s = string.rep("  ", indent-1)..'{'.."\n"
+	local s = --[[string.rep("  ", indent-1)..]]--'{'..newl
 	for k,v in pairs(obj) do
 		-- Discard function keys. If they're built in they'll be part of a superclass, if they're custom they'll be encoded in xxx_str
 		if type(v) ~= "function" then				
@@ -42,12 +43,12 @@ function ser(obj, indent, tables)
 				-- If it's a table not yet seen, encode it
 				elseif not contains(tables, v) then
 					table.insert(tables, v)
-					v = ser(v, indent+1, tables)
+					v = ser(v, newl, indent+1, tables)
 				end
 			end
 			
 			s = s .. tostring(v) .. ","
-			s = s.."\n"
+			s = s..newl
 		end
 	end
 	s = s..string.rep("  ",indent-1).."}"

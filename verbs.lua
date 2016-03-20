@@ -82,7 +82,7 @@ local t = {
 			"say"
 		}
 	},
-	emote = {	
+	pose = {	
 		f = function(player, parts, data)
 			-- Add pronoun parsing!
 			--
@@ -94,7 +94,7 @@ local t = {
 			local msg = ""
 			if not parts[1]:find("^%..+") then
 				if #parts < 2 then
-					return {"error", "Please supply a phrase to emote"}
+					return {"error", "Please supply a phrase to pose"}
 				end
 				msg = data:match("[^ ]+ (.+)")
 			else
@@ -126,20 +126,27 @@ local t = {
 					p.name, "you"
 				):gsub(
 					"([%.%?%!]) (%a)", function(punctuation, letter) return punctuation.." "..letter:upper() end
+				):gsub(
+					"^%a", function(l) return l:upper() end
 				)
-				
-				
-				newmsg = newmsg
-				
-				
 				
 				p:send(newmsg)
 				--player:send(msg)
 			end
 		end,
 		aliases = {
-			"%.", "/me",
-			"e", "%..+"
+			"%.", "%..+"
+		}
+	},
+	emote = {
+		f = function(player, parts, data)
+			if #parts < 2 then
+				return {"error", "Please supply a phrase to emote"}
+			end
+			player.room:broadcast(player.name.." "..data:match("%S+ (.+)"))
+		end,
+		aliases = {
+			"e", "/me"
 		}
 	},
 	stop = {

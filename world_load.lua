@@ -22,11 +22,18 @@ function t.load_rooms()
 	local rooms = {}
 	local roomfiles = files("rooms")
 	
+	for i,v in ipairs(roomfiles) do
+		if v:find("%.bak") then
+			table.remove(roomfiles, i)
+		end
+	end
+	
 	local env = getfenv()
 	
 	-- For every file in the /rooms subdirectory
 	for i, v in ipairs(roomfiles) do
 		local filename = v
+		
 		local G = {}
 		
 		-- Load the file into a function

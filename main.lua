@@ -2,6 +2,7 @@ socket = require "socket"
 config = require "config"
 md5 = require "md5"
 colour = require "ansicolors"
+require "utils"
 
 math.randomseed(os.time())
 

@@ -14,7 +14,7 @@ Room.__index = Room
 Room.new = function(o)
 	local o = o or {}
 	
-	for k,v in pairs(Room.default())
+	for k,v in pairs(Room.default()) do
 		o[k] = o[k] or v
 	end
 	

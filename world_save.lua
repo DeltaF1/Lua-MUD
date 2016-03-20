@@ -6,7 +6,6 @@ local table = table
 function ser(obj, indent, tables)
 	-- Previously serialized tables, to prevent stack overflows
 	local tables = tables or {}
-	print("indent: "..tostring(indent))
 	local indent = indent or 1
 	local indentStr = string.rep("  ", indent)
 	local s = string.rep("  ", indent-1)..'{'..NEWL
@@ -52,3 +51,29 @@ function ser(obj, indent, tables)
 	s = s..string.rep("  ",indent-1).."}"
 	return s
 end
+
+local t = {}
+
+t.save_rooms = function(rooms)
+	local files = {}
+	for k,v in pairs(rooms) do
+		files[v.filename] = files[v.filename] or {}
+		table.insert(files[v.filename], v)
+	end
+	
+	for k,v in pairs(files) do
+		print("Saving to file "..k)
+		local s = "-- "..k..NEWL..NEWL
+		-- s = s.."-- Generated "..os.time()
+		for _, room in ipairs(v) do
+			s = s..room.identifier.." = "..ser(room)..NEWL..NEWL
+		end
+		s = s.."END OF FILE"
+		local f = io.open("roomsTEST\\"..k, "w")
+		f:write(s)
+		f:close()
+	end
+	--print(ser(keys))
+end
+
+return t

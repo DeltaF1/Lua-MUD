@@ -154,6 +154,7 @@ local t = {
 			error("STOP COMMAND")
 		end
 	},
+	--[[
 	run = {
 		f = function(player, parts, data)
 			-- NOT SAFE
@@ -176,7 +177,7 @@ local t = {
 			-- HAVE MERCY ON MY SOUL
 			player:send(tostring(err or result))
 		end
-	},
+	},--]]
 	set = {
 		f = function(player, parts, data)
 			if #parts < 2 then
@@ -226,7 +227,9 @@ local t = {
 			payload = "return "..payload
 			
 			-- PLEASE SANDBOX THIS FOR THE LOVE OF GOD
-			local newval = loadstring(payload)()
+			local success, newval = pcall(loadstring(payload))
+			
+			if not success then player:send(newval); return end
 			
 			if type(newval) == "function" then
 				obj[k.."_str"] = payload

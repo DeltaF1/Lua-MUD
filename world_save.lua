@@ -9,7 +9,7 @@ function ser(obj, newl, indent, tables)
 	local tables = tables or {}
 	local indent = indent or 1
 	local indentStr = string.rep("  ", indent)
-	local s = --[[string.rep("  ", indent-1)..]]--'{'..newl
+	local s = --[[string.rep("  ", indent-1)..]]'{'..newl
 	for k,v in pairs(obj) do
 		-- Discard function keys. If they're built in they'll be part of a superclass, if they're custom they'll be encoded in xxx_str
 		if type(v) ~= "function" then				

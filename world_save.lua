@@ -8,7 +8,7 @@ function ser(obj, indent, tables)
 	local tables = tables or {}
 	local indent = indent or 1
 	local indentStr = string.rep("  ", indent)
-	local s = string.rep("  ", indent-1)..'{'..NEWL
+	local s = string.rep("  ", indent-1)..'{'.."\n"
 	for k,v in pairs(obj) do
 		-- Discard function keys. If they're built in they'll be part of a superclass, if they're custom they'll be encoded in xxx_str
 		if type(v) ~= "function" then				
@@ -23,6 +23,7 @@ function ser(obj, indent, tables)
 				if not k:match("^[%a_][%w_]*$") then
 					k = '["'..k..'"]'
 				end
+				
 			-- If the key is a number index add brackets. e.g. {[1]="foo", [2]="bar"}
 			elseif type(k) == "number" then
 				k = "["..k.."]"
@@ -31,6 +32,7 @@ function ser(obj, indent, tables)
 			s = s ..k..' = '
 			
 			if type(v) == "string" then
+				v = v:gsub(NEWL, "\\NEWL")
 				v = '"'..v..'"'
 			elseif type(v) == "table" then
 				-- If it has an identifier, then encode that instead of the table
@@ -45,7 +47,7 @@ function ser(obj, indent, tables)
 			end
 			
 			s = s .. tostring(v) .. ","
-			s = s..NEWL
+			s = s.."\n"
 		end
 	end
 	s = s..string.rep("  ",indent-1).."}"
@@ -63,12 +65,14 @@ t.save_rooms = function(rooms)
 	
 	for k,v in pairs(files) do
 		print("Saving to file "..k)
-		local s = "-- "..k..NEWL..NEWL
+		local s = "-- "..k.."\n\n"
 		-- s = s.."-- Generated "..os.time()
 		for _, room in ipairs(v) do
-			s = s..room.identifier.." = "..ser(room)..NEWL..NEWL
+			s = s..room.identifier.." = "..ser(room).."\n\n"
 		end
-		s = s.."END OF FILE"
+		s = s.."--[[END OF FILE]]--"
+		
+		-- Need to find way to create empty file
 		local f = io.open("roomsTEST\\"..k, "w")
 		f:write(s)
 		f:close()

@@ -11,12 +11,12 @@ return {
 			
 			-- If there are any non alphanumeric characters in the data
 			if data:find("%W") then
-				player:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)")
+				player.sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)
 				return
 			end
 			
 			player.name = data
-			
+			player.identifier = "player_"..player.name
 			-- TBD add a "login2" state for password
 			player.state = "chat"
 			
@@ -37,10 +37,15 @@ return {
 			--get hash
 			--load player data from file
 		end,
-		prompt = "Please enter your username:"
+		prompt = colour("%{green}Please enter your username:")
 	},
 	chat = {
 		f = function(player, data)
+			
+			-- Don't do anything
+			if #data == 0 then
+				return
+			end
 			
 			-- Get parts of data. e.g. "Why is the rum always gone?" will become {"Why", "is", "the", "rum", "always", "gone?"}
 			local parts = split(data)
@@ -49,6 +54,8 @@ return {
 			
 			-- First word sent
 			local cmd = parts[1]
+			
+			
 			
 			-- Declare verb and name of verb
 			local verb

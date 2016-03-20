@@ -61,6 +61,12 @@ function t.load_rooms()
 			
 			v = Room.new(v)
 			
+			for key,val in pairs(v) do
+				if type(val) == "string" then
+					v[key] = val:gsub("\\NEWL", NEWL)
+				end
+			end
+			
 			--parse room for do_xxx_str 
 		end
 	end

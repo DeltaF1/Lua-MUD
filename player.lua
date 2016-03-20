@@ -18,6 +18,12 @@ pronouns = {
 		my = "their",
 		mine = "theirs",
 		myself = "themself"
+	},
+	second = {
+		i = "you",
+		my = "your",
+		mine = "yours",
+		myself = "yourself"
 	}
 }
 
@@ -54,14 +60,17 @@ end
 
 Player.sendraw = function(self, msg)
 	
-	local newmsg = string.gsub(msg, "([%w_]+)", function(v)
-		-- For every word, search the room for an object with that name
-		local obj = self.room:search(v)
-		
-		-- If that name means an object, highlight it
-		if obj then
-			return colour("%{"..(obj.colour or "green").."}"..v)
-		end 
-	end)
-	self.sock:send(newmsg)
+	if self.room then
+		msg = string.gsub(msg, "([%w_]+)", function(v)
+			-- For every word, search the room for an object with that name
+			local obj = self.room:search(v)
+			
+			-- If that name means an object, highlight it
+			if obj then
+				return colour("%{"..(obj.colour or "green").."}"..v)
+			end 
+		end)
+	end
+	
+	self.sock:send(msg)
 end

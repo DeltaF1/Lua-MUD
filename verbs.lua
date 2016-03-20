@@ -105,7 +105,7 @@ local t = {
 				msg = msg..data:match("[^ ]+ (.+)")
 			end
 			--]]
-			msg = msg:gsub("(%a+)", function(v) return player.pronouns[v:lower()] end)
+			msg = msg
 			
 			msg = player.name.." "..msg
 			
@@ -118,7 +118,11 @@ local t = {
 					-- v = v:gsub(ShinMojo pattern (need RegEx or custom pattern builder))
 					if p == player then return v end-- secondPersonOfVerb(v)
 					return v.."s"
-				end):gsub(
+				end):gsub("(%a+)", function(v)
+					if p == player then return pronouns.second[v:lower()] end
+					return player.pronouns[v:lower()]
+				end
+				):gsub(
 					p.name, "you"
 				):gsub(
 					"([%.%?%!]) (%a)", function(punctuation, letter) return punctuation.." "..letter:upper() end

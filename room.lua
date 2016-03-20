@@ -35,7 +35,7 @@ Room.do_look = function(self, player)
 	
 	for i,v in ipairs(self.players) do
 		if v ~= player then
-			s = s..v.name.." is here. " -- Replace with v.messages.standing
+			s = s..v:message("standing").."." -- Replace with v.messages.standing
 		end
 	end
 	return s

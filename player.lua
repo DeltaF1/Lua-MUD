@@ -1,4 +1,8 @@
-Player = {}
+messages = {
+	standing = "{name} is standing here"
+}
+
+messages.__index = messages
 
 pronouns = {
 	male = {
@@ -27,6 +31,8 @@ pronouns = {
 	}
 }
 
+Player = {}
+
 Player.__index = Player
 
 Player.default = function()
@@ -35,7 +41,8 @@ Player.default = function()
 		aliases = {},
 		colour = "green",
 		desc = "A person with no distinguishing features, their blank face devoid of any human emotions",
-		pronouns = pronouns.female
+		pronouns = pronouns.female,
+		messages = {}
 	}
 end
 
@@ -47,7 +54,15 @@ Player.new = function(o)
 	for k,v in pairs(Player.default()) do
 		o[k] = o[k] or v
 	end
+	
+	setmetatable(o.messages, messages)
+	
 	return setmetatable(o, Player)
+end
+
+Player.message = function(self, message)
+	assert(self.messages[message], "Invalid message '"..message.."'")
+	return self.messages[message]:gsub("{([^}]+)}", function(key) return self[key] end)
 end
 
 Player.do_look = function(self, player)

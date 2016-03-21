@@ -30,6 +30,12 @@ function split(s, sep)
 	return t
 end
 
+function files(dir)
+	local s = io.popen("dir "..dir.." /b /a-d"):read("*all")
+
+	return split(s)
+end
+
 contains = function (t, i)
 	for j,v in ipairs(t) do
 		if v == i then return true end

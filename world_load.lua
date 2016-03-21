@@ -1,11 +1,5 @@
 local t = {}
 
-function files(dir)
-	local s = io.popen("dir "..dir.." /b /a-d"):read("*all")
-
-	return split(s)
-end
-
 --Door
 
 --self.destination

@@ -62,7 +62,18 @@ end
 
 Player.message = function(self, message)
 	assert(self.messages[message], "Invalid message '"..message.."'")
-	return self.messages[message]:gsub("{([^}]+)}", function(key) return self[key] end)
+	return self:sub(self.messages[message])
+end
+
+Player.sub = function(self, s)
+	return s:gsub("{([^}]+)}", function(key)
+		local t,k = resolve(self, key)
+		if not t then
+			print("Invalid key "..key)
+			
+		end
+		return t[k]
+	end)
 end
 
 Player.do_look = function(self, player)

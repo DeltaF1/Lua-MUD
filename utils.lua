@@ -36,6 +36,27 @@ function files(dir)
 	return split(s)
 end
 
+function resolve(obj, key)
+	local k
+	local keyparts = {}
+	for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
+	
+	for i, part in ipairs(keyparts) do
+		print("Setting at "..part)
+		local num = part:match("#(%d+)")
+		if num then part = tonumber(num) end
+		k = part
+		if i == #keyparts then break end
+		if type(obj[part]) == "table" then
+			obj = obj[part]
+		elseif i ~= #keyparts then
+			return nil
+		end
+	end
+	
+	return obj, k
+end
+
 contains = function (t, i)
 	for j,v in ipairs(t) do
 		if v == i then return true end

@@ -1,9 +1,3 @@
-helpfiles = {
-	savvy = true,
-	goop = true,
-	stap = true
-}
-
 local t = {
 	who={
 		f = function(player, parts)
@@ -209,23 +203,8 @@ local t = {
 			-- set hobo pronouns.myself "xirself"
 			
 			local key = parts[3]
-			local k
-			local keyparts = {}
-			for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
-			
-			for i, part in ipairs(keyparts) do
-				print("Setting at "..part)
-				local num = part:match("#(%d+)")
-				if num then part = tonumber(num) end
-				k = part
-				if i == #keyparts then break end
-				if type(obj[part]) == "table" then
-					obj = obj[part]
-				elseif i ~= #keyparts then
-					return player:send("Invalid keypath "..key)
-				end
-				
-			end
+			local obj, k = resolve(obj, key)
+			if not obj then return player:send("Invalid keypath "..key) end
 			print("Setting "..(obj.name or tostring(obj)).." at "..k)
 			
 			local payload = data:match("%S+ %S+ %S+ (.+)")
@@ -321,7 +300,11 @@ local t = {
 					end
 				end
 				
-				if #potential > 0 then
+				
+				if #potential == 1 then
+					player:send("Showing helpfile for "..colour("%{yellow}"..potential[1]))
+					helpfile = helpfiles[potential[1]]
+				elseif #potential > 1 then
 					local s = "Did you mean"
 					for i,v in ipairs(potential) do
 						s = s.." "..colour("%{yellow}"..v)..(i == #potential and "?" or ",")
@@ -330,14 +313,17 @@ local t = {
 					player:send(s)
 				end
 			end
+			
+			
+			if helpfile then
+				player:send(player:sub(helpfile))
+			end
 		end,
 		aliases = {"?"}
 	}
 }
 
 for k,v in pairs(t) do
-	-- Debugging helpfiles
-	helpfiles[k] = true
 	v.aliases = v.aliases or {}
 	
 	table.insert(v.aliases, k)

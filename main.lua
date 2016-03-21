@@ -27,18 +27,16 @@ rooms = world_load.load_rooms()
 clients = {}
 players = {}
 
-contains = function (t, i)
-	for j,v in ipairs(t) do
-		if v == i then return true end
-	end
-	return false
-end
+helpfiles = {}
 
-tremove = function(t, i)
-	for j = #t, 1, -1 do
-		if t[j] == i then table.remove(t, j) end
-	end
-	return t
+for _,v in ipairs(files("helpfiles")) do
+	local f = io.open("helpfiles\\"..v)
+	local key = f:read("*line")
+	local content = f:read("*all"):gsub("\n", NEWL)
+	
+	-- preprocess, add colour codes?
+	
+	helpfiles[key] = content
 end
 
 function broadcast(s)
@@ -47,7 +45,7 @@ function broadcast(s)
 	print("Wher is backup? D:")
 	for _,v in pairs(players) do
 		if v.state == "chat" then
-			v.sock:send(s..NEWL)
+			v:send(s)
 		end
 	end
 end

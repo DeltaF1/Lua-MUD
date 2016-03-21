@@ -1,0 +1,11 @@
+emote
+Emotes an action to everyone in the room.
+
+Syntax
+emote <phrase>
+
+Aliases
+e /me
+
+e.g. /me laughs and falls off {pronouns.my} stool.
+yields "{name} laughs and falls off {pronouns.my} stool"

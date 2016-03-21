@@ -44,7 +44,7 @@ Room.do_look = function(self, player)
 end
 
 -- Attach one room to another. e.g. Closet:attach(rooms.lobby, "out")
-Room.attach(self, room, dir)
+function Room.attach(self, room, dir)
 	local oppdir = oppdirs[dir]
 	
 	self.exits[dir] = room
@@ -53,10 +53,11 @@ Room.attach(self, room, dir)
 		room.exits[oppdir] = self
 	else
 		-- Log("Added room at non-cardinal direction: "..dir)
+		return
 	end
 end
 
-Room.detach(self, dir)
+function Room.detach(self, dir)
 	local oppdir = oppdirs[dir]
 	
 	if oppdir and self.exits[dir] then

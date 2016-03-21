@@ -1,4 +1,8 @@
-local helpfiles = {}
+helpfiles = {
+	savvy = true,
+	goop = true,
+	stap = true
+}
 
 local t = {
 	who={
@@ -291,6 +295,7 @@ local t = {
 			local helpfile = helpfiles[keyword]
 			
 			if not helpfile then
+				-- Log(player.name.." tried to find helpfile "..keyword)
 				player:send("Helpfile '"..keyword.."' not found.")
 				-- soundex it upppp!
 				local s1 = soundex(keyword)

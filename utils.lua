@@ -29,3 +29,17 @@ function split(s, sep)
 	for i in string.gmatch(s, "[^"..sep.."]+") do table.insert(t, i) end
 	return t
 end
+
+contains = function (t, i)
+	for j,v in ipairs(t) do
+		if v == i then return true end
+	end
+	return false
+end
+
+tremove = function(t, i)
+	for j = #t, 1, -1 do
+		if t[j] == i then table.remove(t, j) end
+	end
+	return t
+end

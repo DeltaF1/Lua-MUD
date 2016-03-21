@@ -1,0 +1,16 @@
+pose
+Sends a phrase to the room describing your actions
+
+Syntax
+pose <phrase>
+.<verb> (phrase)
+
+Aliases
+.<verb> .
+
+Example
+.doff my hat
+yields "{name} doffs {pronouns.my} hat"
+
+.walk towards my horse. After a moment, I .stop, and .look at myself.
+yield "{name} walks towards {pronouns.my} horse. After a moment, {pronouns.i} stops and looks at {pronouns.myself}."

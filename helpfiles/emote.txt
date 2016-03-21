@@ -7,5 +7,6 @@ emote <phrase>
 Aliases
 e /me
 
-e.g. /me laughs and falls off {pronouns.my} stool.
+Example
+/me laughs and falls off {pronouns.my} stool.
 yields "{name} laughs and falls off {pronouns.my} stool"

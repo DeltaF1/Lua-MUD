@@ -19,7 +19,7 @@ local TblCodeNum = {					-- Soundex code number table is faster as Global than L
 	R=6
 	}
  
-return function StrSoundex(strAnyName)
+function StrSoundex(strAnyName)
 	strAnyName = string.upper(strAnyName:gsub("[^%a]",""))			-- Make name upper case letters only
 	if strAnyName == "" then return "Z000" end
 	local strSoundex = TblSoundex[strAnyName]				-- If already coded in cache then return previous Soundex code
@@ -44,3 +44,5 @@ return function StrSoundex(strAnyName)
 	TblSoundex[strAnyName] = strSoundex					-- Save code in cache for future quick lookup
 	return strSoundex
 end -- function StrSoundex
+
+return StrSoundex

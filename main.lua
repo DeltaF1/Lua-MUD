@@ -63,6 +63,8 @@ oppdirs = {
 	northeast="southwest",
 	up="down",
 	down="up",
+	["in"]="out",
+	out="in"
 }
 
 dirs = {
@@ -98,7 +100,7 @@ function main()
 		table.insert(clients, sock)
 	end
 	
-	local ready = socket.select(clients, nil, 1)
+	local ready = socket.select(clients, nil, 0.5)
 	
 	for i,sock in ipairs(ready) do
 		local v = players[sock]

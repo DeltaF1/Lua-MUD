@@ -1,3 +1,5 @@
+local helpfiles = {}
+
 local t = {
 	who={
 		f = function(player, parts)
@@ -284,13 +286,53 @@ local t = {
 				return player:send(s)
 			end
 			
+			local keyword = parts[2]
 			
+			local helpfile = helpfiles[keyword]
+			
+			if not helpfile then
+				player:send("Helpfile '"..keyword.."' not found.")
+				-- soundex it upppp!
+				local s1 = soundex(keyword)
+				
+				-- Starting letter
+				local l1 = s1:sub(1,1)
+				-- Soundex number
+				local n1 = s1:sub(2,4)
+				
+				local potential = {}
+				
+				for k,v in pairs(helpfiles) do
+					local s2 = soundex(k)
+					local l2 = s2:sub(1,1)
+					local n2 = s2:sub(2,4)
+					
+					-- If the words start with the same letter
+					if l1 == l2 then
+						dif = math.abs(n1 - n2)
+						if dif <= 5 then
+							table.insert(potential, k)
+						end
+					end
+				end
+				
+				if #potential > 0 then
+					local s = "Did you mean"
+					for i,v in ipairs(potential) do
+						s = s.." "..colour("%{yellow}"..v)..(i == #potential and "?" or ",")
+					end
+					
+					player:send(s)
+				end
+			end
 		end,
 		aliases = {"?"}
 	}
 }
 
 for k,v in pairs(t) do
+	-- Debugging helpfiles
+	helpfiles[k] = true
 	v.aliases = v.aliases or {}
 	
 	table.insert(v.aliases, k)

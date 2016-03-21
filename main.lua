@@ -20,6 +20,8 @@ require "player"
 world_load = require "world_load"
 world_save = require "world_save"
 
+soundex = require "soundex"
+
 rooms = world_load.load_rooms()
 
 clients = {}

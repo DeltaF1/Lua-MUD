@@ -26,7 +26,9 @@ Room.do_look = function(self, player)
 	-- NAME
 	--
 	-- DESC
-	local s = self.name..NEWL..NEWL..self.desc
+	local s = colour("%{green}"..self.name)
+	s = s..NEWL..NEWL
+	s = s..self.desc
 	
 	-- If there are players here, add a newline to separate from the player list
 	if #self.players > 1 then

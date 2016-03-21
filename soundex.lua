@@ -9,7 +9,7 @@
  
 TblSoundex = {}					-- Soundex dictionary cache of previously coded Names
  
-TblCodeNum = {					-- Soundex code number table is faster as Global than Local
+local TblCodeNum = {					-- Soundex code number table is faster as Global than Local
 	A=0,E=0,I=0,O=0,U=0,Y=0,		-- H=0,W=0,	-- H & W are ignored
 	B=1,F=1,P=1,V=1,
 	C=2,G=2,J=2,K=2,Q=2,S=2,X=2,Z=2,
@@ -19,7 +19,7 @@ TblCodeNum = {					-- Soundex code number table is faster as Global than Local
 	R=6
 	}
  
-function StrSoundex(strAnyName)
+return function StrSoundex(strAnyName)
 	strAnyName = string.upper(strAnyName:gsub("[^%a]",""))			-- Make name upper case letters only
 	if strAnyName == "" then return "Z000" end
 	local strSoundex = TblSoundex[strAnyName]				-- If already coded in cache then return previous Soundex code

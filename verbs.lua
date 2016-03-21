@@ -272,6 +272,21 @@ local t = {
 			end
 			world_save.save_rooms(rooms)
 		end
+	},
+	help = {
+		f = function(player, parts)
+			if #parts < 2 then
+				local s = "Available commands are:"..NEWL
+				for k,v in pairs(verbs) do
+					-- If permitted(player, v)
+					s = s .. k .. NEWL
+				end
+				return player:send(s)
+			end
+			
+			
+		end,
+		aliases = {"?"}
 	}
 }
 

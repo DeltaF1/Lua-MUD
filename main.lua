@@ -7,7 +7,7 @@ require "utils"
 math.randomseed(os.time())
 
 NEWL = "\r\n"
-IAC = "\255"
+IAC  = "\255"
 WILL = "\251"
 WONT = "\252"
 ECHO = "\001"
@@ -94,9 +94,8 @@ function main()
 	
 	if sock then 
 		--DEBUG REMOVE
-		sock:send(IAC)
-		sock:send(WILL)
-		sock:send(ECHO)
+		--sock:send(WILL)
+		--sock:send(ECHO)
 		local s = colour("%{green}Welcome to the text-chat-test-server-o-matic-9000"..NEWL.."Please enter your username: ")
 		sock:send(s)
 		print(s)

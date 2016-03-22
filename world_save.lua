@@ -69,7 +69,10 @@ t.save_rooms = function(rooms)
 		local s = "-- "..k.."\n\n"
 		-- s = s.."-- Generated "..os.time()
 		for _, room in ipairs(v) do
+			local oldplayers = room.players
+			room.players = {}
 			s = s..room.identifier.." = "..ser(room).."\n\n"
+			room.players = oldplayers
 		end
 		s = s.."--[[END OF FILE]]--"
 		

@@ -18,7 +18,17 @@ return {
 			player.name = data
 			player.identifier = "player_"..player.name
 			-- TBD add a "login2" state for password
-			player.state = "chat"
+			player.state = "login2"
+			player:sendraw(IAC..WILL..ECHO)
+			
+		end,
+		prompt = colour("%{green}Please enter your username:")
+	},
+	login2 = {
+		f = function(player, data)
+			-- Get hash of player.name..data..salt
+			
+		
 			
 			-- Mainly for debuggin, eventually colours will mean something. Maybe class/rank?
 			player.colour = colours[math.random(#colours)]
@@ -28,7 +38,7 @@ return {
 			-- We really need to setup an init function!
 			
 			table.insert(player.room.players, player)
-			player:send(player.room:do_look(player))
+			player:send(NEWL..player.room:do_look(player))
 			
 			-- Announce the player entering the server
 			player.room:broadcast("With a small crack "..player.name.." appears, along with a brisk wind", player)
@@ -36,8 +46,11 @@ return {
 			--get password
 			--get hash
 			--load player data from file
+			player:send(IAC..WONT..ECHO)
+			player.state = "chat"
+			
 		end,
-		prompt = colour("%{green}Please enter your username:")
+		prompt = colour("%{red}Please enter your password: ")
 	},
 	chat = {
 		f = function(player, data)

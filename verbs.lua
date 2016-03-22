@@ -125,6 +125,7 @@ local t = {
 					end
 					cap = nil
 					cap = v:multimatch({"(x)$", "(ch)$", "(ss)$","(sh)$"})
+					
 					if cap then
 						return v.."es"
 					end

@@ -14,7 +14,7 @@ local t = {}
 
 function t.load_rooms()
 	local rooms = {}
-	local roomfiles = files("rooms")
+	local roomfiles = files("roomsTEST")
 	
 	for i,v in ipairs(roomfiles) do
 		if v:find("%.bak") then

@@ -36,13 +36,20 @@ function files(dir)
 	return split(s)
 end
 
+function string.multimatch(s, patterns)
+	for _,v in ipairs(patterns) do
+		local capture = s:match(v)
+		if capture then return capture end
+	end
+	return nil
+end
+
 function resolve(obj, key)
 	local k
 	local keyparts = {}
 	for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
 	
 	for i, part in ipairs(keyparts) do
-		print("Setting at "..part)
 		local num = part:match("#(%d+)")
 		if num then part = tonumber(num) end
 		k = part

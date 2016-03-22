@@ -7,6 +7,10 @@ require "utils"
 math.randomseed(os.time())
 
 NEWL = "\r\n"
+IAC = "\255"
+WILL = "\251"
+WONT = "\252"
+ECHO = "\001"
 
 server = socket.bind("*", config.port)
 
@@ -29,15 +33,18 @@ players = {}
 
 helpfiles = {}
 
-for _,v in ipairs(files("helpfiles")) do
-	local f = io.open("helpfiles\\"..v)
-	local key = f:read("*line")
-	local content = f:read("*all"):gsub("\n", NEWL)
-	
-	-- preprocess, add colour codes?
-	
-	helpfiles[key] = content
+function loadHelpFiles()
+	for _,v in ipairs(files("helpfiles")) do
+		local f = io.open("helpfiles\\"..v)
+		local key = f:read("*line")
+		local content = f:read("*all"):gsub("\n", NEWL)
+		
+		-- preprocess, add colour codes?
+		
+		helpfiles[key] = content
+	end
 end
+loadHelpFiles()
 
 function broadcast(s)
 
@@ -87,6 +94,9 @@ function main()
 	
 	if sock then 
 		--DEBUG REMOVE
+		sock:send(IAC)
+		sock:send(WILL)
+		sock:send(ECHO)
 		local s = colour("%{green}Welcome to the text-chat-test-server-o-matic-9000"..NEWL.."Please enter your username: ")
 		sock:send(s)
 		print(s)

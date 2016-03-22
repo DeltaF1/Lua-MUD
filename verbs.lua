@@ -116,7 +116,19 @@ local t = {
 					-- ShinMojo @ sindome.org ([^aeiouy]|qu)y$"-> "$1ies" and (x|ch|ss|sh)$ -> "$1es"
 					--Adds an s. e.g. .walk briskly becomes "walks briskly"
 					-- v = v:gsub(ShinMojo pattern (need RegEx or custom pattern builder))
+					
+					-- If pronouns.neutral and last used pronoun ~= nil
 					if p == player then return v end-- secondPersonOfVerb(v)
+					local cap = v:multimatch({"([^aeiouy]y)$","(quy)$"})
+					if cap then
+						return v:sub(1, #v-1).."ies"
+					end
+					cap = nil
+					cap = v:multimatch({"(x)$", "(ch)$", "(ss)$","(sh)$"})
+					if cap then
+						return v.."es"
+					end
+					
 					return v.."s"
 				end):gsub("(%a+)", function(v)
 					if p == player then return pronouns.second[v:lower()] end

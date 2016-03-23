@@ -340,6 +340,8 @@ for k,v in pairs(t) do
 	v.aliases = v.aliases or {}
 	
 	table.insert(v.aliases, k)
+	
+	v.name = k
 end
 
 return t

@@ -31,7 +31,7 @@ function t.load_rooms()
 		local G = {}
 		
 		-- Load the file into a function
-		local f = loadfile("rooms\\"..v)
+		local f = loadfile("roomsTEST\\"..v)
 		
 		-- Set the environment of the function, so that every global function is saved into the 'G' table
 		setfenv(f, G)

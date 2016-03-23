@@ -30,6 +30,13 @@ return {
 			
 		
 			
+			player.cmdset = cmdsets.Default
+			
+			if player.name == "Delta" then
+				player.cmdset = player.cmdset:union(cmdsets.Admin)
+			end
+			
+			--CommandSet:new(keys(verbs))
 			-- Mainly for debuggin, eventually colours will mean something. Maybe class/rank?
 			player.colour = colours[math.random(#colours)]
 			
@@ -76,20 +83,14 @@ return {
 			
 			
 			-- For every verb
-			for k,v in pairs(verbs) do
-				-- For every alias
-				for _, a in ipairs(v.aliases) do
-					-- Check if the command matches the command aliases, aliases can be patterns
-					if cmd:match("^"..a.."$") then
-						verb = v
-						key = k
-						break
-					end
-				end
-			end
+			verb = player.cmdset:find(cmd)
+			
 			
 			if verb then
+				key = verb.name
 				-- Run the verb, passing in the player, split parts, and original data string
+				--
+				-- If the player is puppeting, send with the puppeted NPC as the player argument
 				local res = verb.f(player, parts, data)
 				
 				if res and type(res) == "table" then

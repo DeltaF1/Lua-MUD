@@ -87,7 +87,7 @@ dirs = {
 
 handlers = require "handlers"
 verbs = require "verbs"
-
+cmdsets = require "commandSets"
 
 function main()
 	local sock = server:accept()

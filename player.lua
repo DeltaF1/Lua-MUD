@@ -1,3 +1,72 @@
+
+-- CommandSet, a container for what verbs are available to the player at any given time
+--
+-- CommandSet.new(t)
+--   Creates a CommandSet out of a list of verb objects
+
+-- CommandSet.find(t)
+-- CommandSet.union(c)
+-- CommandSet.sub(c)
+-- CommandSet.intersect(c)
+CommandSet = {}
+
+CommandSet.__index = CommandSet
+
+function CommandSet:new(t)
+	-- If it is an array
+	if t and isArray(t) then
+		print("t is an array!")
+		local arr = t
+		t = {}
+		for i = 1,#arr do
+			t[arr[i]] = verbs[arr[i]]
+		end
+	else
+		t = shallowcopy(t) or {}
+	end
+	
+	return setmetatable(t, self)
+end
+
+function CommandSet:find(name)
+	name = name:lower()
+	local verb = self[name]
+	if verb then
+		return verb
+	end
+	for _,v in pairs(self) do
+		for _, alias in ipairs(v.aliases) do
+			if name:match("^"..alias.."$") then return v end
+		end
+	end
+end
+
+function CommandSet:intersect(c)
+	local t = CommandSet:new(self)
+	for k,v in pairs(c) do
+		if not self[k] then
+			t[k] = nil
+		end
+	end
+	return t
+end
+
+function CommandSet:union(c)
+	local t = CommandSet:new(self)
+	for k,v in pairs(c) do
+		self[k] = v
+	end
+	return t
+end
+
+function CommandSet:sub(c)
+	local t = CommandSet:new(self)
+	for k,v in pairs(c) do
+		self[k] = nil
+	end
+	return t
+end
+
 messages = {
 	standing = "{name} is standing here"
 }

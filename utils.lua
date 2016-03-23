@@ -44,6 +44,31 @@ function string.multimatch(s, patterns)
 	return nil
 end
 
+-- lua-users.org
+function shallowcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do
+            copy[orig_key] = orig_value
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+-- kikito @ stackoverflow.com
+function isArray(t)
+  local i = 0
+  for _ in pairs(t) do
+      i = i + 1
+      if t[i] == nil then return false end
+  end
+  return true
+end
+
 function resolve(obj, key)
 	local k
 	local keyparts = {}

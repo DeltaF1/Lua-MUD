@@ -9,6 +9,6 @@ I really enjoy these kinds of games, and the systems behind them are often very 
 
 ## How do I use this?
 1. Download or clone the source
-  1. After downloading, create a directory called "rooms" in the source directory, and build some room files. This directory will be added into the full source shortly, once I have building tools available to create some demo room files.
+  1. After downloading, create a directory called "rooms" in the source directory, and build some [room files](https://github.com/DeltaF1/Lua-MUD/wiki/Room-Files). This directory will be added into the full source shortly, once I have building tools available to create some demo room files.
 2. Make sure that lua is installed and in your path
 3. Run 'lua main.lua' inside the source directory, and take note of the port it is bound to. Players can connect to the server via telnet, or via any one of a number of pre-existing MUD clients.

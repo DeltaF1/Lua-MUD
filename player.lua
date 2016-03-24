@@ -54,7 +54,7 @@ end
 function CommandSet:union(c)
 	local t = CommandSet:new(self)
 	for k,v in pairs(c) do
-		self[k] = v
+		t[k] = v
 	end
 	return t
 end

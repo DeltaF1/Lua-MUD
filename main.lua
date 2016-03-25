@@ -123,7 +123,7 @@ function main()
 			if handler then
 				handler.f(v, data)
 				-- state may have changed
-				v:sendraw(handlers[v.state].prompt)
+				v:sendraw(v.prompt or handlers[v.state].prompt)
 			end
 		else
 			--print(err)

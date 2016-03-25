@@ -18,11 +18,11 @@ return {
 			player.name = data
 			player.identifier = "player_"..player.name
 			-- TBD add a "login2" state for password
-			player.state = "login2"
+			player:setState "login2"
 			player:sendraw(IAC..WILL..ECHO)
 			
 		end,
-		prompt = colour("%{green}Please enter your username:")
+		prompt = colour("%{green}Please enter your username (type 'new' to create a new character):")
 	},
 	login2 = {
 		f = function(player, data)
@@ -54,7 +54,7 @@ return {
 			--get hash
 			--load player data from file
 			player:send(IAC..WONT..ECHO)
-			player.state = "chat"
+			player:setState "chat"
 			
 		end,
 		prompt = colour("%{red}Please enter your password: ")
@@ -87,6 +87,7 @@ return {
 			
 			
 			if verb then
+				print("Got verb!")
 				key = verb.name
 				-- Run the verb, passing in the player, split parts, and original data string
 				--
@@ -106,5 +107,11 @@ return {
 			end
 		end,
 		prompt = ">"
+	},
+	menu = {
+		f = function(player, data)
+			player.menu(player, data)
+		end,
+		prompt = "menu>"
 	}
 }

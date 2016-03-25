@@ -164,7 +164,13 @@ local t = {
 	},
 	stop = {
 		f = function(player, parts)
-			error("STOP COMMAND")
+			player:setMenu("Are you sure you want to stop the server? ", function(p,_,i)
+				if i == 1 then
+					error("STOP COMMAND")
+				else
+					p:setState("chat")
+				end
+			end)
 		end
 	},
 	--[[
@@ -333,6 +339,21 @@ local t = {
 			end
 		end,
 		aliases = {"?"}
+	},
+	dummymenu = {
+		f = function(player, parts, data)
+			print("setting dummy menu!")
+			player:setMenu("Reset priveleges?", function(p, d, i)
+				-- If the option selected is the first option (yes)
+				print("Got a valid menu entry!")
+				if i == 1 then
+					print("Resetting privs...")
+					p.cmdset = cmdsets.Default
+				end
+				p:setState("chat")
+			end)
+		end,
+		aliases = {"dummy"}
 	}
 }
 

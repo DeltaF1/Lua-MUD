@@ -6,7 +6,8 @@ local t = {
 		"emote",
 		"pose",
 		"quit",
-		"chat"
+		"chat",
+		"dummymenu"
 	},
 	Builder = CommandSet:new{
 		"inspect",

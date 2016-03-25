@@ -169,3 +169,27 @@ Player.sendraw = function(self, msg)
 	
 	self.sock:send(msg)
 end
+
+Player.setMenu = function(self, prompt, f, input)
+	input = input or {"y","n"}
+	self.state = "menu"
+	self.prompt = prompt
+	self.menu = function(player, data)
+		print("Got data in menu of "..data)
+		for i = 1, #input do
+			patt = "^"..input[i]
+			print("Does the data match '"..patt.."'?")
+			if data:match(patt) then
+				print("Running the menu command!")
+				f(player, data, i)
+				return
+			end
+		end
+		player:send("Invalid option!")
+	end
+end
+
+Player.setState = function(self, state)
+	self.prompt = nil
+	self.state = state
+end

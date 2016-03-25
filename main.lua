@@ -88,6 +88,7 @@ dirs = {
 handlers = require "handlers"
 verbs = require "verbs"
 cmdsets = require "commandSets"
+menus = require "menus"
 
 function main()
 	local sock = server:accept()
@@ -96,7 +97,7 @@ function main()
 		--DEBUG REMOVE
 		--sock:send(WILL)
 		--sock:send(ECHO)
-		local s = colour("%{green}Welcome to the text-chat-test-server-o-matic-9000"..NEWL.."Please enter your username: ")
+		local s = colour("%{green}Welcome to the text-chat-test-server-o-matic-9000"..NEWL..handlers.login1.prompt)
 		sock:send(s)
 		print(s)
 		sock:settimeout(1)

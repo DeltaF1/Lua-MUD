@@ -9,6 +9,13 @@ return {
 				return
 			end
 			
+			if data == "new" then
+				player:send("(OOC: type 'cancel' to exit character creation)")
+				player:send("You find yourself in a vortex of sound and colour, arcane energies swirling all around. Before you is a small pocket of calm, an orb of clay floating in the center.")
+				player:setMenu(unpack(menus.char_gender))
+				return
+			end
+			
 			-- If there are any non alphanumeric characters in the data
 			if data:find("%W") then
 				player.sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)

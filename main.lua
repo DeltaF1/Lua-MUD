@@ -50,7 +50,7 @@ function broadcast(s)
 
 	print("Broadcasting")
 	print("Wher is backup? D:")
-	for _,v in pairs(players) do
+	for _,v in pairs(clients) do
 		if v.state == "chat" then
 			v:send(s)
 		end
@@ -103,14 +103,13 @@ function main()
 		print(tostring(sock).." has connected")
 		local player = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
 		player = Player.new(player)
-		players[sock] = player
-		table.insert(clients, sock)
+		clients[sock] = player
 	end
 	
-	local ready = socket.select(clients, nil, 0.5)
+	local ready = socket.select(keys(clients), nil, 0.5)
 	
 	for i,sock in ipairs(ready) do
-		local v = players[sock]
+		local v = clients[sock]
 		local data, err = v.sock:receive()
 		if data then
 			

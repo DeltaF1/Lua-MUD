@@ -15,8 +15,7 @@ local t = {
 			player.sock:send("Goodbye!"..NEWL)
 			player.sock:close()
 			print(tostring(player.name or player.sock).." has disconnected")
-			players[player.sock] = nil
-			tremove(clients, player.sock)
+			clients[player.sock] = nil
 			if player.state == "chat" then
 				player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air")
 			end

@@ -33,7 +33,10 @@ local t = {
 			end
 			if not obj then return player:send("Could not find "..parts[2]) end
 			player:send(obj:do_look(player))
-		end
+		end,
+		aliases = {
+			"ex", "x", "examine"
+		}
 	},
 	go = {
 		f = function(player, parts)
@@ -339,20 +342,19 @@ local t = {
 		end,
 		aliases = {"?"}
 	},
-	dummymenu = {
+	create = {
 		f = function(player, parts, data)
-			print("setting dummy menu!")
-			player:setMenu("Reset priveleges?", function(p, d, i)
-				-- If the option selected is the first option (yes)
-				print("Got a valid menu entry!")
-				if i == 1 then
-					print("Resetting privs...")
-					p.cmdset = cmdsets.Default
-				end
-				p:setState("chat")
-			end)
-		end,
-		aliases = {"dummy"}
+			if #parts < 2 then
+				return {"error", "Please supply a type to create!"}
+			end
+			
+			local type = parts[2]
+			
+			if not contains({"object","room","player"}, type) then return player:send("Invalid type '"..type.."'") end
+			player._editing_obj = _G[type:sub(1,1):upper()..type:sub(2,#type)].new({})
+			player._editing_obj._type = type
+			player:setMenu(unpack(menus.obj_name))
+		end
 	}
 }
 

@@ -5,7 +5,8 @@ Room = {
 		name = "",
 		desc="",
 		exits={},
-		objects={}
+		objects={},
+		filename="misc.lua"
 	} end
 }
 

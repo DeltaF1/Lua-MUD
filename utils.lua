@@ -36,6 +36,10 @@ function files(dir)
 	return split(s)
 end
 
+function makeFile(dir)
+	os.execute()
+end
+
 function string.multimatch(s, patterns)
 	for _,v in ipairs(patterns) do
 		local capture = s:match(v)

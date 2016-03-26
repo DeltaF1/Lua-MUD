@@ -21,6 +21,7 @@ print("use telnet localhost "..port.." to connect!")
 
 require "room"
 require "player"
+require "object"
 world_load = require "world_load"
 world_save = require "world_save"
 

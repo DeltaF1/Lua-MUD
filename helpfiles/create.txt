@@ -1,0 +1,10 @@
+create
+Creates an object, room, or player to be placed in the world.
+
+Syntax
+create <type>
+create room <dir>
+type can be "object", "room", or "player"
+
+Example
+create room

@@ -1,0 +1,16 @@
+look
+Describes the given object, or the current room if left blank
+
+Syntax
+look 
+look <object>
+
+Aliases
+examine ex x
+
+Example
+look
+yields "{room.desc}"
+
+look vase
+yields "An ornate vase, inlaid with gold filigree. The hieroglyphics depict a bathing scene" 

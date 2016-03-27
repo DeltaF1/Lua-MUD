@@ -16,10 +16,11 @@ local t = {
 			player.sock:close()
 			print(tostring(player.name or player.sock).." has disconnected")
 			clients[player.sock] = nil
-			if player.state == "chat" then
-				player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air")
-			end
 			
+			if player.state == "chat" then
+				player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air", player)
+			end
+			tremove(player.room.players, player)
 			--save player data to file
 		end
 	},
@@ -348,11 +349,11 @@ local t = {
 				return {"error", "Please supply a type to create!"}
 			end
 			
-			local type = parts[2]
+			local t = parts[2]
 			
-			if not contains({"object","room","player"}, type) then return player:send("Invalid type '"..type.."'") end
-			player._editing_obj = _G[type:sub(1,1):upper()..type:sub(2,#type)].new({})
-			player._editing_obj._type = type
+			if not contains({"object","room","player"}, t) then return player:send("Invalid type '"..t.."'") end
+			player._editing_obj = _G[t:sub(1,1):upper()..t:sub(2,#t)].new({})
+			player._editing_obj._type = t
 			player:setMenu(unpack(menus.obj_name))
 		end
 	}

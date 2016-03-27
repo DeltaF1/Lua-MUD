@@ -33,7 +33,7 @@ function ser(obj, newl, indent, tables)
 			s = s ..k..' = '
 			
 			if type(v) == "string" then
-				v = v:gsub(NEWL, "\\NEWL")
+				v = v:gsub(NEWL, "\\".."\\".."NEWL")
 				v = '"'..v..'"'
 			elseif type(v) == "table" then
 				-- If it has an identifier, then encode that instead of the table
@@ -77,7 +77,7 @@ t.save_rooms = function(rooms)
 		s = s.."--[[END OF FILE]]--"
 		
 		-- Need to find way to create empty file
-		local f = io.open("roomsTEST\\"..k, "w")
+		local f = io.open("world\\rooms\\"..k, "w")
 		f:write(s)
 		f:close()
 	end

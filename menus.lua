@@ -11,6 +11,7 @@ return {
 				p:send("Whoops, don't have a menu for this yet, defaulting to female!!")
 			end
 			--TODO: Add some fluff
+			p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
 			p:setMenu(unpack(menus.char_desc))
 		end, 
 		{"m","f","n","o"}
@@ -21,6 +22,7 @@ return {
 		function(p,d,i)
 			p.desc = d
 			-- TODO: Add some fluff
+			p:send("The golem begins to take on more humanistic characteristics, and facial features push themself out of the surface of its head.")
 			p:setMenu(unpack(menus.char_name))
 		end,
 		{"."}
@@ -31,7 +33,7 @@ return {
 		function(p,d,i)
 			-- Check for name already existing!
 			p.name = d
-			p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. As the vortex swirls around you, you feel yourself blink out of this hellscape, into an absolute darkness.")
+			p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
 			p:setMenu(unpack(menus.char_pass))
 		end,
 		{"%w+"}
@@ -44,7 +46,8 @@ return {
 			-- Add entry to hash table
 			-- p:send("With a lurch in the pit of your stomach, you feel yourself materialize.")
 			-- send back to login1?
-			p:setState("login2")
+			p:send("(OOC) You will now be asked to login with the credentials provided")
+			p:setState("login1")
 		end,
 		{"."}
 	},
@@ -71,19 +74,24 @@ return {
 	obj_ident = {
 		"Set an identifier for this object (leave blank to generate one) ",
 		function(p,d,i)
-			p._editing_obj._type = nil
 			if #d > 0 then
 				p._editing_obj.identifier = d
 			end
 			
-			if p._editing_obj._type == "room" then
+			print("Creating object of type "..p._editing_obj._type)
+			local t = p._editing_obj._type
+			p._editing_obj._type = nil
+			if t == "room" then
+				print("Adding room")
 				rooms[p._editing_obj.identifier] = p._editing_obj
 				p:setMenu(unpack(menus.room_dir))
 				return
-			elseif p._editing_obj._type == "object" then
+			elseif t == "object" then
 				-- objects[p._editing_obj.identifier] = p._editing_obj
+				print("Adding object")
 				table.insert(p.room.objects, p._editing_obj)
 			else
+				print("Adding player")
 				-- players[p._editing_obj.identifier(or maybe p._editing_obj.name)] = p._editing_obj
 				table.insert(p.room.players, p._editing_obj)
 			end

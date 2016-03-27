@@ -161,8 +161,8 @@ Player.sendraw = function(self, msg)
 			local obj = self.room:search(v)
 			
 			-- If that name means an object, highlight it
-			if obj then
-				return colour("%{"..(obj.colour or "green").."}"..v)
+			if obj and obj.colour then
+				return colour("%{"..(obj.colour).."}"..v)
 			end 
 		end)
 	end

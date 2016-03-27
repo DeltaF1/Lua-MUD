@@ -35,7 +35,7 @@ return {
 		f = function(player, data)
 			-- Get hash of player.name..data..salt
 			
-		
+			
 			
 			player.cmdset = cmdsets.Default
 			
@@ -52,7 +52,10 @@ return {
 			-- We really need to setup an init function!
 			
 			table.insert(player.room.players, player)
-			player:send(NEWL..player.room:do_look(player))
+			
+			-- Counts as a newline!
+			player:send(IAC..WONT..ECHO)
+			player:send(player.room:do_look(player))
 			
 			-- Announce the player entering the server
 			player.room:broadcast("With a small crack "..player.name.." appears, along with a brisk wind", player)
@@ -60,7 +63,7 @@ return {
 			--get password
 			--get hash
 			--load player data from file
-			player:send(IAC..WONT..ECHO)
+			
 			player:setState "chat"
 			
 		end,
@@ -91,7 +94,6 @@ return {
 			
 			-- For every verb
 			verb = player.cmdset:find(cmd)
-			
 			
 			if verb then
 				print("Got verb!")

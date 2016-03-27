@@ -18,13 +18,17 @@ local t = {
 	Moderator = CommandSet:new{
 		"kick",
 		"ban",
-		"mute"
+		"mute",
+		"save"
 	},
 	Admin = CommandSet:new{
 		"stop",
 		"run",
 		"set-priv"
-	}
+	},
+	All = CommandSet:new(
+		keys(verbs)
+	)
 }
 
 t.Admin = t.Admin:union(t.Builder):union(t.Moderator)

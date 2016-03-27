@@ -10,11 +10,9 @@ local t = {}
 --self.close
 --	self.room.exits[self.dir] = nil
 
-
-
 function t.load_rooms()
 	local rooms = {}
-	local roomfiles = files("roomsTEST")
+	local roomfiles = files("world\\rooms")
 	
 	for i,v in ipairs(roomfiles) do
 		if v:find("%.bak") then
@@ -31,31 +29,40 @@ function t.load_rooms()
 		local G = {}
 		
 		-- Load the file into a function
-		local f = loadfile("roomsTEST\\"..v)
+		local f = loadfile("world\\rooms\\"..v)
 		
 		-- Set the environment of the function, so that every global function is saved into the 'G' table
 		setfenv(f, G)
 		f()
 		
 		-- For every global variable created in the room file
-		for k,v in pairs(G) do
+		for k,room in pairs(G) do
 			-- If there is already a room with that identifier
 			if rooms[k] then
 				error("Room identifier conflict: "..k)
 			end
 			
 			-- Add the room to the rooms table
-			rooms[k] = v
+			rooms[k] = room
 			
 			-- Store the room's identifier and filename for later reserialization
-			v.identifier = k
-			v.filename = filename
+			room.identifier = k
+			room.filename = filename
 			
-			v = Room.new(v)
+			room = Room.new(room)
 			
-			for key,val in pairs(v) do
+			for _,object in ipairs(room.objects) do
+				-- set equal to objects[object]
+				Object.new(object)
+			end
+			
+			for key,val in pairs(room) do
 				if type(val) == "string" then
-					v[key] = val:gsub("\\NEWL", NEWL)
+					print("Checking string '"..key.."' for \\NEWL")
+					room[key] = val:gsub("\\NEWL", function()
+						print("subbing newl")
+						return NEWL
+					end)
 				end
 			end
 			

@@ -1,5 +1,6 @@
 pose
 Sends a phrase to the room describing your actions
+Use '.' to signify a verb to translated. Pronouns will be automatically translated unless a '\' is placed before them. e.g. '.mumble "\I'm sorry for this."'
 
 Syntax
 pose <phrase>
@@ -12,5 +13,5 @@ Example
 .doff my hat
 yields "{name} doffs {pronouns.my} hat"
 
-.walk towards my horse. After a moment, I .stop, and .look at myself.
+pose .walk towards my horse. After a moment, I .stop, and .look at myself.
 yield "{name} walks towards {pronouns.my} horse. After a moment, {pronouns.i} stops and looks at {pronouns.myself}."

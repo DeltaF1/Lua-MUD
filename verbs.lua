@@ -134,12 +134,13 @@ local t = {
 					end
 					
 					return v.."s"
-				end):gsub("(%a+)", function(v)
+				end):gsub("(\\?)(%a+)", function(except, v)
+					if except ~= "" then return v end
 					if p == player then return pronouns.second[v:lower()] end
 					return player.pronouns[v:lower()]
 				end
 				):gsub(
-					p.name, "you"
+					case_insensitive_pattern(p.name), "you"
 				):gsub(
 					"([%.%?%!]) (%a)", function(punctuation, letter) return punctuation.." "..letter:upper() end
 				):gsub(

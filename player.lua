@@ -170,6 +170,15 @@ Player.sendraw = function(self, msg)
 	self.sock:send(msg)
 end
 
+Player.proxy = function(self)
+	return makeProxy(self,
+		{"name", "desc", "send", "message"},
+		{
+			
+		}
+	)
+end
+
 Player.setMenu = function(self, prompt, f, input)
 	input = input or {"y","n"}
 	self.state = "menu"

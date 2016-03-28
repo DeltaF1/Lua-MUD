@@ -125,3 +125,17 @@ tremove = function(t, i)
 	end
 	return t
 end
+
+
+function makeProxy(t, get, set)
+	return setmetatable({}, {
+		__index = function(self, k)
+			assert(get[k], "Read-access error in script!")
+			return t[k]
+		end,
+		__newindex = function(self, k, v)
+			assert(type(v):match("^"..set[k].."$"), "Write-access error in script!")
+			t[k] = v
+		end,
+	})
+end

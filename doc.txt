@@ -1,0 +1,4 @@
+-- DOC --
+
+player:message(key)
+	returns a formatted message

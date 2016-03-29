@@ -1,0 +1,31 @@
+Possible sandboxing method
+
+load function
+
+set env of function to a table containing "state", a deepcopy of a gamestate (player/room etc.)
+
+once function is complete, only copy over data that we need, verify type?
+
+if setting any functions, make sure that those are sandboxed as well.
+
+resolve(t, key)
+	e.g. player, "room.players.#1"
+	returns player.room.players, 1, player.room.players[1]?
+
+sandbox(userdata, perms = {"player.room.desc", "", ""})
+
+local f = loadstring(userdata)
+
+state = {player = player}
+
+G = {state = deepcopy(state)}
+
+setfenv(f, G)
+
+f()
+
+for _, perm in ipairs(perms) do
+	local t, k = resolve(G.state, perm)
+	local ts, tk = resolve(state, perm)
+	ts[tk] = t[k]
+end

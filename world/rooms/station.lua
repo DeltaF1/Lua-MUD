@@ -9,15 +9,6 @@ closet = {
     south = "starting",
   },
   objects = {
-    [1] = {
-      aliases = {
-        [1] = "cleaning",
-        [2] = "fluid",
-        [3] = "fluids",
-      },
-      name = "bleach",
-      desc = "A large blue bottle, labelled \"Javex! Drink me!\"",
-    },
   },
   filename = "station.lua",
   desc = "A single lightbulb swings on a naked wire, casting sharp shadows on a shelf of cleaning fluids.",

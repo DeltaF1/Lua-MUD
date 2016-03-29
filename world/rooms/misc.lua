@@ -10,10 +10,10 @@ arcane_alcove = {
   },
   objects = {
     [1] = {
-      desc = "A tallow candle, burnt almost to the ground, the flame guttering in a pool of wax.",
-      name = "candle",
       aliases = {
       },
+      name = "candle",
+      desc = "A tallow candle, burnt almost to the ground, the flame guttering in a pool of wax.",
     },
   },
   filename = "misc.lua",

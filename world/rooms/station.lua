@@ -21,20 +21,20 @@ starting = {
   desc = "As your eyes adust to the dim lighting, you can see rough stone walls all around, with a low vaulted ceiling. On the north wall is a wooden door. A ladder hangs down from above. To the west you can see a small stone alcove",
   objects = {
     [1] = {
+      desc = "The sign reads: Welcome to the server! an exits command will be added, but for now you can go north, west, or up",
+      name = "sign",
       aliases = {
       },
-      name = "sign",
-      desc = "The sign reads: Welcome to the server! an exits command will be added, but for now you can go north, west, or up",
     },
   },
-  filename = "station.lua",
+  name = "Starting",
   exits = {
-    up = "tavern_ground_floor",
-    north = "closet",
     west = "arcane_alcove",
+    north = "closet",
+    up = "tavern_ground_floor",
   },
   do_enter = "return function(self, player, dir) Room.do_enter(self, player, dir); local t = {\"A cold breeze brushes past your cheeks\", \"The torches on the walls flicker for a moment, but the air is still\", \"You feel a drop of water fall from above, and trickle down your back\"}; local msg = t[math.random(#t)]; if msg then player:send(NEWL); player:send(msg); end; end",
-  name = "Starting",
+  filename = "station.lua",
 }
 
 --[[END OF FILE]]--

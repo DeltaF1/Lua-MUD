@@ -357,6 +357,18 @@ local t = {
 			player._editing_obj._type = t
 			player:setMenu(unpack(menus.obj_name))
 		end
+	},
+	attr_type = {
+		f = function(player, parts, data)
+			local obj
+			if parts[2] == "@here" then
+				obj = player.room
+			else
+				obj = player.room:search(parts[2])
+			end
+			local t, k = resolve(obj, parts[3])
+			player:send(type(t[k]))
+		end
 	}
 }
 

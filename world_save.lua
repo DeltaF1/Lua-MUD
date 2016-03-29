@@ -34,6 +34,7 @@ function ser(obj, newl, indent, tables)
 			
 			if type(v) == "string" then
 				v = v:gsub(NEWL, "\\".."\\".."NEWL")
+				v = v:gsub('["\']', '\\"')
 				v = '"'..v..'"'
 			elseif type(v) == "table" then
 				-- If it has an identifier, then encode that instead of the table

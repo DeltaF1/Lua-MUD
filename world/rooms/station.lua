@@ -9,6 +9,15 @@ closet = {
     south = "starting",
   },
   objects = {
+    [1] = {
+      aliases = {
+        [1] = "cleaning",
+        [2] = "fluid",
+        [3] = "fluids",
+      },
+      name = "bleach",
+      desc = "A large blue bottle, labelled \"Javex! Drink me!\"",
+    },
   },
   filename = "station.lua",
   desc = "A single lightbulb swings on a naked wire, casting sharp shadows on a shelf of cleaning fluids.",
@@ -18,12 +27,7 @@ starting = {
   players = {
   },
   identifier = "starting",
-  name = "Starting",
-  exits = {
-    up = "tavern_ground_floor",
-    north = "closet",
-    west = "arcane_alcove",
-  },
+  desc = "As your eyes adust to the dim lighting, you can see rough stone walls all around, with a low vaulted ceiling. On the north wall is a wooden door. A ladder hangs down from above. To the west you can see a small stone alcove",
   objects = {
     [1] = {
       aliases = {
@@ -33,7 +37,13 @@ starting = {
     },
   },
   filename = "station.lua",
-  desc = "As your eyes adust to the dim lighting, you can see rough stone walls all around, with a low vaulted ceiling. On the north wall is a wooden door. A ladder hangs down from above. To the west you can see a small stone alcove",
+  exits = {
+    up = "tavern_ground_floor",
+    north = "closet",
+    west = "arcane_alcove",
+  },
+  do_enter = "return function(self, player, dir) Room.do_enter(self, player, dir); local t = {\"A cold breeze brushes past your cheeks\", \"The torches on the walls flicker for a moment, but the air is still\", \"You feel a drop of water fall from above, and trickle down your back\"}; local msg = t[math.random(#t)]; if msg then player:send(NEWL); player:send(msg); end; end",
+  name = "Starting",
 }
 
 --[[END OF FILE]]--

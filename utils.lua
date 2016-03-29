@@ -39,7 +39,7 @@ function files(dir)
 	if DIR_SEP == "\\" then
 		s = io.popen("dir "..dir.." /b /a-d"):read("*all")
 	else
-		s = io.popen("ls - p | grep -v "..dir)
+		s = io.popen("ls - p "..dir.." | grep -v ")
 	end
 		
 	return split(s)

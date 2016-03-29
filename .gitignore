@@ -1,3 +1,4 @@
 *.bak
 rooms/
+world/
 users.lua

@@ -59,10 +59,19 @@ function t.load_rooms()
 			end
 			
 			for key,val in pairs(room) do
-				if type(val) == "string" then
-					print("Checking string '"..key.."' for \\NEWL")
+				if key:match("do_") then
+					print("Loading function!")
+					room[key.."_str"] = val
+					
+					print("val = "..val)
+					local f = loadstring(val)
+					room[key] = f()
+					
+					print("type("..key..") = "..type(room[key]))
+				elseif type(val) == "string" then
+					-- print("Checking string '"..key.."' for \\NEWL")
 					room[key] = val:gsub("\\NEWL", function()
-						print("subbing newl")
+						-- print("subbing newl")
 						return NEWL
 					end)
 				end

@@ -31,6 +31,6 @@ local t = {
 	)
 }
 
-t.Admin = t.Admin:union(t.Builder):union(t.Moderator)
+t.Admin = t.Admin:union(t.Builder):union(t.Moderator):union(t.All)
 
 return t

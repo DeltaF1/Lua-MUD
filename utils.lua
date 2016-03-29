@@ -35,10 +35,11 @@ function split(s, sep)
 end
 
 function files(dir)
+	local s
 	if DIR_SEP == "\\" then
-		local s = io.popen("dir "..dir.." /b /a-d"):read("*all")
+		s = io.popen("dir "..dir.." /b /a-d"):read("*all")
 	else
-		local s - io.popen("ls - p | grep -v "..dir)
+		s = io.popen("ls - p | grep -v "..dir)
 	end
 		
 	return split(s)

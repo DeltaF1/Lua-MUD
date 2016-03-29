@@ -29,7 +29,9 @@ function t.load_rooms()
 		local G = {}
 		
 		-- Load the file into a function
-		local f = loadfile("world"..DIR_SEP.."rooms"..DIR_SEP..v)
+		local path = "world"..DIR_SEP.."rooms"..DIR_SEP..v
+		print("Getting file at patch "..path)
+		local f = loadfile(path)
 		
 		-- Set the environment of the function, so that every global function is saved into the 'G' table
 		setfenv(f, G)

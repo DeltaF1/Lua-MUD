@@ -1,6 +1,5 @@
 *.bak
 rooms/
-world/
 users.lua
 roomsTEST/
 roomsBACKUP/

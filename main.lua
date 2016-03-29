@@ -36,7 +36,7 @@ helpfiles = {}
 
 function loadHelpFiles()
 	for _,v in ipairs(files("helpfiles")) do
-		local f = io.open("helpfiles\\"..v)
+		local f = io.open("helpfiles"..DIR_SEP..v)
 		local key = f:read("*line")
 		local content = f:read("*all"):gsub("\n", NEWL)
 		

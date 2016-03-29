@@ -12,7 +12,7 @@ local t = {}
 
 function t.load_rooms()
 	local rooms = {}
-	local roomfiles = files("world\\rooms")
+	local roomfiles = files("world"..DIR_SEP.."rooms")
 	
 	for i,v in ipairs(roomfiles) do
 		if v:find("%.bak") then
@@ -29,7 +29,7 @@ function t.load_rooms()
 		local G = {}
 		
 		-- Load the file into a function
-		local f = loadfile("world\\rooms\\"..v)
+		local f = loadfile("world"..DIR_SEP.."rooms"..DIR_SEP..v)
 		
 		-- Set the environment of the function, so that every global function is saved into the 'G' table
 		setfenv(f, G)

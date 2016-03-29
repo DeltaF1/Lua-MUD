@@ -1,5 +1,9 @@
 -- I know, I know, this file may as well  be named "RandomCodeThatHasNoHome.lua"
 
+DIR_SEP = package.config:sub(1,1)
+
+print(DIR_SEP)
+
 function keys(t)
 	local rt = {}
 	for k,_ in pairs(t) do table.insert(rt, k) end
@@ -31,8 +35,12 @@ function split(s, sep)
 end
 
 function files(dir)
-	local s = io.popen("dir "..dir.." /b /a-d"):read("*all")
-
+	if DIR_SEP == "\\" then
+		local s = io.popen("dir "..dir.." /b /a-d"):read("*all")
+	else
+		local s - io.popen("ls - p | grep -v "..dir)
+	end
+		
 	return split(s)
 end
 
@@ -129,13 +137,20 @@ end
 
 function makeProxy(t, get, set)
 	return setmetatable({}, {
-		__index = function(self, k)
-			assert(get[k], "Read-access error in script!")
-			return t[k]
+		__index = function(self, k)	
+			if get then assert(get[k], "Read-access error in script!") end
+			local v = t[k]
+			if type(v) == "function" then
+				return function(proxy, ...)
+					return v(t, ...)
+				end
+			end
+			return v
 		end,
 		__newindex = function(self, k, v)
-			assert(type(v):match("^"..set[k].."$"), "Write-access error in script!")
+			assert(set and type(v):match("^"..set[k]), "Write-access error in script!")
 			t[k] = v
 		end,
+		
 	})
 end

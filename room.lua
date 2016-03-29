@@ -37,7 +37,7 @@ Room.do_look = function(self, player)
 	end
 	
 	for i,v in ipairs(self.players) do
-		if v ~= player then
+		if not player:eq(v) then
 			s = s..v:message("standing").."." -- Replace with v.messages.standing
 		end
 	end
@@ -73,25 +73,40 @@ Room.do_move = function(self, player, dir)
 	local destination = self.exits[dir]
 	
 	if destination then
+		self:do_exit(player:proxy(), dir)
 		player.room = destination
 		tremove(self.players, player)
-		self:broadcast(player.name.." leaves to the "..dir) --fix "leaves to the up"
+		 --fix "leaves to the up"
 		
 		-- Show the description of the destination
-		player:send(player.room:do_look(player))
-		player.room:broadcast(player.name.." enters from the "..oppdirs[dir])
 		table.insert(player.room.players, player)
-		
+		player.room:do_enter(player:proxy(), dir)
 	else
 		player:send("Can't go that way!")
 	end
 end
 
+Room.do_enter = function(self, player, dir)
+	print("do_enter")
+	self:broadcast(player.name.." enters from the "..oppdirs[dir], player)
+	
+	print("getting do_look")
+	local s = self:do_look(player)
+	
+	print("sending do_look")
+	player:send(s)
+end
+
+Room.do_exit = function(self, player, dir)
+	print("do_exit")
+	self:broadcast(player.name.." leaves to the "..dir, player)
+end
 --Room.do_enter? Room.do_enter_msg? 
 
 Room.broadcast = function(self, message, player)
+	print("broadcast")
 	for i,v in ipairs(self.players) do
-		if v ~= player then v:send(message) end
+		if not player:eq(v) then v:send(message) end
 	end
 end
 

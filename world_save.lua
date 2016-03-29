@@ -77,7 +77,7 @@ t.save_rooms = function(rooms)
 		s = s.."--[[END OF FILE]]--"
 		
 		-- Need to find way to create empty file
-		local f = io.open("world\\rooms\\"..k, "w")
+		local f = io.open("world"..DIR_SEP.."rooms"..DIR_SEP..k, "w")
 		f:write(s)
 		f:close()
 	end

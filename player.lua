@@ -145,6 +145,10 @@ Player.sub = function(self, s)
 	end)
 end
 
+Player.eq = function(self, o2)
+	return self == o2
+end
+
 Player.do_look = function(self, player)
 	return self.desc
 end
@@ -172,10 +176,8 @@ end
 
 Player.proxy = function(self)
 	return makeProxy(self,
-		{"name", "desc", "send", "message"},
-		{
-			
-		}
+		{eq=true, name=true, desc=true, send=true, message=true}
+		-- No set usage yet
 	)
 end
 

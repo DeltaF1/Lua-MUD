@@ -87,24 +87,16 @@ Room.do_move = function(self, player, dir)
 end
 
 Room.do_enter = function(self, player, dir)
-	print("do_enter")
 	self:broadcast(player.name.." enters from the "..oppdirs[dir], player)
-	
-	print("getting do_look")
-	local s = self:do_look(player)
-	
-	print("sending do_look")
-	player:send(s)
+	player:send(self:do_look(player))
 end
 
 Room.do_exit = function(self, player, dir)
-	print("do_exit")
 	self:broadcast(player.name.." leaves to the "..dir, player)
 end
 --Room.do_enter? Room.do_enter_msg? 
 
 Room.broadcast = function(self, message, player)
-	print("broadcast")
 	for i,v in ipairs(self.players) do
 		if not player:eq(v) then v:send(message) end
 	end

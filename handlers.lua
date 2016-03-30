@@ -91,9 +91,11 @@ return {
 			local verb
 			local key
 			
-			
-			-- For every verb
-			verb = player.cmdset:find(cmd)
+			if player.room.cmdset and player.room.cmdset:find(cmd) then
+				verb = player.room.cmdset:find(cmd)
+			else
+				verb = player.cmdset:find(cmd)
+			end
 			
 			if verb then
 				print("Got verb!")

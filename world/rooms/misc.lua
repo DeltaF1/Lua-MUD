@@ -1,5 +1,21 @@
 -- misc.lua
 
+mech_1 = {
+  players = {
+  },
+  identifier = "mech_1",
+  desc = "A large metallic frame, holding {name} within",
+  objects = {
+  },
+  room = "starting",
+  filename = "misc.lua",
+  do_look = "return function(self, player) return \"Through the cockpit you see...\".. NEWL .. self.room:do_look(player) end",
+  exits = {
+    out = "starting",
+  },
+  name = "Mech",
+}
+
 arcane_alcove = {
   players = {
   },
@@ -9,12 +25,7 @@ arcane_alcove = {
     east = "starting",
   },
   objects = {
-    [1] = {
-      aliases = {
-      },
-      name = "candle",
-      desc = "A tallow candle, burnt almost to the ground, the flame guttering in a pool of wax.",
-    },
+    [1] = "arcane_candle",
   },
   filename = "misc.lua",
   desc = "Set aside from the other rooms, this space is dimly lit, save for a small flickering candle. The stonework seems to dance in the candelight, and strange runes fade in and out of view. To the east is the starting zone.",

@@ -27,10 +27,9 @@ world_save = require "world_save"
 
 soundex = require "soundex"
 
-rooms = world_load.load_rooms()
+rooms, objects, players = world_load.load()
 
 clients = {}
-players = {}
 
 helpfiles = {}
 
@@ -84,6 +83,8 @@ dirs = {
 	[{"southwest", "sw"}]="southwest",
 	[{"northeast", "ne"}]="northeast",
 	[{"northwest", "nw"}]="northwest",
+	[{"in"}]="in",
+	[{"out"}]="out",
 }
 
 handlers = require "handlers"
@@ -165,7 +166,7 @@ while true do
 		--also, save room/items
 		--	serialize, keep do_xxx_str
 		
-		world_save.save_rooms(rooms)
+		world_save.save()
 		
 		break
 	end

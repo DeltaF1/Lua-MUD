@@ -21,7 +21,7 @@ function ser(obj, newl, indent, tables)
 				end
 				
 				-- If the key is only alphanumeric, and doesn't start with a number, leave it as is. Otheriwse add ["key"] syntax
-				if not k:match("^[%a_][%w_]*$") then
+				if contains(EDITOR_KEYWORDS, k) or not k:match("^[%a_][%w_]*$") then
 					k = '["'..k..'"]'
 				end
 				
@@ -58,9 +58,15 @@ end
 
 local t = {}
 
-t.save_rooms = function(rooms)
+function t.save()
+	for dir, tbl in pairs{["rooms"]=rooms, ["objects"]=objects, ["players"]=players} do
+		saveTable(tbl, dir)
+	end
+end
+
+function saveTable(tbl, dir)
 	local files = {}
-	for k,v in pairs(rooms) do
+	for k,v in pairs(tbl) do
 		files[v.filename] = files[v.filename] or {}
 		table.insert(files[v.filename], v)
 	end
@@ -69,16 +75,20 @@ t.save_rooms = function(rooms)
 		print("Saving to file "..k)
 		local s = "-- "..k.."\n\n"
 		-- s = s.."-- Generated "..os.time()
-		for _, room in ipairs(v) do
-			local oldplayers = room.players
-			room.players = {}
-			s = s..room.identifier.." = "..ser(room).."\n\n"
-			room.players = oldplayers
+		for _, object in ipairs(v) do
+			if object.players then
+				local oldplayers = object.players
+				object.players = {}
+			end
+			s = s..object.identifier.." = "..ser(object).."\n\n"
+			if object.players then
+				object.players = oldplayers
+			end
 		end
 		s = s.."--[[END OF FILE]]--"
 		
 		-- Need to find way to create empty file
-		local f = io.open("world"..DIR_SEP.."rooms"..DIR_SEP..k, "w")
+		local f = io.open("world"..DIR_SEP..dir..DIR_SEP..k, "w")
 		f:write(s)
 		f:close()
 	end

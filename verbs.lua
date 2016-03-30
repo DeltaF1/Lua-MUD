@@ -278,7 +278,7 @@ local t = {
 			for _,v in pairs(players) do
 				v:send("Saving world...")
 			end
-			world_save.save_rooms(rooms)
+			world_save.save()
 		end
 	},
 	help = {

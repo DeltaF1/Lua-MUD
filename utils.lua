@@ -4,6 +4,11 @@ DIR_SEP = package.config:sub(1,1)
 
 print(DIR_SEP)
 
+EDITOR_KEYWORDS = {"and", "break", "do", "else", "elseif",
+     "end", "false", "for", "function", "if",
+     "in", "local", "nil", "not", "or",
+     "repeat", "return", "then", "true", "until", "while"}
+
 function keys(t)
 	local rt = {}
 	for k,_ in pairs(t) do table.insert(rt, k) end

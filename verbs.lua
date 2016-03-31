@@ -20,7 +20,9 @@ local t = {
 			if player.state == "chat" then
 				player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air", player)
 			end
-			tremove(player.room.players, player)
+			if player.room then
+				tremove(player.room.players, player)
+			end
 			--save player data to file
 		end
 	},
@@ -353,7 +355,7 @@ local t = {
 			local t = parts[2]
 			
 			if not contains({"object","room","player"}, t) then return player:send("Invalid type '"..t.."'") end
-			player._editing_obj = _G[t:sub(1,1):upper()..t:sub(2,#t)].new({})
+			player._editing_obj = types[t].new({})
 			player._editing_obj._type = t
 			player:setMenu(unpack(menus.obj_name))
 		end
@@ -368,6 +370,25 @@ local t = {
 			end
 			local t, k = resolve(obj, parts[3])
 			player:send(type(t[k]))
+		end
+	},
+	edit = {
+		f = function(player, parts)
+			if #parts < 2 then
+				return {"error", "Please supply a type to edit!"}
+			elseif #parts < 3 then
+				return {"error", "Please supply an identifier to use"}
+			end
+			
+			local t = parts[2]
+			local list = _G[t.."s"]
+			player._editing_obj = list[parts[3]]
+			if not player._editing_obj then
+				player:send(parts[3].." not found, creating it...")
+				player._editing_obj = class.new({identifier = parts[3]})
+			end
+			
+			player:setState "edit"
 		end
 	}
 }

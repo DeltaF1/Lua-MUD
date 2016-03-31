@@ -44,6 +44,8 @@ return {
 		function(p,d,i)
 			-- p.password = d
 			-- Add entry to hash table
+			users[md5.sumhexa(p.name..d)] = p.name
+			players[p.name] = p
 			-- p:send("With a lurch in the pit of your stomach, you feel yourself materialize.")
 			-- send back to login1?
 			p:send("(OOC) You will now be asked to login with the credentials provided")

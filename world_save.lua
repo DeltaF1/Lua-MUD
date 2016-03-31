@@ -62,6 +62,9 @@ function t.save()
 	for dir, tbl in pairs{["rooms"]=rooms, ["objects"]=objects, ["players"]=players} do
 		saveTable(tbl, dir)
 	end
+	local f = io.open("users.lua")
+	f:write("return"..ser(users))
+	f:close()
 end
 
 function saveTable(tbl, dir)
@@ -76,6 +79,10 @@ function saveTable(tbl, dir)
 		local s = "-- "..k.."\n\n"
 		-- s = s.."-- Generated "..os.time()
 		for _, object in ipairs(v) do
+			if object.sock then
+				local oldsock = object.sock
+				object.sock = nil
+			end
 			if object.players then
 				local oldplayers = object.players
 				object.players = {}
@@ -84,6 +91,7 @@ function saveTable(tbl, dir)
 			if object.players then
 				object.players = oldplayers
 			end
+			if oldsock then object.sock = oldsock end
 		end
 		s = s.."--[[END OF FILE]]--"
 		

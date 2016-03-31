@@ -111,7 +111,8 @@ Player.default = function()
 		colour = "green",
 		desc = "A person with no distinguishing features, their blank face devoid of any human emotions",
 		pronouns = pronouns.female,
-		messages = {}
+		messages = {},
+		filename = "misc.lua"
 	}
 end
 

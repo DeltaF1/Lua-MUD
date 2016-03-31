@@ -29,6 +29,10 @@ soundex = require "soundex"
 
 rooms, objects, players = world_load.load()
 
+types = {room = Room, player = Player, object = Object}
+
+users = require "users"
+
 clients = {}
 
 helpfiles = {}
@@ -117,9 +121,8 @@ function main()
 		if data then
 			
 			print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
-			--set state for login1, login2 etc. to get user/password
-			--maybe extend for in-combat, selecting options, etc.?
-			--   i.e Are you sure? (Y/n) (v.state="confirm")
+			
+			data = stripControlChars(data)
 			local handler = handlers[v.state]
 			
 			if handler then

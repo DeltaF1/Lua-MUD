@@ -35,7 +35,13 @@ return {
 		f = function(player, data)
 			-- Get hash of player.name..data..salt
 			
-			
+			hash = md5.sumhexa(player.name..data)
+			if users[hash] ~= player.name then
+				player:send("Incorrect password!")
+				player:send(IAC..WONT..ECHO)
+				player:setState("login1")
+				return
+			end
 			
 			player.cmdset = cmdsets.Default
 			
@@ -43,12 +49,16 @@ return {
 				player.cmdset = player.cmdset:union(cmdsets.Admin)
 			end
 			
+			for k,v in pairs(players[player.name]) do
+				player[k] = v
+			end
+			
 			--CommandSet:new(keys(verbs))
 			-- Mainly for debuggin, eventually colours will mean something. Maybe class/rank?
 			player.colour = colours[math.random(#colours)]
 			
 			-- This should probably be adjustable for different spawnrooms or something
-			player.room = rooms.starting
+			player.room = player.room or rooms.starting
 			-- We really need to setup an init function!
 			
 			table.insert(player.room.players, player)
@@ -85,8 +95,6 @@ return {
 			-- First word sent
 			local cmd = parts[1]
 			
-			
-			
 			-- Declare verb and name of verb
 			local verb
 			local key
@@ -117,12 +125,29 @@ return {
 				end
 			end
 		end,
-		prompt = ">"
+		prompt = "> "
 	},
 	menu = {
 		f = function(player, data)
 			player.menu(player, data)
 		end,
 		prompt = "menu>"
+	},
+	edit = {
+		f = function(player, data)
+			local parts = split(data)
+			local key = parts[1]
+			local val = table.concat(parts, " ", 2)
+			print("key = "..tostring(key).." val = "..tostring(val))
+			if not key then return end
+			if key == "quit" then
+				player._editing_obj = nil
+				player:setState "chat"
+				return
+			end
+			
+			player._editing_obj[key] = val
+		end,
+		prompt = "edit> "
 	}
 }

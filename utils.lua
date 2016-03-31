@@ -30,6 +30,16 @@ function string.compare(s1, s2)
 	return 0
 end
 
+function stripControlChars(str)
+    local s = ""
+    for i = 1, str:len() do
+	if str:byte(i) >= 32 and str:byte(i) <= 126 then
+  	    s = s .. str:sub(i,i)
+	end
+    end
+    return s
+end
+
 function split(s, sep)
 	local t = {}
 	local sep = sep or " "..NEWL

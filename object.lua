@@ -7,6 +7,7 @@ Object.default = function()
 		name = "",
 		aliases = {},
 		desc = "A boring object",
+		filename = "misc.lua"
 	}
 end
 

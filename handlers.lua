@@ -43,14 +43,19 @@ return {
 				return
 			end
 			
+			
+			
+			for k,v in pairs(players[player.name]) do
+				if not contains({"sock", "cmdset", "prompt"}, k)
+				player[k] = v
+			end
+			
+			players[player.name] = player
+			
 			player.cmdset = cmdsets.Default
 			
 			if player.name == "Delta" then
 				player.cmdset = player.cmdset:union(cmdsets.Admin)
-			end
-			
-			for k,v in pairs(players[player.name]) do
-				player[k] = v
 			end
 			
 			--CommandSet:new(keys(verbs))

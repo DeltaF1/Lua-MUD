@@ -374,11 +374,19 @@ local t = {
 	},
 	edit = {
 		f = function(player, parts)
-			if #parts < 2 then
-				return {"error", "Please supply a type to edit!"}
+			if player.room:search(parts[2]) then
+				player._editing_obj = player.room:search(parts[2])
+				player:setState "edit"
+				return
+			elseif #parts < 2 then
+				return {"error", "Please supply a type to edit, or the name of a visible object!"}
 			elseif #parts < 3 then
 				return {"error", "Please supply an identifier to use"}
 			end
+			
+			local class = types[t]
+			
+			
 			
 			local t = parts[2]
 			local list = _G[t.."s"]

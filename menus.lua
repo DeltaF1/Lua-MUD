@@ -32,7 +32,12 @@ return {
 		"What is your character's name? ",
 		function(p,d,i)
 			-- Check for name already existing!
+			if players[d] then
+				p:send("(OOC) That name is taken!")
+				return
+			end
 			p.name = d
+			p.identifier = d
 			p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
 			p:setMenu(unpack(menus.char_pass))
 		end,

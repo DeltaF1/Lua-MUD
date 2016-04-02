@@ -46,8 +46,9 @@ return {
 			
 			
 			for k,v in pairs(players[player.name]) do
-				if not contains({"sock", "cmdset", "prompt"}, k)
-				player[k] = v
+				if not contains({"sock", "cmdset", "prompt"}, k) then
+					player[k] = v
+				end
 			end
 			
 			players[player.name] = player

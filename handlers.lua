@@ -155,5 +155,24 @@ return {
 			player._editing_obj[key] = val
 		end,
 		prompt = "edit> "
+	},
+	--[[
+	combat = {
+		f = function(player, data)
+			parts = split(data)
+			
+			getAttackVerb(parts[1])
+			if player.arena.member[player.arena.turn].mobile == player then
+				-- Do attack stuff
+				
+				use item
+			else
+				player:send("Don't run! >:D")
+			end
+		end
 	}
+	
+	arena = {members={{mobile=someMob, }}, turn = 1}
+	
+	--]]
 }

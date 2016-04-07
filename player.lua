@@ -104,6 +104,8 @@ Player = {}
 
 Player.__index = Player
 
+setmetatable(Player, Mobile)
+
 Player.default = function()
 	return {
 		name = "",
@@ -114,20 +116,6 @@ Player.default = function()
 		messages = {},
 		filename = "misc.lua"
 	}
-end
-
-Player.new = function(o)
-	-- Either create a new object, or turn existing table into an instance
-	local o = o or {}
-	
-	-- Fill in missing values
-	for k,v in pairs(Player.default()) do
-		o[k] = o[k] or v
-	end
-	
-	setmetatable(o.messages, messages)
-	
-	return setmetatable(o, Player)
 end
 
 Player.message = function(self, message)

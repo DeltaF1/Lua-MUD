@@ -20,6 +20,7 @@ server:settimeout(0)
 print("use telnet localhost "..port.." to connect!")
 
 require "room"
+require "mobile"
 require "player"
 require "object"
 world_load = require "world_load"
@@ -109,7 +110,7 @@ function main()
 		sock:settimeout(1)
 		print(tostring(sock).." has connected")
 		local player = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
-		player = Player.new(player)
+		player = Player:new(player)
 		clients[sock] = player
 	end
 	

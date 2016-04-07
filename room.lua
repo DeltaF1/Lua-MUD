@@ -12,14 +12,14 @@ Room = {
 
 Room.__index = Room
 
-Room.new = function(o)
+Room.new = function(self,o)
 	local o = o or {}
 	
-	for k,v in pairs(Room.default()) do
+	for k,v in pairs(self.default()) do
 		o[k] = o[k] or v
 	end
 	
-	return setmetatable(o, Room)
+	return setmetatable(o, self)
 end
 
 Room.do_look = function(self, player)

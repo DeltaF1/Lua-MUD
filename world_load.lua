@@ -106,11 +106,11 @@ function t.load_rooms()
 			room.identifier = k
 			room.filename = filename
 			
-			room = Room.new(room)
+			room = Room:new(room)
 			
 			for _,object in ipairs(room.objects) do
 				-- set equal to objects[object]
-				Object.new(object)
+				Object:new(object)
 			end
 			
 			for key,val in pairs(room) do
@@ -151,7 +151,7 @@ function t.load_rooms()
 end
 
 -- Rehashing of above function, to load into objects/rooms/players
-function loadFileInto(filename, tbl, class)	
+function loadFileInto(filename, tbl, class)
 	print("loading file "..filename)
 	local func = loadfile(filename)
 	local G = {}
@@ -167,7 +167,7 @@ function loadFileInto(filename, tbl, class)
 		object.identifier = k
 		object.filename = filename:match(DIR_SEP.."([^"..DIR_SEP.."]+%..+)$")
 		
-		class.new(object)
+		class:new(object)
 		
 		for key,val in pairs(object) do
 			if key:match("do_") then

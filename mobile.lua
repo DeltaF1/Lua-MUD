@@ -2,6 +2,12 @@ Mobile = {}
 
 Mobile.__index = Mobile
 
+Mobile.default = function()
+	return {
+		
+	}
+end
+
 Mobile.new = function(self,o)
 	-- Either create a new object, or turn existing table into an instance
 	local o = o or {}

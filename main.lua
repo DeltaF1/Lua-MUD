@@ -104,7 +104,7 @@ function main()
 		--DEBUG REMOVE
 		--sock:send(WILL)
 		--sock:send(ECHO)
-		local s = colour("%{green}Welcome to the text-chat-test-server-o-matic-9000"..NEWL..handlers.login1.prompt)
+		local s = colour(config.motd..NEWL..handlers.login1.prompt)
 		sock:send(s)
 		print(s)
 		sock:settimeout(1)

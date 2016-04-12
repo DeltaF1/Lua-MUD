@@ -4,7 +4,10 @@ Mobile.__index = Mobile
 
 Mobile.default = function()
 	return {
-		
+		name = "",
+		aliases = {},
+		messages = {},
+		filename = "misc.lua"
 	}
 end
 

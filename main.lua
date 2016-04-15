@@ -97,7 +97,7 @@ verbs = require "verbs"
 cmdsets = require "commandSets"
 menus = require "menus"
 
-function main()
+function main(dt)
 	local sock = server:accept()
 	
 	if sock then 
@@ -114,7 +114,9 @@ function main()
 		clients[sock] = player
 	end
 	
-	local ready = socket.select(keys(clients), nil, 0.5)
+	-- Update(dt)
+	
+	local ready = socket.select(keys(clients), nil, 0.01)
 	
 	for i,sock in ipairs(ready) do
 		local v = clients[sock]
@@ -151,7 +153,7 @@ while true do
 	
 	TIME = TIME + DT
 	prevTime = curTime
-	status, err = pcall(main)
+	status, err = pcall(main, DT)
 	if not status then
 
 		if string.match(err, "interrupted!") then

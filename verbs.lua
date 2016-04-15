@@ -398,6 +398,32 @@ local t = {
 			
 			player:setState "edit"
 		end
+	},
+	attack = {
+		f = function(player, parts)
+			local target = player.room:search(parts[2])
+			
+			if target then
+				-- check if it's a mobile?
+				if target.hp then
+					if not player.room.tags.SAFE then
+						player:send("Cannot start a fight here!")
+					elseif target.arena then
+						target.arena:add(player)
+					else
+						local arena = newArenaFunction()
+						arena:add(self)
+						arena:add(target)
+					end
+				else
+					player:send("That target is not combattable!")
+				end
+			elseif parts[2] then
+				player:send(parts[2].." not found!")
+			else
+				return {"error", "Please provide a target to attack!"}
+			end
+		end
 	}
 }
 

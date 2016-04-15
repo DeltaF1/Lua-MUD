@@ -7,7 +7,8 @@ Mobile.default = function()
 		name = "",
 		aliases = {},
 		messages = {},
-		filename = "misc.lua"
+		filename = "misc.lua",
+		hp = 5
 	}
 end
 
@@ -23,4 +24,13 @@ Mobile.new = function(self,o)
 	setmetatable(o.messages, messages)
 	
 	return setmetatable(o, self)
+end
+
+Mobile.damage = function(self, num)
+	self.hp = self.hp - num
+	
+	if self.hp <= 0 then
+		self:send("You died!")
+		-- TP home? Delete character?
+	end
 end

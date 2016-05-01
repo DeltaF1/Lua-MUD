@@ -34,3 +34,48 @@ Mobile.damage = function(self, num)
 		-- TP home? Delete character?
 	end
 end
+
+Arena = {}
+
+Arena.__index = Arena
+
+Arena.default = function()
+	return {
+		mobiles = {},
+		timer = 0,
+		maxTime = 7
+	}
+end
+
+Arena.new = function(self, o)
+	local o = o or {}
+	
+	for k,v in pairs(self.default()) do
+		o[k] = o[k] or v
+	end
+	
+	--table.insert(Arenas, self)
+	table.insert(updateHandlers, o)
+	
+	return setmetatable(o, self)
+end
+
+Arena.update = function(self, dt)
+	self.timer = self.timer - dt
+	if self.timer <= 0 then
+		for i= 1,#self.mobiles do
+			-- Reset Action points of each member of the arena
+			self.mobiles[i].ap = self.mobiles[i].maxap
+		end
+		self.timer = self.maxTime
+	end
+end
+
+Arena.add = function(self, mob)
+	table.insert(self.mobiles, mob)
+	mob.arena = self
+end
+
+Arena.remove = function(self, mob)
+	tremove(self.mobiles, mob)
+end

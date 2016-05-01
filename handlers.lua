@@ -45,7 +45,7 @@ return {
 			
 			
 			
-			for k,v in pairs(players[player.name]) do
+			for k,v in pairs(players["player_"..player.name]) do
 				if not contains({"sock", "cmdset", "prompt"}, k) then
 					player[k] = v
 				end
@@ -156,7 +156,7 @@ return {
 		end,
 		prompt = "edit> "
 	},
-	--[[
+	
 	combat = {
 		f = function(player, data)
 			parts = split(data)
@@ -164,10 +164,12 @@ return {
 			local arena = player.arena
 			
 			local verb = parts[1]
-			
+			if not parts[2] then
+				return player:send("Please supply a target to attack!")
+			end
 			if verb == "attack" then -- hard coded D:
 				local target = player.room:search(parts[2])
-				if target then
+				if contains(arena.mobiles, target) then
 					if player.ap > 3 then -- hard coded D:
 						player.ap = player.ap - 3
 						target:damage(1) -- hard coded D:
@@ -176,10 +178,9 @@ return {
 					player:send("Invalid target!")
 				end
 			end
-		end
+		end,
+		prompt = "combat> "
 	}
 	
-	arena = {members={{mobile=someMob, }}, turn = 1}
 	
-	--]]
 }

@@ -406,15 +406,17 @@ local t = {
 			if target then
 				-- check if it's a mobile?
 				if target.hp then
-					if not player.room.tags.SAFE then
+					if player.room.flags.SAFE then
 						player:send("Cannot start a fight here!")
 					elseif target.arena then
 						target.arena:add(player)
 					else
-						local arena = newArenaFunction()
-						arena:add(self)
+						local arena = Arena:new()
+						arena:add(player)
 						arena:add(target)
+						target:setState("combat")
 					end
+					player:setState("combat")
 				else
 					player:send("That target is not combattable!")
 				end

@@ -167,6 +167,10 @@ function loadFileInto(filename, tbl, class)
 		object.identifier = k
 		object.filename = filename:match(DIR_SEP.."([^"..DIR_SEP.."]+%..+)$")
 		
+		-- D:
+		object.cmdset = nil
+		object.arena = nil
+		
 		class:new(object)
 		
 		for key,val in pairs(object) do

@@ -97,6 +97,19 @@ verbs = require "verbs"
 cmdsets = require "commandSets"
 menus = require "menus"
 
+updateHandlers = {}
+
+function Update(dt)
+	for i = 1,#updateHandlers do
+		local handler = updateHandlers[i]
+		if type(handler) == "table" then
+			handler:update(dt)
+		elseif type(handler) == "function" then
+			handler(dt)
+		end
+	end
+end
+
 function main(dt)
 	local sock = server:accept()
 	
@@ -114,7 +127,7 @@ function main(dt)
 		clients[sock] = player
 	end
 	
-	-- Update(dt)
+	Update(dt)
 	
 	local ready = socket.select(keys(clients), nil, 0.01)
 	

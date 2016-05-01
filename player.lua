@@ -18,16 +18,20 @@ function CommandSet:new(t)
 		print("t is an array!")
 		local arr = t
 		t = {}
+		-- For every verb in the array
 		for i = 1,#arr do
+			-- Add to our list
 			t[arr[i]] = verbs[arr[i]]
 		end
 	else
+		-- If the table is a CommandSet, set ourselves to a copy of its
 		t = shallowcopy(t) or {}
 	end
 	
 	return setmetatable(t, self)
 end
 
+-- Return a verb object from a name
 function CommandSet:find(name)
 	name = name:lower()
 	local verb = self[name]
@@ -36,21 +40,28 @@ function CommandSet:find(name)
 	end
 	for _,v in pairs(self) do
 		for _, alias in ipairs(v.aliases) do
+			-- Check to see if name matches pattern. e.g. "x" matches "^x$", ".slap" matches "^%.%w+$"
 			if name:match("^"..alias.."$") then return v end
 		end
 	end
 end
 
+
+-- Get all commands that are common between two command sets
 function CommandSet:intersect(c)
+	-- Duplicate of self
 	local t = CommandSet:new(self)
 	for k,v in pairs(c) do
+		-- If one of our keys is not present in the other command set
 		if not self[k] then
+			-- remove it from the clone
 			t[k] = nil
 		end
 	end
 	return t
 end
 
+-- Combine two command sets
 function CommandSet:union(c)
 	local t = CommandSet:new(self)
 	for k,v in pairs(c) do
@@ -62,7 +73,7 @@ end
 function CommandSet:sub(c)
 	local t = CommandSet:new(self)
 	for k,v in pairs(c) do
-		self[k] = nil
+		t[k] = nil
 	end
 	return t
 end
@@ -71,6 +82,7 @@ messages = {
 	standing = "{name} is standing here"
 }
 
+-- messages is a metatable
 messages.__index = messages
 
 pronouns = {
@@ -115,7 +127,9 @@ Player.default = function()
 		pronouns = pronouns.female,
 		messages = {},
 		filename = "misc.lua",
-		hp = 0
+		hp = 5,
+		ap = 0,
+		maxap = 5,
 	}
 end
 
@@ -124,17 +138,21 @@ Player.message = function(self, message)
 	return self:sub(self.messages[message])
 end
 
+
+-- Replace elements of a string with the value of the player at that key
+-- e.g. "The coat that belongs to {name}" is turned into "The coat that belongs to Alice"
 Player.sub = function(self, s)
 	return s:gsub("{([^}]+)}", function(key)
 		local t,k = resolve(self, key)
 		if not t then
 			print("Invalid key "..key)
-			
 		end
 		return t[k]
 	end)
 end
 
+-- Equality function, to be used in place of == when dealing with proxies
+-- e.g. if proxy.eq(room.players[1]) then ...
 Player.eq = function(self, o2)
 	return self == o2
 end

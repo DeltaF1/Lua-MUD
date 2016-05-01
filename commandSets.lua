@@ -9,6 +9,7 @@ local t = {
 		"chat",
 		"help",
 		"dummymenu",
+		"attack"
 	},
 	Builder = CommandSet:new{
 		"inspect",

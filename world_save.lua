@@ -5,6 +5,10 @@ local table = table
 -- Serialize a table
 function ser(obj, newl, indent, tables)
 	-- Previously serialized tables, to prevent stack overflows
+	if getmetatable(obj) == CommandSet then
+		--Serialize the keys
+		obj = keys(obj)
+	end
 	local newl = newl or "\n"
 	local tables = tables or {}
 	local indent = indent or 1

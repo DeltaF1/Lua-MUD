@@ -21,8 +21,8 @@ function string.compare(s1, s2)
 	local len = math.min(#s1, #s2)
 	
 	for i = 1, len do
-		local num1 = s1:sub(i,i):byte()
-		local num2 = s2:sub(i,i):byte()
+		local num1 = s1:lower():sub(i,i):byte()
+		local num2 = s2:lower():sub(i,i):byte()
 		if num1 ~= num2 then
 			return num1 < num2 and 1 or -1
 		end
@@ -116,6 +116,7 @@ function isArray(t)
   return true
 end
 
+--resolve identifier chain i.e. object.inventory.items.1
 function resolve(obj, key)
 	local k
 	local keyparts = {}
@@ -150,7 +151,7 @@ tremove = function(t, i)
 	return t
 end
 
-
+--create proxy table with get/set list
 function makeProxy(t, get, set)
 	return setmetatable({}, {
 		__index = function(self, k)	

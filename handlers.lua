@@ -35,6 +35,9 @@ return {
 		f = function(player, data)
 			-- Get hash of player.name..data..salt
 			
+			--ADD SALT
+			
+			--FOR THE LOVE OF GOD DON'T USE MD5
 			hash = md5.sumhexa(player.name..data)
 			if users[hash] ~= player.name then
 				player:send("Incorrect password!")
@@ -45,22 +48,20 @@ return {
 			
 			
 			
-			for k,v in pairs(players["player_"..player.name]) do
-				if not contains({"sock", "cmdset", "prompt"}, k) then
+			for k,v in pairs(players[player.identifier]) do
+				if not contains({"sock", "prompt"}, k) then
 					player[k] = v
 				end
 			end
 			
-			players[player.name] = player
+			players[player.identifier] = player
 			
-			player.cmdset = cmdsets.Default
 			
-			if player.name == "Delta" then
-				player.cmdset = player.cmdset:union(cmdsets.Admin)
-			end
+			
+			player.cmdset = CommandSet:new(player.cmdset)
 			
 			--CommandSet:new(keys(verbs))
-			-- Mainly for debuggin, eventually colours will mean something. Maybe class/rank?
+			-- Mainly for debugging, eventually colours will mean something. Maybe class/rank?
 			player.colour = colours[math.random(#colours)]
 			
 			-- This should probably be adjustable for different spawnrooms or something
@@ -137,7 +138,7 @@ return {
 		f = function(player, data)
 			player.menu(player, data)
 		end,
-		prompt = "menu>"
+		prompt = "menu> "
 	},
 	edit = {
 		f = function(player, data)

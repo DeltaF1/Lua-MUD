@@ -7,6 +7,10 @@ This is a framework written in lua, designed to be the server-side of a MUD (Mul
 ## Why make this?
 I really enjoy these kinds of games, and the systems behind them are often very interesting, requiring a wide breadth of programming knowledge to design. This project has a lot of different components interacting together, such as a tcp/ip server, object (de)serialization methods, player state management, and security measures to prevent cheating or server destruction.
 
+##What dependencies does this have?
+Currently it runs on Lua 5.1, I haven't tested it on 5.2+
+It also depends on [LuaCrypto](https://github.com/mkottman/luacrypto) to store passwords securely.
+
 ## How do I use this?
 1. Download or clone the source
   1. After downloading, if an example world is not provided, create a directory called "world" in the source directory, and a subdirectory called "rooms" inside of that". and build some [room files](https://github.com/DeltaF1/Lua-MUD/wiki/Room-Files). 

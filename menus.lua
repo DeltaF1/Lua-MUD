@@ -49,7 +49,10 @@ return {
 		function(p,d,i)
 			-- p.password = d
 			-- Add entry to hash table
-			users[md5.sumhexa(p.name..d)] = p.name
+			
+			salt = tostring(math.random())
+			users[p.name] = {sha.init().update(d..salt).asHex(), salt}
+			
 			players[p.name] = p
 			-- p:send("With a lurch in the pit of your stomach, you feel yourself materialize.")
 			-- send back to login1?

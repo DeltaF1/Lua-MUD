@@ -38,8 +38,16 @@ return {
 			--ADD SALT
 			
 			--FOR THE LOVE OF GOD DON'T USE MD5
-			hash = md5.sumhexa(player.name..data)
-			if users[hash] ~= player.name then
+			hash, salt = unpack(users[player.name] or {})
+			
+			if not hash or not salt then
+				player:send("User does not exist!")
+				player:send(IAC..WONT..ECHO)
+				player:setState("login1")
+				return
+			end
+			
+			if hash ~= sha.init().update(data..salt).asHex() then
 				player:send("Incorrect password!")
 				player:send(IAC..WONT..ECHO)
 				player:setState("login1")

@@ -5,6 +5,8 @@ colour = require "ansicolors"
 require "utils"
 
 math.randomseed(os.time())
+math.randomseed(os.time())
+math.randomseed(os.time())
 
 NEWL = "\r\n"
 IAC  = "\255"
@@ -28,11 +30,13 @@ world_save = require "world_save"
 
 soundex = require "soundex"
 
+sha = require("lockbox.digest.sha2_256")()
+
 rooms, objects, players = world_load.load()
 
 types = {room = Room, player = Player, object = Object}
 
-users = require "users"
+users = require "users" or {}
 
 clients = {}
 

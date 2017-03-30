@@ -56,7 +56,9 @@ return {
 			
 			players[player.identifier] = player
 			
-			
+			if not player.cmdset then
+				player.cmdset = cmdsets.Default
+			end
 			
 			player.cmdset = CommandSet:new(player.cmdset)
 			

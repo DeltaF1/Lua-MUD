@@ -81,7 +81,7 @@ local t = {
 			
 			local msg = data:match("[^ ]+ (.+)")
 			
-			player.room:broadcast(player.name..' says "'..msg..'"')
+			player.room:broadcast(player.name..' says "'..msg..'"', player)
 		end,
 		aliases = {
 			"say"

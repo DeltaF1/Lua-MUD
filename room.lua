@@ -105,7 +105,7 @@ end
 
 Room.broadcast = function(self, message, player)
 	for i,v in ipairs(self.players) do
-		if not player:eq(v) then v:send(message) end
+		if player and not player:eq(v) then v:send(message) end
 	end
 end
 

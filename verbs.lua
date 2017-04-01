@@ -287,7 +287,7 @@ local t = {
 		f = function(player, parts)
 			if #parts < 2 then
 				local s = "Available commands are:"..NEWL
-				for k,v in pairs(verbs) do
+				for k,v in pairs(player.cmdset) do
 					-- If permitted(player, v)
 					s = s .. k .. NEWL
 				end

@@ -37,7 +37,7 @@ return {
 				return
 			end
 			p.name = d
-			p.identifier = d
+			p.identifier = "player_"..d
 			p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
 			p:setMenu(unpack(menus.char_pass))
 		end,
@@ -50,7 +50,7 @@ return {
 			-- p.password = d
 			-- Add entry to hash table
 			users[md5.sumhexa(p.name..d)] = p.name
-			players[p.name] = p
+			players[p.identifier] = p
 			-- p:send("With a lurch in the pit of your stomach, you feel yourself materialize.")
 			-- send back to login1?
 			p:send("(OOC) You will now be asked to login with the credentials provided")

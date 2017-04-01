@@ -14,4 +14,4 @@ Example
 yields "{name} doffs {pronouns.my} hat"
 
 pose .walk towards my horse. After a moment, I .stop, and .look at myself.
-yield "{name} walks towards {pronouns.my} horse. After a moment, {pronouns.i} stops and looks at {pronouns.myself}."
+yields "{name} walks towards {pronouns.my} horse. After a moment, {pronouns.i} stops and looks at {pronouns.myself}."

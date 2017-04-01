@@ -1,0 +1,13 @@
+set
+Sets a new value at the given key for a given object.
+The aliases '@here' and '@me' can be used to specify the object to edit.
+
+Syntax
+set <object> <key> <value>
+
+Example
+set @me name "test"
+Sets {name}'s name to "test"
+
+set @here exits.north rooms["test"]
+Sets the current room's northern exit to point to the room identified by "test".

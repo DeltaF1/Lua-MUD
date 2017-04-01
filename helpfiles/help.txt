@@ -1,0 +1,15 @@
+help
+Displays the helpfile for the given verb, or the closest match in case no helpfiles are found.
+
+Syntax
+help (verb)
+
+Aliases
+? (verb)
+
+Example
+help
+Shows a list of all verbs
+
+help help
+Displays this helpfile

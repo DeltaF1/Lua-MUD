@@ -136,7 +136,7 @@ function main(dt)
 		local data, err = v.sock:receive()
 		if data then
 			
-			print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
+			--print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
 			
 			data = stripControlChars(data)
 			local handler = handlers[v.state]

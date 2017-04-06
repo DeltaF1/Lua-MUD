@@ -355,7 +355,7 @@ local t = {
 			local t = parts[2]
 			
 			if not contains({"object","room","player"}, t) then return player:send("Invalid type '"..t.."'") end
-			player._editing_obj = types[t].new({})
+			player._editing_obj = types[t]:new({})
 			player._editing_obj._type = t
 			player:setMenu(unpack(menus.obj_name))
 		end

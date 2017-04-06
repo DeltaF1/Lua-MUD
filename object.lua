@@ -23,6 +23,13 @@ Object.new = function(self,o)
 	return setmetatable(o, self)
 end
 
+Object.setName = function(self, name)
+	self.name = name
+	for i, str in ipairs(split(name)) do
+		table.insert(self.aliases, str)
+	end
+end
+
 Object.do_look = function(self, player)
 	return self.desc
 end

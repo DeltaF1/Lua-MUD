@@ -62,7 +62,7 @@ return {
 	obj_name = {
 		"What is the name of the object? ",
 		function(p,d,i)
-			p._editing_obj.name = d
+			p._editing_obj:setName(d)
 			p:setMenu(unpack(menus.obj_desc))
 		end,
 		{"."}
@@ -96,6 +96,7 @@ return {
 			elseif t == "object" then
 				-- objects[p._editing_obj.identifier] = p._editing_obj
 				print("Adding object")
+				objects[p._editing_obj.identifier] = p._editing_obj
 				table.insert(p.room.objects, p._editing_obj)
 			else
 				print("Adding player")

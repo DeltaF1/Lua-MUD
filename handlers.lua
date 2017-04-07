@@ -180,6 +180,8 @@ return {
 				else
 					player:send("Invalid target!")
 				end
+			elseif verb == "quit" then
+				player:setState("chat")
 			end
 		end,
 		prompt = "combat> "

@@ -119,7 +119,7 @@ local t = {
 					-- for verb in gmatch(%.%S+) do verb..s or verb[conjugations]
 				
 					-- ShinMojo @ sindome.org ([^aeiouy]|qu)y$"-> "$1ies" and (x|ch|ss|sh)$ -> "$1es"
-					--Adds an s. e.g. .walk briskly becomes "walks briskly"
+					-- Adds an s. e.g. .walk briskly becomes "walks briskly"
 					-- v = v:gsub(ShinMojo pattern (need RegEx or custom pattern builder))
 					
 					-- If pronouns.neutral and last used pronoun ~= nil

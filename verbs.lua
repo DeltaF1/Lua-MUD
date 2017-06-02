@@ -312,6 +312,7 @@ local t = {
 				local potential = {}
 				
 				for k,v in pairs(helpfiles) do
+					-- TODO: add tags to helpfiles, soundex those as well
 					local s2 = soundex(k)
 					local l2 = s2:sub(1,1)
 					local n2 = s2:sub(2,4)

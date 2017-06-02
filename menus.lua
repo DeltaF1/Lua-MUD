@@ -31,7 +31,9 @@ return {
 	char_name = {
 		"What is your character's name? ",
 		function(p,d,i)
+			-- TODO: Replace this with if user.characters[d] then
 			-- Check for name already existing!
+			
 			if players[d] then
 				p:send("(OOC) That name is taken!")
 				return
@@ -39,9 +41,10 @@ return {
 			p.name = d
 			p.identifier = "player_"..d
 			p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
+			p:send(IAC..WILL..ECHO)
 			p:setMenu(unpack(menus.char_pass))
 		end,
-		{"%w+"}
+		{"^%w+$"}
 	},
 	
 	char_pass = {
@@ -49,10 +52,16 @@ return {
 		function(p,d,i)
 			-- p.password = d
 			-- Add entry to hash table
+			
+			-- TODO: Abstract login / user retrieval to a separate library, and remove password association with character
+			-- TODO: Add password confirmation menu
+			-- TODO: Remove user and Character association, allow single users to have multiple characters.
 			users[md5.sumhexa(p.name..d)] = p.name
 			players[p.identifier] = p
+			
+			p:send(IAC..WONT..ECHO)
 			-- p:send("With a lurch in the pit of your stomach, you feel yourself materialize.")
-			-- send back to login1?
+			
 			p:send("(OOC) You will now be asked to login with the credentials provided")
 			p:setState("login1")
 		end,

@@ -8,7 +8,8 @@ return {
 			elseif i == 3 then p.pronouns = pronouns.neutral
 			else
 				-- Add this later!
-				p:send("Whoops, don't have a menu for this yet, defaulting to female!!")
+				p:send("Whoops, this feature hasn't been added yet, please choose one of the other options!")
+				return
 			end
 			--TODO: Add some fluff
 			p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
@@ -44,7 +45,7 @@ return {
 			p:send(IAC..WILL..ECHO)
 			p:setMenu(unpack(menus.char_pass))
 		end,
-		{"^%w+$"}
+		{"%w+$"}
 	},
 	
 	char_pass = {
@@ -60,7 +61,6 @@ return {
 			players[p.identifier] = p
 			
 			p:send(IAC..WONT..ECHO)
-			-- p:send("With a lurch in the pit of your stomach, you feel yourself materialize.")
 			
 			p:send("(OOC) You will now be asked to login with the credentials provided")
 			p:setState("login1")

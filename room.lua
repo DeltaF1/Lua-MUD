@@ -70,6 +70,12 @@ function Room.detach(self, dir)
 	
 	self.exits[dir] = nil
 end
+-- ARCH:
+-- Room.move(self, player, dir)
+--   ARCH: check for keys/lock here?
+--   if self:before_move(player, dir) == false then return end
+--   moving logic
+--   self:after_move(player, dir)
 
 Room.do_move = function(self, player, dir)
 	-- Get room at direction
@@ -113,6 +119,11 @@ Room.search = function(self, name)
 	
 	-- Get lower case of search term
 	local name = string.lower(name)
+	
+	if self.name:lower() == name then
+		return self
+	end
+	
 	for i,v in ipairs(self.players) do
 		if v.name:lower() == name or contains(v.aliases, name) then --aliases must be lower case... enforce this in an alias set command?
 			return v

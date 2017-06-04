@@ -119,8 +119,8 @@ end
 --resolve identifier chain i.e. object.inventory.items.1
 function resolve(obj, key)
 	local k
-	local keyparts = {}
-	for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
+	local keyparts = split(key, "%.")
+	-- for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
 	
 	for i, part in ipairs(keyparts) do
 		local num = part:match("#(%d+)")

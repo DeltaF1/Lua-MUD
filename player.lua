@@ -8,6 +8,8 @@
 -- CommandSet.union(c)
 -- CommandSet.sub(c)
 -- CommandSet.intersect(c)
+
+-- TODO: Move CommandSet out of player.lua
 CommandSet = {}
 
 CommandSet.__index = CommandSet
@@ -15,7 +17,6 @@ CommandSet.__index = CommandSet
 function CommandSet:new(t)
 	-- If it is an array
 	if t and isArray(t) then
-		print("t is an array!")
 		local arr = t
 		t = {}
 		-- For every verb in the array
@@ -78,6 +79,7 @@ function CommandSet:sub(c)
 	return t
 end
 
+-- TODO: Make local?
 messages = {
 	standing = "{name} is standing here"
 }
@@ -161,10 +163,13 @@ Player.do_look = function(self, player)
 	return self.desc
 end
 
+-- TODO: Rewrite Player.send to do colour substitution, have optional argument "concat" by default set to
+-- NEWL, then sendRaw can be for actually sending raw :P
 Player.send = function(self, msg)
 	self:sendraw(msg..NEWL)
 end
 
+-- TODO: Rename to sendRaw, to comply with the style guide
 Player.sendraw = function(self, msg)
 	
 	if self.room then
@@ -189,6 +194,7 @@ Player.proxy = function(self)
 	)
 end
 
+-- ARCH: Should any of this be offloaded into the menu handler instead?
 Player.setMenu = function(self, prompt, f, input)
 	input = input or {"y","n"}
 	self.state = "menu"

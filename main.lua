@@ -54,7 +54,6 @@ loadHelpFiles()
 function broadcast(s)
 
 	print("Broadcasting")
-	print("Wher is backup? D:")
 	for _,v in pairs(clients) do
 		if v.state == "chat" then
 			v:send(s)
@@ -111,6 +110,7 @@ function Update(dt)
 end
 
 function main(dt)
+	local status, err = pcall(function()
 	local sock = server:accept()
 	
 	if sock then 
@@ -125,6 +125,11 @@ function main(dt)
 		local player = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
 		player = Player:new(player)
 		clients[sock] = player
+	end
+	end)
+	
+	if not status then
+		error("There was an error trying to accept a new connection: "..NEWL..err)
 	end
 	
 	Update(dt)
@@ -147,7 +152,6 @@ function main(dt)
 				v:sendraw(v.prompt or handlers[v.state].prompt)
 			end
 		else
-			--print(err)
 			if err == "closed" then
 				verbs.quit.f(v)
 			end
@@ -161,6 +165,7 @@ DT = 0
 prevTime = os.time()
 
 while true do
+	-- Why are we using socket.gettime in one place and os.time in another...
 	curTime = socket.gettime()
 	DT = curTime - prevTime
 	
@@ -174,7 +179,7 @@ while true do
 		elseif err:find("STOP COMMAND") then
 			print("Stopping program normally, just a STOP command")
 		else
-			print("The program has halted in the middle of something, the world may be corrupted! Error: "..err)
+			print("The program has halted in the middle of something, the world may be corrupted! Error: "..NEWL..err)
 		end
 				
 		--save the world!

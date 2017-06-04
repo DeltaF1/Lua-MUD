@@ -56,11 +56,13 @@ return {
 			
 			players[player.identifier] = player
 			
+			-- TODO: Move this to world_load
 			if not player.cmdset then
 				player.cmdset = cmdsets.Default
 			end
 			
 			player.cmdset = CommandSet:new(player.cmdset)
+			player.cmdset = player.cmdset:union(cmdsets.Default)
 			
 			--CommandSet:new(keys(verbs))
 			-- Mainly for debugging, eventually colours will mean something. Maybe class/rank?
@@ -100,6 +102,27 @@ return {
 			local parts = split(data)
 			
 			-- replace parts like "@here" or "@me" with names of objects?
+			
+			newData = ""
+			for i, part in ipairs(parts) do
+		
+				if part:sub(1,1) == "@" then
+					print("Got an @")
+					if part == "@me" then
+						print("replacing @me!")
+						part = player.name
+					elseif part == "@here" then
+						part = player.room.name
+					end
+					print(part)
+					parts[i] = part
+				end
+				
+				newData = newData..part.." "
+			end
+			
+			data = newData:sub(1,#newData-1)
+			
 			
 			-- First word sent
 			local cmd = parts[1]
@@ -155,6 +178,7 @@ return {
 				return
 			end
 			
+			-- TODO: = loadstring(val)
 			player._editing_obj[key] = val
 		end,
 		prompt = "edit> "

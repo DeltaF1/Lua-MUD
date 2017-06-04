@@ -29,8 +29,10 @@ local t = {
 	look = {
 		f = function(player, parts)
 			local obj
-			if #parts < 2 then
+			if #parts < 2 or parts[2] == "@here" then
 				obj = player.room
+			elseif parts[2] == "@me" then
+				obj = player
 			else
 				obj = player.room:search(parts[2])
 			end
@@ -425,6 +427,15 @@ local t = {
 				player:send(parts[2].." not found!")
 			else
 				return {"error", "Please provide a target to attack!"}
+			end
+		end
+	},
+	exits = {
+		f = function(player, parts)
+			player:send("The available exits are:")
+			
+			for k,v in pairs(player.room.exits) do
+				player:send(k)
 			end
 		end
 	}

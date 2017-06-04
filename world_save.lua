@@ -42,7 +42,7 @@ function ser(obj, newl, indent, tables)
 				v = '"'..v..'"'
 			elseif type(v) == "table" then
 				-- If it has an identifier, then encode that instead of the table
-				-- TBD: in world_load load players, objects, and rooms with unique identifiers to support this
+				-- TODO: in world_load load players, objects, and rooms with unique identifiers to support this
 				if v.identifier then
 					v = '"'..v.identifier..'"'
 				-- If it's a table not yet seen, encode it

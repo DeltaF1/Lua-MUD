@@ -167,12 +167,11 @@ end
 -- NEWL, then sendRaw can be for actually sending raw :P
 Player.send = function(self, msg, concat)
 	if concat == nil then
-		concat == NEWL
+		concat = NEWL
 	end
 	self:sendRaw(msg..concat)
 end
 
--- TODO: Rename to sendRaw, to comply with the style guide
 Player.sendRaw = function(self, msg)
 	
 	if self.room then

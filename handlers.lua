@@ -98,31 +98,12 @@ return {
 				return
 			end
 			
+			-- replace parts like "@here" or "@me" with names of objects
+			data = data:gsub("@([^ ]*)", {me=player.name, here=player.room.name})
+			
+			
 			-- Get parts of data. e.g. "Why is the rum always gone?" will become {"Why", "is", "the", "rum", "always", "gone?"}
 			local parts = split(data)
-			
-			-- replace parts like "@here" or "@me" with names of objects?
-			
-			newData = ""
-			for i, part in ipairs(parts) do
-		
-				if part:sub(1,1) == "@" then
-					print("Got an @")
-					if part == "@me" then
-						print("replacing @me!")
-						part = player.name
-					elseif part == "@here" then
-						part = player.room.name
-					end
-					print(part)
-					parts[i] = part
-				end
-				
-				newData = newData..part.." "
-			end
-			
-			data = newData:sub(1,#newData-1)
-			
 			
 			-- First word sent
 			local cmd = parts[1]

@@ -26,7 +26,7 @@ return {
 			player.identifier = "player_"..player.name
 			-- TBD add a "login2" state for password
 			player:setState "login2"
-			player:sendraw(IAC..WILL..ECHO)
+			player:sendRaw(IAC..WILL..ECHO)
 			
 		end,
 		prompt = colour("%{green}Please enter your username (type 'new' to create a new character):")

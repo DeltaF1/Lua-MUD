@@ -165,12 +165,15 @@ end
 
 -- TODO: Rewrite Player.send to do colour substitution, have optional argument "concat" by default set to
 -- NEWL, then sendRaw can be for actually sending raw :P
-Player.send = function(self, msg)
-	self:sendraw(msg..NEWL)
+Player.send = function(self, msg, concat)
+	if concat == nil then
+		concat == NEWL
+	end
+	self:sendRaw(msg..concat)
 end
 
 -- TODO: Rename to sendRaw, to comply with the style guide
-Player.sendraw = function(self, msg)
+Player.sendRaw = function(self, msg)
 	
 	if self.room then
 		msg = string.gsub(msg, "([%w_]+)", function(v)

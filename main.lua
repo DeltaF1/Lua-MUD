@@ -149,7 +149,7 @@ function main(dt)
 			if handler then
 				handler.f(v, data)
 				-- state may have changed
-				v:sendraw(v.prompt or handlers[v.state].prompt)
+				v:sendRaw(v.prompt or handlers[v.state].prompt)
 			end
 		else
 			if err == "closed" then

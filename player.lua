@@ -87,7 +87,7 @@ messages = {
 -- messages is a metatable
 messages.__index = messages
 
-pronouns = {
+PRONOUNS = {
 	male = {
 		i = "he",
 		my = "his",
@@ -126,9 +126,9 @@ Player.default = function()
 		aliases = {},
 		colour = "green",
 		desc = "A person with no distinguishing features, their blank face devoid of any human emotions",
-		pronouns = pronouns.female,
+		pronouns = PRONOUNS.female,
 		messages = {},
-		filename = "misc.lua",
+		user = "__NPC",
 		hp = 5,
 		ap = 0,
 		maxap = 5,
@@ -186,6 +186,7 @@ Player.sendRaw = function(self, msg)
 		end)
 	end
 	
+	if not self.sock then return end -- TODO: Integrate into AI's text input module
 	self.sock:send(msg)
 end
 

@@ -22,6 +22,10 @@ Room.new = function(self,o)
 		o[k] = o[k] or v
 	end
 	
+	if not o.identifier then
+		o.identifier = sql.get_identifier("rooms")
+	end
+	
 	return setmetatable(o, self)
 end
 
@@ -41,7 +45,7 @@ Room.do_look = function(self, player)
 	
 	for i,v in ipairs(self.players) do
 		if not player:eq(v) then
-			s = s..v:message("standing").."." -- Replace with v.messages.standing
+			s = s..v:message("standing")..". " -- Replace with v.messages.standing
 		end
 	end
 	return s
@@ -117,8 +121,13 @@ end
 
 Room.search = function(self, name)
 	
+	if not name then return end
 	-- Get lower case of search term
 	local name = string.lower(name)
+	
+	parts = split(name, ".")
+	name = parts[1]
+	num = parts[2]
 	
 	if self.name:lower() == name then
 		return self
@@ -135,4 +144,8 @@ Room.search = function(self, name)
 			return v
 		end
 	end
+end
+
+Room.setName = function(self, name)
+	self.name = name	
 end

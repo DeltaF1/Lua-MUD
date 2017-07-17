@@ -3,9 +3,9 @@ return {
 	
 		"What gender is your character? (m(ale)/f(emale)/n(eutral)/o(ther)): ",
 		function(p,d,i)
-			if i == 1 then p.pronouns = pronouns.male
-			elseif i == 2 then p.pronouns = pronouns.female
-			elseif i == 3 then p.pronouns = pronouns.neutral
+			if i == 1 then p.pronouns = PRONOUNS.male
+			elseif i == 2 then p.pronouns = PRONOUNS.female
+			elseif i == 3 then p.pronouns = PRONOUNS.neutral
 			else
 				-- Add this later!
 				p:send("Whoops, this feature hasn't been added yet, please choose one of the other options!")
@@ -32,15 +32,22 @@ return {
 	char_name = {
 		"What is your character's name? ",
 		function(p,d,i)
-			-- TODO: Replace this with if user.characters[d] then
 			-- Check for name already existing!
 			
-			if players[d] then
+			-- ARCH: Allow multple users to have the same name?
+			-- TODO: implement name.# syntax for multiple objects w/ same name
+			
+			stmt = DB_CON:prepare("SELECT identifier FROM characters WHERE name=?")
+			stmt:vbind_param_char(1,d)
+			
+			cur = stmt:execute()
+			
+			if cur:fetch() then
 				p:send("(OOC) That name is taken!")
 				return
 			end
 			p.name = d
-			p.identifier = "player_"..d
+			
 			p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
 			p:send(IAC..WILL..ECHO)
 			p:setMenu(unpack(menus.char_pass))
@@ -59,6 +66,9 @@ return {
 			-- TODO: Remove user and Character association, allow single users to have multiple characters.
 			users[md5.sumhexa(p.name..d)] = p.name
 			players[p.identifier] = p
+			p.user = p.name -- TODO: Change this to delink users and players
+			print("[char_pass] p.identifier = "..tostring(p.identifier))
+			world_save.update_player(p)
 			
 			p:send(IAC..WONT..ECHO)
 			
@@ -82,18 +92,6 @@ return {
 		function(p,d,i)
 			p._editing_obj.desc = d
 			
-			p:setMenu(unpack(menus.obj_ident))
-		end,
-		{"."}
-	},
-	
-	obj_ident = {
-		"Set an identifier for this object (leave blank to generate one) ",
-		function(p,d,i)
-			if #d > 0 then
-				p._editing_obj.identifier = d
-			end
-			
 			print("Creating object of type "..p._editing_obj._type)
 			local t = p._editing_obj._type
 			p._editing_obj._type = nil
@@ -108,14 +106,15 @@ return {
 				objects[p._editing_obj.identifier] = p._editing_obj
 				table.insert(p.room.objects, p._editing_obj)
 			else
-				print("Adding player")
+				print("Adding character")
 				-- players[p._editing_obj.identifier(or maybe p._editing_obj.name)] = p._editing_obj
+				players[p._editing_obj.identifier] = p._editing_obj
 				table.insert(p.room.players, p._editing_obj)
 			end
 			p._editing_obj = nil
 			p:setState("chat")
 		end,
-		{"[%S]+"}
+		{"."}
 	},
 	
 	room_dir = {

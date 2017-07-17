@@ -1,8 +1,22 @@
 socket = require "socket"
+
 config = require "config"
 md5 = require "md5"
 colour = require "ansicolors"
 require "utils"
+
+sql = require "sql"
+odbc = require "odbc"
+
+
+sql_pass = config.sql_pass
+
+if not sql_pass then
+	io.write("Enter SQL password: ")	
+	sql_pass = io.read("*l")
+end
+
+DB_CON = odbc.connect("lua_mud", config.sql_user, sql_pass)
 
 math.randomseed(os.time())
 
@@ -23,8 +37,11 @@ require "room"
 require "mobile"
 require "player"
 require "object"
-world_load = require "world_load"
-world_save = require "world_save"
+world_load = require "sql_world_load"
+world_save = require "sql_world_save"
+
+-- To get ser
+require "world_save"
 
 soundex = require "soundex"
 
@@ -32,7 +49,12 @@ rooms, objects, players = world_load.load()
 
 types = {room = Room, player = Player, object = Object}
 
-users = require "users"
+users = {}
+
+for username, password in sql.rows(DB_CON, "SELECT * FROM users") do
+	users[password] = username
+end
+
 
 clients = {}
 
@@ -123,6 +145,7 @@ function main(dt)
 		sock:settimeout(1)
 		print(tostring(sock).." has connected")
 		local player = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
+		player.identifier = 0
 		player = Player:new(player)
 		clients[sock] = player
 	end

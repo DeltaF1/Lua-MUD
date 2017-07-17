@@ -125,7 +125,7 @@ local t = {
 					-- v = v:gsub(ShinMojo pattern (need RegEx or custom pattern builder))
 					
 					-- If pronouns.neutral and last used pronoun ~= nil
-					if p == player then return v end-- secondPersonOfVerb(v)
+					if p == player then return v end -- secondPersonOfVerb(v)
 					local cap = v:multimatch({"([^aeiouy]y)$","(quy)$"})
 					if cap then
 						return v:sub(1, #v-1).."ies"
@@ -140,7 +140,7 @@ local t = {
 					return v.."s"
 				end):gsub("(\\?)(%a+)", function(except, v)
 					if except ~= "" then return v end
-					if p == player then return pronouns.second[v:lower()] end
+					if p == player then return PRONOUNS.second[v:lower()] end
 					return player.pronouns[v:lower()]
 				end
 				):gsub(

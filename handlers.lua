@@ -12,6 +12,7 @@ return {
 			if data == "new" then
 				player:send("(OOC: type 'cancel' to exit character creation)")
 				player:send("You find yourself in a vortex of sound and colour, arcane energies swirling all around. Before you is a small pocket of calm, an orb of clay floating in the center.")
+				player.identifier = sql.get_identifier("characters")
 				player:setMenu(unpack(menus.char_gender))
 				return
 			end
@@ -23,7 +24,7 @@ return {
 			end
 			
 			player.name = data
-			player.identifier = "player_"..player.name
+			
 			-- TBD add a "login2" state for password
 			player:setState "login2"
 			player:sendRaw(IAC..WILL..ECHO)
@@ -33,6 +34,8 @@ return {
 	},
 	login2 = {
 		f = function(player, data)
+			
+			player:send(IAC..WONT..ECHO)
 			-- Get hash of player.name..data..salt
 			
 			--ADD SALT
@@ -41,12 +44,27 @@ return {
 			hash = md5.sumhexa(player.name..data)
 			if users[hash] ~= player.name then
 				player:send("Incorrect password!")
-				player:send(IAC..WONT..ECHO)
 				player:setState("login1")
 				return
 			end
 			
 			
+			-- TODO: Keep a list of users connected separate from characters
+			for k,v in pairs(clients) do
+				if not v.state:find("login") and v.name == player.name then
+					player:send("Error: Already logged in!")
+					player:setState("login1")
+					player.name = nil
+					return
+				end
+			end
+			
+			stmt = DB_CON:prepare("SELECT identifier FROM characters WHERE user=?")
+			stmt:vbind_param_char(1, player.name)
+			
+			cur = stmt:execute()
+			
+			player.identifier = cur:fetch() 
 			
 			for k,v in pairs(players[player.identifier]) do
 				if not contains({"sock", "prompt"}, k) then
@@ -63,6 +81,10 @@ return {
 			
 			player.cmdset = CommandSet:new(player.cmdset)
 			player.cmdset = player.cmdset:union(cmdsets.Default)
+			
+			if player.name == "Delta" then
+				player.cmdset = player.cmdset:union(cmdsets.All)
+			end
 			
 			--CommandSet:new(keys(verbs))
 			-- Mainly for debugging, eventually colours will mean something. Maybe class/rank?

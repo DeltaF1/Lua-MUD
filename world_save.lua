@@ -66,10 +66,9 @@ function t.save()
 	for dir, tbl in pairs{["rooms"]=rooms, ["objects"]=objects, ["players"]=players} do
 		saveTable(tbl, dir)
 	end
-	local f = io.open("users.lua", "w")
-	print("users = "..ser(users))
-	f:write("return"..ser(users))
-	f:close()
+	
+	
+	
 end
 
 function saveTable(tbl, dir)

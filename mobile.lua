@@ -21,6 +21,10 @@ Mobile.new = function(self,o)
 		o[k] = o[k] or v
 	end
 	
+	if not o.identifier then
+		o.identifier = sql.get_identifier("characters")	
+	end
+	
 	setmetatable(o.messages, messages)
 	
 	return setmetatable(o, self)
@@ -35,6 +39,10 @@ Mobile.damage = function(self, num)
 		self:setState "chat"
 		-- TP home? Delete character?
 	end
+end
+
+Mobile.setName = function(self, name)
+	self.name = name	
 end
 
 Arena = {}

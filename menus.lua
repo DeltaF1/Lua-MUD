@@ -3,15 +3,16 @@ return {
 	
 		"What gender is your character? (m(ale)/f(emale)/n(eutral)/o(ther)): ",
 		function(p,d,i)
-			if i == 1 then p.pronouns = PRONOUNS.male
-			elseif i == 2 then p.pronouns = PRONOUNS.female
-			elseif i == 3 then p.pronouns = PRONOUNS.neutral
+			obj = p._editing_obj
+			if i == 1 then obj.pronouns = PRONOUNS.male
+			elseif i == 2 then obj.pronouns = PRONOUNS.female
+			elseif i == 3 then obj.pronouns = PRONOUNS.neutral
 			else
-				-- Add this later!
+				-- TODO: Add pronoun creation menu
 				p:send("Whoops, this feature hasn't been added yet, please choose one of the other options!")
 				return
 			end
-			--TODO: Add some fluff
+			
 			p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
 			p:setMenu(unpack(menus.char_desc))
 		end, 
@@ -19,9 +20,11 @@ return {
 	},
 	
 	char_desc = {
-		"What does your character look like?",
+		"What does your character look like? ",
 		function(p,d,i)
-			p.desc = d
+			obj = p._editing_obj
+			
+			obj.desc = d
 			-- TODO: Add some fluff
 			p:send("The golem begins to take on more humanistic characteristics, and facial features push themself out of the surface of its head.")
 			p:setMenu(unpack(menus.char_name))
@@ -37,6 +40,10 @@ return {
 			-- ARCH: Allow multple users to have the same name?
 			-- TODO: implement name.# syntax for multiple objects w/ same name
 			
+			if contains({"quit"}, d) then
+				p:send("(OOC) Invalid name!")
+			end
+			
 			stmt = DB_CON:prepare("SELECT identifier FROM characters WHERE name=?")
 			stmt:vbind_param_char(1,d)
 			
@@ -46,13 +53,39 @@ return {
 				p:send("(OOC) That name is taken!")
 				return
 			end
-			p.name = d
 			
+			obj = p._editing_obj
+			
+			obj.name = d
+			
+			-- TODO: Edit flavor text
 			p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
-			p:send(IAC..WILL..ECHO)
-			p:setMenu(unpack(menus.char_pass))
+			
+			p:setMenu(unpack(menus.char_confirm))
 		end,
 		{"%w+$"}
+	},
+	
+	char_confirm = {
+		"Create character? (Y/N)",
+		function(p,d,i)
+			p:send("")
+			if i == 1 then
+				obj = p._editing_obj
+				
+				obj.user = p.name
+				
+				players[obj.identifier] = obj
+				world_save.update_player(obj)
+				
+			else
+				p:send("Cancelling character creation...")
+				
+				p._editing_obj = nil
+			end
+			p:setState("login3")
+		end,
+		{"[Yy].*$", "[Nn].*$"}
 	},
 	
 	char_pass = {
@@ -64,10 +97,10 @@ return {
 			-- TODO: Abstract login / user retrieval to a separate library, and remove password association with character
 			-- TODO: Add password confirmation menu
 			-- TODO: Remove user and Character association, allow single users to have multiple characters.
-			users[md5.sumhexa(p.name..d)] = p.name
+			users[md5.sumhexa(d)] = p.name
 			players[p.identifier] = p
 			p.user = p.name -- TODO: Change this to delink users and players
-			print("[char_pass] p.identifier = "..tostring(p.identifier))
+			
 			world_save.update_player(p)
 			
 			p:send(IAC..WONT..ECHO)

@@ -114,6 +114,14 @@ PRONOUNS = {
 	}
 }
 
+User = {}
+
+User.__index = User
+
+User.new = function(self, o)
+		
+end
+
 Player = {}
 
 Player.__index = Player
@@ -147,7 +155,7 @@ Player.sub = function(self, s)
 	return s:gsub("{([^}]+)}", function(key)
 		local t,k = resolve(self, key)
 		if not t then
-			print("Invalid key "..key)
+			
 		end
 		return t[k]
 	end)
@@ -166,9 +174,8 @@ end
 -- TODO: Rewrite Player.send to do colour substitution, have optional argument "concat" by default set to
 -- NEWL, then sendRaw can be for actually sending raw :P
 Player.send = function(self, msg, concat)
-	if concat == nil then
-		concat = NEWL
-	end
+	concat = concat or NEWL
+	msg = msg or ""
 	self:sendRaw(msg..concat)
 end
 
@@ -192,7 +199,7 @@ end
 
 Player.proxy = function(self)
 	return makeProxy(self,
-		{eq=true, name=true, desc=true, send=true, message=true}
+		{eq=true, name=true, desc=true, send=true, message=true, user=true}
 		-- No set usage yet
 	)
 end
@@ -203,12 +210,12 @@ Player.setMenu = function(self, prompt, f, input)
 	self.state = "menu"
 	self.prompt = prompt
 	self.menu = function(player, data)
-		print("Got data in menu of "..data)
+		
 		for i = 1, #input do
 			patt = "^"..input[i]
-			print("Does the data match '"..patt.."'?")
+			
 			if data:match(patt) then
-				print("Running the menu command!")
+				
 				f(player, data, i)
 				return
 			end
@@ -219,5 +226,12 @@ end
 
 Player.setState = function(self, state)
 	self.prompt = nil
+	
+	local after = handlers[self.state].after
+	if after then after(self) end
+	
+	local before = handlers[state].before
+	if before then before(self) end
+	
 	self.state = state
 end

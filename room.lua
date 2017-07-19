@@ -93,9 +93,9 @@ Room.do_move = function(self, player, dir)
 		
 		-- Show the description of the destination
 		table.insert(player.room.players, player)
-		print("running player.room:do_enter")
+		-- print("running player.room:do_enter")
 		local f = player.room.do_enter
-		print("type(f) = "..type(f))
+		
 		f(player.room, player:proxy(),dir)
 		--player.room:do_enter(player:proxy(), dir)
 	else

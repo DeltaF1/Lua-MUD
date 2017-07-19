@@ -7,14 +7,14 @@ local t = {
 					s = s..v.name..NEWL
 				end
 			end
-			player.sock:send(s)
+			player:send(s)
 		end
 	},
 	quit = {
 		f = function(player, parts)
 			player.sock:send("Goodbye!"..NEWL)
 			player.sock:close()
-			print(tostring(player.name or player.sock).." has disconnected")
+			print(tostring(player.user or player.name or player.sock).." has disconnected")
 			clients[player.sock] = nil
 			
 			if player.state == "chat" then
@@ -23,7 +23,7 @@ local t = {
 			if player.room then
 				tremove(player.room.players, player)
 			end
-			--save player data to file
+			world_save.update_player(player)
 		end
 	},
 	look = {
@@ -344,7 +344,7 @@ local t = {
 			
 			
 			if helpfile then
-				player:send(player:sub(helpfile))
+				player:send(player:sub(helpfile)..NEWL)
 			end
 		end,
 		aliases = {"?"}
@@ -409,7 +409,7 @@ local t = {
 			if target then
 				-- check if it's a mobile?
 				if target.hp then
-					if player.room.flags.SAFE then
+					if player.room.flags:sub(1,1) == "1" then
 						player:send("Cannot start a fight here!")
 					elseif target.arena then
 						target.arena:add(player)

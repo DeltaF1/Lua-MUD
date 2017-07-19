@@ -8,6 +8,8 @@ require "utils"
 sql = require "sql"
 odbc = require "odbc"
 
+-- Convert line endings from unix to telnet
+config.motd = config.motd:gsub("([^\r])(\n)", "%1\r\n")
 
 sql_pass = config.sql_pass
 
@@ -49,13 +51,6 @@ rooms, objects, players = world_load.load()
 
 types = {room = Room, player = Player, object = Object}
 
-users = {}
-
-for username, password in sql.rows(DB_CON, "SELECT * FROM users") do
-	users[password] = username
-end
-
-
 clients = {}
 
 helpfiles = {}
@@ -75,7 +70,7 @@ loadHelpFiles()
 
 function broadcast(s)
 
-	print("Broadcasting")
+	-- print("Broadcasting")
 	for _,v in pairs(clients) do
 		if v.state == "chat" then
 			v:send(s)
@@ -141,13 +136,14 @@ function main(dt)
 		--sock:send(ECHO)
 		local s = colour(config.motd..NEWL..handlers.login1.prompt)
 		sock:send(s)
-		print(s)
+		
 		sock:settimeout(1)
 		print(tostring(sock).." has connected")
-		local player = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
-		player.identifier = 0
-		player = Player:new(player)
-		clients[sock] = player
+		local user = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
+		user.identifier = 0
+		user = Player:new(user)
+		user.name = nil
+		clients[sock] = user
 	end
 	end)
 	

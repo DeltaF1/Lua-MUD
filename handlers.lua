@@ -34,8 +34,10 @@
 				cur = stmt:execute()
 
 				pass = cur:fetch()
+				
+				cur:close()
 				-- Get hash of user.name..data..salt
-
+			
 				--ADD SALT
 
 				--FOR THE LOVE OF GOD DON'T USE MD5

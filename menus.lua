@@ -9,7 +9,7 @@ return {
 			elseif i == 3 then obj.pronouns = PRONOUNS.neutral
 			else
 				-- TODO: Add pronoun creation menu
-				p:send("Whoops, this feature hasn't been added yet, please choose one of the other options!")
+				p:setMenu(unpack(menus.char_gender_other))
 				return
 			end
 			
@@ -17,6 +17,53 @@ return {
 			p:setMenu(unpack(menus.char_desc))
 		end, 
 		{"m","f","n","o"}
+	},
+	char_gender_other = {
+		"Enter your pronouns here, in the format i/myself/mine/my\
+		e.g. she/herself/hers/her: ",
+		function(p,d,i)
+			obj = p._editing_obj
+			parts = split(d, '/')
+			
+			obj.pronouns.i=parts[1]
+			obj.pronouns.myself=parts[2]
+			obj.pronouns.mine=parts[3]
+			obj.pronouns.my=parts[4]
+			
+			get_pronoun:vbind_param_char(1,obj.pronouns.i)
+			get_pronoun:vbind_param_char(2,obj.pronouns.myself)
+			get_pronoun:vbind_param_char(3,obj.pronouns.mine)
+			get_pronoun:vbind_param_char(4,obj.pronouns.my)
+			
+			cur = get_pronoun:execute()
+			
+			identifier = cur:fetch()
+			
+			cur:close()
+			
+			if identifier then
+				obj.pronouns = PRONOUNS[identifier]
+			else
+				-- It's a new pronoun set
+				identifier = sql.get_identifier("pronouns", "i")
+				
+				stmt = DB_CON:prepare("UPDATE pronouns SET i=?, myself=?, mine=?, my=? WHERE identifier=?")
+			
+				stmt:vbind_param_char(1, obj.pronouns.i)
+				stmt:vbind_param_char(2, obj.pronouns.myself)
+				stmt:vbind_param_char(3, obj.pronouns.mine)
+				stmt:vbind_param_char(4, obj.pronouns.my)
+				
+				stmt:vbind_param_ulong(5, identifier)
+				
+				res, err = stmt:execute()
+				if not res then print(err) end
+			end
+			
+			p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
+			p:setMenu(unpack(menus.char_desc))
+		end,
+		{"%w+/%w+/%w+/%w+$"}
 	},
 	
 	char_desc = {
@@ -49,7 +96,11 @@ return {
 			
 			cur = stmt:execute()
 			
-			if cur:fetch() then
+			identifier = cur:fetch()
+			
+			cur:close()
+			
+			if identifier then
 				p:send("(OOC) That name is taken!")
 				return
 			end

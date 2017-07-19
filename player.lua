@@ -180,7 +180,7 @@ Player.send = function(self, msg, concat)
 end
 
 Player.sendRaw = function(self, msg)
-	
+	msg = msg:gsub("([^\r])(\n)", "%1\r\n")
 	if self.room then
 		msg = string.gsub(msg, "([%w_]+)", function(v)
 			-- For every word, search the room for an object with that name

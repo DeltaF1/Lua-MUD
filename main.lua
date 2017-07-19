@@ -27,6 +27,7 @@ IAC  = "\255"
 WILL = "\251"
 WONT = "\252"
 ECHO = "\001"
+AYT  = "\246"
 
 server = socket.bind("*", config.port)
 
@@ -131,9 +132,8 @@ function main(dt)
 	local sock = server:accept()
 	
 	if sock then 
-		--DEBUG REMOVE
-		--sock:send(WILL)
-		--sock:send(ECHO)
+		sock:send(IAC..AYT)
+		sock:send(IAC..WONT..ECHO)
 		local s = colour(config.motd..NEWL..handlers.login1.prompt)
 		sock:send(s)
 		

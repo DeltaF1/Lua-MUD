@@ -8,6 +8,36 @@ require "utils"
 sql = require "sql"
 odbc = require "odbc"
 
+do
+	local logfile
+	--TODO implement a non-positional arg system i.e. --logfile=/var/log/luamud.log
+	if arg[1] then
+		logfile = arg[1]
+	else
+		logfile = "/var/log/luamud.log"
+	end
+	
+	
+	
+	PRINT_F, err = io.open(logfile, "a")
+	
+	if not PRINT_F then
+		error(err)
+	end
+	
+	_print = print
+	print = function(...)
+		_print(...)
+		
+		local timestamp = os.date("[%d-%b-%Y %H:%M:%S]")
+		
+		PRINT_F:write(timestamp .." ".. ... .. "\r\n")
+		PRINT_F:flush()
+	end
+end
+
+print("Starting up server...")
+
 -- Convert line endings from unix to telnet
 config.motd = config.motd:gsub("([^\r])(\n)", "%1\r\n")
 
@@ -18,7 +48,14 @@ if not sql_pass then
 	sql_pass = io.read("*l")
 end
 
-DB_CON = odbc.connect("lua_mud", config.sql_user, sql_pass)
+DB_CON, err = odbc.connect("lua_mud", config.sql_user, sql_pass)
+
+if not DB_CON then
+	print(err)
+	error(err)
+end
+
+print("Connected to database!")
 
 math.randomseed(os.time())
 
@@ -34,7 +71,7 @@ server = socket.bind("*", config.port)
 local ip, port = server:getsockname()
 server:settimeout(0)
 
-print("use telnet localhost "..port.." to connect!")
+print(string.format("Bound to port %i!", port))
 
 require "room"
 require "mobile"
@@ -127,7 +164,8 @@ function Update(dt)
 	end
 end
 
-function main(dt)
+function main()
+	local dt = DT
 	local status, err = pcall(function()
 	local sock = server:accept()
 	
@@ -163,6 +201,7 @@ function main(dt)
 			--print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
 			
 			data = stripControlChars(data)
+			print("data = "..data)
 			local handler = handlers[v.state]
 			
 			if handler then
@@ -172,7 +211,11 @@ function main(dt)
 			end
 		else
 			if err == "closed" then
-				verbs.quit.f(v)
+				if v.name then
+					verbs.quit.f(v)
+				else
+					clients[v.sock] = nil
+				end
 			end
 		end
 	end
@@ -181,7 +224,18 @@ end
 
 TIME = 0
 DT = 0
-prevTime = os.time()
+prevTime = socket.gettime()
+
+err_handler = function(err) 
+	if string.match(err, "interrupted!") then
+		print("Stopping program normally, just a Ctrl-C")
+	elseif err:find("STOP COMMAND") then
+		print("Stopping program normally, just a STOP command")
+	else
+		print("The program has halted in the middle of something, the world may be corrupted! Error: "..NEWL..err)
+		print(debug.traceback())
+	end
+end
 
 while true do
 	-- Why are we using socket.gettime in one place and os.time in another...
@@ -190,16 +244,11 @@ while true do
 	
 	TIME = TIME + DT
 	prevTime = curTime
-	status, err = pcall(main, DT)
+	
+	status, err = xpcall(main, err_handler)
 	if not status then
 
-		if string.match(err, "interrupted!") then
-			print("Stopping program normally, just a Ctrl-C")
-		elseif err:find("STOP COMMAND") then
-			print("Stopping program normally, just a STOP command")
-		else
-			print("The program has halted in the middle of something, the world may be corrupted! Error: "..NEWL..err)
-		end
+		
 				
 		--save the world!
 		
@@ -209,8 +258,10 @@ while true do
 		--also, save room/items
 		--	serialize, keep do_xxx_str
 		
+		print("Saving the world...")
 		world_save.save()
-		
+		print("Goodbye.")
+		PRINT_F:close()
 		break
 	end
 	--if math.floor(TIME) % 10 == 0 then print("Time: "..TIME) end

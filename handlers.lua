@@ -16,6 +16,7 @@
 				end
 
 				user.name = data
+				
 
 
 				user:setState "login2"
@@ -27,8 +28,8 @@
 		login2 = {
 			before = function(user) user:send(IAC..WILL..ECHO, "") end,
 			f = function(user, data)
-
-				stmt = DB_CON:prepare("SELECT password FROM users WHERE username=?")
+			
+				stmt = DB_CON:prepare("SELECT password FROM users WHERE username = BINARY ?")
 				stmt:vbind_param_char(1, user.name)
 
 				cur = stmt:execute()
@@ -41,16 +42,16 @@
 				--ADD SALT
 
 				--FOR THE LOVE OF GOD DON'T USE MD5
+				-- TODO use salt, and sha256
 				hash = md5.sumhexa(data)
 
 				if pass ~= hash then
-					user:send("Incorrect password!")
+					user:send("Incorrect login!")
 					user:setState("login1")
 					return
 				end
 
 
-				-- TODO: Keep a list of users connected separate from characters
 				for k,v in pairs(clients) do
 					if v ~= user and ((v.state:find("login3") and v.name == user.name) or (v.user and v.user == user.name)) then
 						user:send("Error: Already logged in!")
@@ -60,11 +61,11 @@
 					end
 				end
 
-
+				user.user = user.name
 
 				user:setState "login3"
 			end,
-			after = function(user) user:sendRaw(IAC..WONT..ECHO) end,
+			after = function(user) user:send(IAC..WONT..ECHO, "") end,
 			prompt = colour("%{red}Please enter your password: ")
 		},
 		login3 = {
@@ -117,7 +118,8 @@
 
 				player.cmdset = CommandSet:new(player.cmdset)
 				player.cmdset = player.cmdset:union(cmdsets.Default)
-
+				
+				-- TODO: Rework command set serialization, use similar method to pronoun storage.
 				if player.name == "Delta" then
 					player.cmdset = player.cmdset:union(cmdsets.All)
 				end
@@ -153,13 +155,17 @@
 					return
 				end
 
-				-- replace parts like "@here" or "@me" with names of objects
-				data = data:gsub("@([^ ]*)", {me=player.name, here=player.room.name})
+				
 
 
 				-- Get parts of data. e.g. "Why is the rum always gone?" will become {"Why", "is", "the", "rum", "always", "gone?"}
 				local parts = split(data)
-
+				
+				-- replace parts like "@here" or "@me" with names of objects
+				for i, part in ipairs(parts) do
+					parts[i] = part:gsub("@([^ ]*)", {me=player.name, here=player.room.name})
+				end
+			
 				-- First word sent
 				local cmd = parts[1]
 
@@ -215,7 +221,13 @@
 				end
 
 				-- TODO: = loadstring(val)
-				player._editing_obj[key] = val
+				
+				payload = "return "..val
+			
+				local success, newval = pcall(loadstring(payload))
+			
+				if not success then player:send(newval); return end
+				player._editing_obj[key] = newval
 			end,
 			prompt = "edit> "
 		},

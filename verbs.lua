@@ -167,7 +167,7 @@ local t = {
 			player.room:broadcast(player.name.." "..data:match("%S+ (.+)"))
 		end,
 		aliases = {
-			"e", "/me"
+			"/me"
 		}
 	},
 	stop = {
@@ -216,25 +216,28 @@ local t = {
 			end
 			
 			local name = parts[2]
-			if name == "@here" then
-				obj = player.room
-			elseif name == "@me" then
-				obj = player
-			else
-				obj = player.room:search(name)
-			end
+			
+			obj = player.room:search(name)
+			
 			if not obj then
 				return "object not found!"
 			end
 			
-			-- set hobo pronouns.myself "xirself"
+			
 			
 			local key = parts[3]
 			local obj, k = resolve(obj, key)
 			if not obj then return player:send("Invalid keypath "..key) end
 			print("Setting "..(obj.name or tostring(obj)).." at "..k)
 			
-			local payload = data:match("%S+ %S+ %S+ (.+)")
+			-- e.g. set hobo pronouns.myself "xirself"
+			
+			local payload_parts = {}
+			for i = 4,#parts do
+				payload_parts[#payload_parts+1] = parts[i]
+			end
+			
+			local payload = table.concat(payload_parts, " ")
 			
 			payload = "return "..payload
 			
@@ -376,7 +379,7 @@ local t = {
 		end
 	},
 	edit = {
-		f = function(player, parts)
+		f = function(player, parts, data)
 			if player.room:search(parts[2]) then
 				player._editing_obj = player.room:search(parts[2])
 				player:setState "edit"

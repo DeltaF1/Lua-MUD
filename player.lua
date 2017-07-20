@@ -171,15 +171,11 @@ Player.do_look = function(self, player)
 	return self.desc
 end
 
--- TODO: Rewrite Player.send to do colour substitution, have optional argument "concat" by default set to
--- NEWL, then sendRaw can be for actually sending raw :P
+
 Player.send = function(self, msg, concat)
 	concat = concat or NEWL
 	msg = msg or ""
-	self:sendRaw(msg..concat)
-end
-
-Player.sendRaw = function(self, msg)
+	
 	msg = msg:gsub("([^\r])(\n)", "%1\r\n")
 	if self.room then
 		msg = string.gsub(msg, "([%w_]+)", function(v)
@@ -192,6 +188,12 @@ Player.sendRaw = function(self, msg)
 			end 
 		end)
 	end
+	
+	self:sendRaw(msg..concat)
+end
+
+Player.sendRaw = function(self, msg)
+	
 	
 	if not self.sock then return end -- TODO: Integrate into AI's text input module
 	self.sock:send(msg)

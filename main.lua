@@ -181,6 +181,7 @@ function main()
 		user.identifier = 0
 		user = Player:new(user)
 		user.name = nil
+		user.user = nil
 		clients[sock] = user
 	end
 	end)
@@ -207,11 +208,11 @@ function main()
 			if handler then
 				handler.f(v, data)
 				-- state may have changed
-				v:sendRaw(v.prompt or handlers[v.state].prompt)
+				v:send(v.prompt or handlers[v.state].prompt, "")
 			end
 		else
 			if err == "closed" then
-				if v.name then
+				if not v.state:find("login") then
 					verbs.quit.f(v)
 				else
 					clients[v.sock] = nil

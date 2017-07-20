@@ -8,7 +8,6 @@ return {
 			elseif i == 2 then obj.pronouns = PRONOUNS.female
 			elseif i == 3 then obj.pronouns = PRONOUNS.neutral
 			else
-				-- TODO: Add pronoun creation menu
 				p:setMenu(unpack(menus.char_gender_other))
 				return
 			end
@@ -72,7 +71,7 @@ return {
 			obj = p._editing_obj
 			
 			obj.desc = d
-			-- TODO: Add some fluff
+			
 			p:send("The golem begins to take on more humanistic characteristics, and facial features push themself out of the surface of its head.")
 			p:setMenu(unpack(menus.char_name))
 		end,
@@ -139,18 +138,18 @@ return {
 		{"[Yy].*$", "[Nn].*$"}
 	},
 	
+	--[[
 	char_pass = {
 		"(OOC) What password would you like to use? ",
 		function(p,d,i)
 			-- p.password = d
 			-- Add entry to hash table
 			
-			-- TODO: Abstract login / user retrieval to a separate library, and remove password association with character
+			
 			-- TODO: Add password confirmation menu
-			-- TODO: Remove user and Character association, allow single users to have multiple characters.
 			users[md5.sumhexa(d)] = p.name
 			players[p.identifier] = p
-			p.user = p.name -- TODO: Change this to delink users and players
+			p.user = p.name
 			
 			world_save.update_player(p)
 			
@@ -160,7 +159,7 @@ return {
 			p:setState("login1")
 		end,
 		{"."}
-	},
+	}, --]]
 	
 	obj_name = {
 		"What is the name of the object? ",

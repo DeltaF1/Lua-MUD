@@ -180,7 +180,6 @@
 				end
 
 				if verb then
-					print("Got verb!")
 					key = verb.name
 					-- Run the verb, passing in the player, split parts, and original data string
 					--
@@ -211,14 +210,18 @@
 			f = function(player, data)
 				local parts = split(data)
 				local key = parts[1]
-				local val = table.concat(parts, " ", 2)
-				print("key = "..tostring(key).." val = "..tostring(val))
-				if not key then return end
+				
 				if key == "quit" then
 					player._editing_obj = nil
 					player:setState "chat"
 					return
 				end
+			
+				t, key = resolve(player._editing_obj, key)
+				local val = table.concat(parts, " ", 2)
+				print("key = "..tostring(key).." val = "..tostring(val))
+				if not key then return end
+				
 
 				-- TODO: = loadstring(val)
 				
@@ -227,7 +230,7 @@
 				local success, newval = pcall(loadstring(payload))
 			
 				if not success then player:send(newval); return end
-				player._editing_obj[key] = newval
+				t[key] = newval
 			end,
 			prompt = "edit> "
 		},

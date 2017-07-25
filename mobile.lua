@@ -36,7 +36,7 @@ Mobile.damage = function(self, num)
 	if self.hp <= 0 then
 		self:send("You died!")
 		self.hp = self.maxhp
-		self:setState "chat"
+		self:setState("chat")
 		-- TP home? Delete character?
 	end
 end

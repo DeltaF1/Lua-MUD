@@ -19,9 +19,9 @@ do
 	
 	
 	
-	PRINT_F, err = io.open(logfile, "a")
+	LOG_F, err = io.open(logfile, "a")
 	
-	if not PRINT_F then
+	if not LOG_F then
 		error(err)
 	end
 	
@@ -31,10 +31,12 @@ do
 		
 		local timestamp = os.date("[%d-%b-%Y %H:%M:%S]")
 		
-		PRINT_F:write(timestamp .." ".. ... .. "\r\n")
-		PRINT_F:flush()
+		LOG_F:write(timestamp .." ".. ... .. "\r\n")
+		LOG_F:flush()
 	end
 end
+
+LOG_F:write(string.rep("=", 80))
 
 print("Starting up server...")
 
@@ -202,7 +204,6 @@ function main()
 			--print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
 			
 			data = stripControlChars(data)
-			print("data = "..data)
 			local handler = handlers[v.state]
 			
 			if handler then
@@ -229,17 +230,16 @@ prevTime = socket.gettime()
 
 err_handler = function(err) 
 	if string.match(err, "interrupted!") then
-		print("Stopping program normally, just a Ctrl-C")
+		print("SIGINT received, stopping server")
 	elseif err:find("STOP COMMAND") then
-		print("Stopping program normally, just a STOP command")
+		print("STOP command received in-game, stopping server")
 	else
-		print("The program has halted in the middle of something, the world may be corrupted! Error: "..NEWL..err)
+		print("The server ran into a problem. The world may be corrupted, review the error before restarting. Error: "..NEWL..err)
 		print(debug.traceback())
 	end
 end
 
 while true do
-	-- Why are we using socket.gettime in one place and os.time in another...
 	curTime = socket.gettime()
 	DT = curTime - prevTime
 	
@@ -248,22 +248,10 @@ while true do
 	
 	status, err = xpcall(main, err_handler)
 	if not status then
-
 		
-				
-		--save the world!
-		
-		--on player quit, save the player's data
-		--	so, we only need to deal with currently connected players
-		
-		--also, save room/items
-		--	serialize, keep do_xxx_str
-		
-		print("Saving the world...")
 		world_save.save()
 		print("Goodbye.")
-		PRINT_F:close()
+		LOG_F:close()
 		break
 	end
-	--if math.floor(TIME) % 10 == 0 then print("Time: "..TIME) end
 end

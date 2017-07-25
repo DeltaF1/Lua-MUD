@@ -7,9 +7,7 @@ Room = {
 		exits={},
 		objects={},
 		filename="misc.lua",
-		flags = {
-			SAFE = false
-		}
+		flags = 0,
 	} end
 }
 
@@ -128,8 +126,7 @@ Room.search = function(self, name)
 	parts = split(name, ".")
 	name = parts[1]
 	num = parts[2]
-	
-	print(string.format("self.name = %q, name = %q", self.name:lower(), name))
+
 	if self.name:lower() == name then
 		return self
 	end

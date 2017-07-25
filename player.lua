@@ -177,8 +177,9 @@ Player.send = function(self, msg, concat)
 	msg = msg or ""
 	
 	msg = msg:gsub("([^\r])(\n)", "%1\r\n")
+	
 	if self.room then
-		msg = string.gsub(msg, "([%w_]+)", function(v)
+		msg = string.gsub(msg, "(%S+)", function(v)
 			-- For every word, search the room for an object with that name
 			local obj = self.room:search(v)
 			

@@ -83,7 +83,7 @@ return {
 		function(p,d,i)
 			-- Check for name already existing!
 			
-			-- ARCH: Allow multple users to have the same name?
+			-- ARCH: Allow multple characters to have the same name?
 			-- TODO: implement name.# syntax for multiple objects w/ same name
 			
 			if contains({"quit"}, d) then

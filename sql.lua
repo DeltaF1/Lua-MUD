@@ -1,3 +1,5 @@
+-- sql credentials are found in config.lua
+
 local sql = {}
 
 function sql.rows(connection, sql_statement)

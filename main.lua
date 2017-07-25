@@ -50,7 +50,9 @@ if not sql_pass then
 	sql_pass = io.read("*l")
 end
 
-DB_CON, err = odbc.connect("lua_mud", config.sql_user, sql_pass)
+local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(config.sql_driver, config.sql_db, config.sql_host, config.sql_port, config.sql_user, sql_pass)
+
+DB_CON, err = odbc.driverconnect(conn_string)
 
 if not DB_CON then
 	print(err)

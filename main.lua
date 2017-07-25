@@ -36,7 +36,7 @@ do
 	end
 end
 
-LOG_F:write(string.rep("=", 80))
+LOG_F:write(string.rep("=", 80).."\r\n")
 
 print("Starting up server...")
 

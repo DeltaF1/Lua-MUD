@@ -2,11 +2,11 @@
 A MUD framework written in lua
 
 ## What is this?
-This is a framework written in lua, designed to be the server-side of a MUD (Multi User Dungeon). MUD's were most popular in the 90's, when compter graphics were, for the most part, limited to text on a console. Most muds are a combination of a text adventure and a TCP chat server, and allow for player-player interactions in a text only environment.
+This is a framework written in lua, designed to be the server-side of a [MUD (Multi User Dungeon)](https://en.wikipedia.org/wiki/MUD). MUD's were most popular in the 90's, when compter graphics were, for the most part, limited to text on a console. Most muds are a combination of a text adventure and a TCP chat server.
 
-##What dependencies does this have?
+## What dependencies does this have?
 Currently runs on Lua 5.1
-Requires a MySQL server for storage.
+Requires lua-odbc to interface with an odbc compliant SQL database. Currently confirmed to work on a MySQL server.
 
 ## How do I use this?
 1. Download or clone the source

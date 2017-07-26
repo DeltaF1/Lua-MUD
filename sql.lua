@@ -1,4 +1,4 @@
--- sql credentials are found in config.lua
+-- (Hint, sql credentials are found in config.lua)
 
 local sql = {}
 

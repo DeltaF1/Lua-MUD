@@ -114,13 +114,6 @@ PRONOUNS = {
 	}
 }
 
-User = {}
-
-User.__index = User
-
-User.new = function(self, o)
-		
-end
 
 Player = {}
 
@@ -176,8 +169,6 @@ Player.send = function(self, msg, concat)
 	concat = concat or NEWL
 	msg = msg or ""
 	
-	msg = msg:gsub("([^\r])(\n)", "%1\r\n")
-	
 	if self.room then
 		msg = string.gsub(msg, "(%S+)", function(v)
 			-- For every word, search the room for an object with that name
@@ -195,7 +186,7 @@ end
 
 Player.sendRaw = function(self, msg)
 	
-	
+	msg = msg:gsub("([^\r])(\n)", "%1\r\n")
 	if not self.sock then return end -- TODO: Integrate into AI's text input module
 	self.sock:send(msg)
 end

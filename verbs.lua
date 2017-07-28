@@ -439,7 +439,22 @@ local t = {
 				player:send(k)
 			end
 		end
-	}
+	},
+	ident = {
+		f = function(player, parts)
+			if not parts[2] then
+				obj = player.room
+			else
+				obj = player.room:search(parts[2])
+			end
+			
+			if obj then
+				player:send(("Identifier of %q is %i"):format(obj.name, obj.identifier))
+			else
+				player:send("Object not found!")
+			end
+		end
+	},
 }
 
 for k,v in pairs(t) do

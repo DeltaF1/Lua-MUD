@@ -4,6 +4,8 @@ update_room = DB_CON:prepare("UPDATE rooms SET name=?,description=?,flags=?,exit
 
 update_player = DB_CON:prepare("UPDATE characters SET name=?,state=?,room=?,description=?,colour=?,cmdset=?,pronouns=?,hp=?,user=? WHERE identifier=?")
 
+update_object = DB_CON:prepare("UPDATE objects SET name=?,description=?,container=?,container_t=? WHERE identifier=?")
+
 get_pronoun, err = DB_CON:prepare("SELECT identifier FROM pronouns WHERE `i`=? AND `myself`=? AND `mine`=? AND `my`=?")
 
 if not get_pronoun then print(err) end
@@ -72,6 +74,33 @@ function t.update_room(room)
 	return room
 end
 
+function t.update_object(object)
+	
+	update_object:vbind_param_char(1,object.name)
+	update_object:vbind_param_char(2,object.desc)
+	update_object:vbind_param_ulong(3,object.container.identifier)
+	
+	--TODO: support players, objects holding other objects
+	
+	local container_t = 0
+	
+	if getmetatable(object.container) == Object then
+		container_t = 2
+	end
+	
+	update_object:vbind_param_utinyint(4,container_t)
+	
+	update_object:vbind_param_ulong(5,object.identifier)
+	
+	res, err = update_object:execute()
+	
+	if not res then
+		error(err)
+	end
+	
+	return object
+end
+
 function t.save()
 	print("Saving the world...")
 	-- Store rooms
@@ -81,6 +110,10 @@ function t.save()
 	
 	for identifier, player in pairs(players) do
 		t.update_player(player)
+	end
+	
+	for identifier, object in pairs(objects) do
+		t.update_object(object)
 	end
 	
 end

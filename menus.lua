@@ -187,6 +187,7 @@ return {
 				-- objects[p._editing_obj.identifier] = p._editing_obj
 				print("Adding object")
 				objects[p._editing_obj.identifier] = p._editing_obj
+				p._editing_obj.container = p.room
 				table.insert(p.room.objects, p._editing_obj)
 			else
 				print("Adding character")

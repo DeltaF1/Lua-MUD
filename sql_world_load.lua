@@ -4,8 +4,10 @@ local colours = {"red","green","yellow","blue","magenta","cyan"}
 
 function t.load()
 	local rooms, objects, players = {}, {}, {}
+
 	
-	for i, table in ipairs({"characters", "rooms"}) do
+	-- Cleanup leftover calls to sql.get_identifier
+	for i, table in ipairs({"characters", "rooms", "objects"}) do
 		res, err = DB_CON:execute(string.format("DELETE FROM %s WHERE name='__new'", table))
 	end
 	DB_CON:execute("DELETE FROM pronouns WHERE i='__new'")
@@ -67,6 +69,7 @@ function t.load()
 		
 		if character.user == "__NPC" then
 			table.insert(character.room.players, character)	
+			character.state = "chat"
 		end
 		character.pronouns = PRONOUNS[pronouns]
 		
@@ -74,6 +77,34 @@ function t.load()
 		player = Player:new(character)
 		
 		players[player.identifier] = player
+	end
+	
+	for identifier, name, desc, container, container_t in sql.rows(DB_CON, "SELECT * FROM objects") do
+		local object = {
+			identifier = identifier,
+			name = name,
+			desc = desc
+			}
+		
+		object = Object:new(object)
+		
+		
+		-- TODO: Deal with players holding objects, objects holding other objects
+		if container_t ==  0 then
+			local room = rooms[container]
+			
+			table.insert(room.objects, object)
+			
+			object.container = room
+		end
+	end
+	
+	for identifier, obj_type, key, body in sql.rows(DB_CON, "SELECT * FROM user_scripts") do
+		-- WHAT A MONSTROSITY
+		local obj = _G[{"rooms", "players", "objects"}[obj_type+1]][identifier]
+		
+		-- SUUUUPER SECURE
+		obj[key] = loadstring(body)
 	end
 	
 	return rooms, objects, players

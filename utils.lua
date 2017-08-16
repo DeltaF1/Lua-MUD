@@ -114,7 +114,7 @@ function isArray(t)
   return true
 end
 
---resolve identifier chain i.e. object.inventory.items.1
+--resolve identifier chain i.e. object.inventory.items.#1
 function resolve(obj, key)
 	local k
 	local keyparts = split(key, "%.")

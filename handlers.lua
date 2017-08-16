@@ -130,7 +130,6 @@
 
 				-- This should probably be adjustable for different spawnrooms or something
 				player.room = player.room or rooms.starting
-				-- We really need to setup an init function!
 
 				table.insert(player.room.players, player)
 

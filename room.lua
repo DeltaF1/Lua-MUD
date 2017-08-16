@@ -6,7 +6,6 @@ Room = {
 		desc="",
 		exits={},
 		objects={},
-		filename="misc.lua",
 		flags = 0,
 	} end
 }

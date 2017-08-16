@@ -100,11 +100,33 @@ function t.load()
 	end
 	
 	for identifier, obj_type, key, body in sql.rows(DB_CON, "SELECT * FROM user_scripts") do
-		-- WHAT A MONSTROSITY
-		local obj = _G[{"rooms", "players", "objects"}[obj_type+1]][identifier]
+		local tbl
+		if obj_type == 0 then
+			tbl = rooms
+		elseif obj_type == 1 then
+			tbl = players
+		else
+			tbl = objects
+		end
+		local obj = tbl[identifier]
+		if not obj then
+			print(("Orphaned user script found for identifier %d, table %q"):format(identifier, ({"rooms", "players", "objects"})[obj_type+1]))
+		else
+			-- SUUUUPER SECURE
+			
+			local chunk = loadstring(body)
+			
+			setfenv(chunk, {})
+			
+			local f = chunk()
+			
+			-- TODO: Create a safe env table
+			-- TODO: Update to 5.3 environments
+			setfenv(f, _G)
+			
+			obj[key] = f
+		end
 		
-		-- SUUUUPER SECURE
-		obj[key] = loadstring(body)
 	end
 	
 	return rooms, objects, players

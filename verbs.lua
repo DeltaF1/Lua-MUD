@@ -455,6 +455,23 @@ local t = {
 			end
 		end
 	},
+	manual = {
+		f = function(player, parts)
+			player:send(
+[[INTRODUCTION
+
+To interact with the world, type commands into the prompt in the following format
+
+>command argument1 argument2 argument3 ...
+
+e.g.
+
+>walk north
+
+Type 'help' to show a list of available commands, and type 'help command' to read a more detailed helpfile.
+]])
+		end
+	}
 }
 
 for k,v in pairs(t) do

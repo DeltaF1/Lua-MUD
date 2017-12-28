@@ -7,13 +7,16 @@ Object.default = function()
 		name = "",
 		aliases = {},
 		desc = "A boring object",
-		filename = "misc.lua"
 	}
 end
 
 Object.new = function(self,o)
 	-- Either create a new object, or turn existing table into an instance
 	local o = o or {}
+	
+	if not o.identifier then
+		o.identifier = sql.get_identifier("objects")
+	end
 	
 	-- Fill in missing values
 	for k,v in pairs(self.default()) do

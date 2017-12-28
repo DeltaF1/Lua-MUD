@@ -6,10 +6,7 @@ Room = {
 		desc="",
 		exits={},
 		objects={},
-		filename="misc.lua",
-		flags = {
-			SAFE = false
-		}
+		flags = 0,
 	} end
 }
 
@@ -20,6 +17,10 @@ Room.new = function(self,o)
 	
 	for k,v in pairs(self.default()) do
 		o[k] = o[k] or v
+	end
+	
+	if not o.identifier then
+		o.identifier = sql.get_identifier("rooms")
 	end
 	
 	return setmetatable(o, self)
@@ -41,7 +42,7 @@ Room.do_look = function(self, player)
 	
 	for i,v in ipairs(self.players) do
 		if not player:eq(v) then
-			s = s..v:message("standing").."." -- Replace with v.messages.standing
+			s = s..v:message("standing")..". " -- Replace with v.messages.standing
 		end
 	end
 	return s
@@ -89,9 +90,9 @@ Room.do_move = function(self, player, dir)
 		
 		-- Show the description of the destination
 		table.insert(player.room.players, player)
-		print("running player.room:do_enter")
+		-- print("running player.room:do_enter")
 		local f = player.room.do_enter
-		print("type(f) = "..type(f))
+		
 		f(player.room, player:proxy(),dir)
 		--player.room:do_enter(player:proxy(), dir)
 	else
@@ -117,9 +118,14 @@ end
 
 Room.search = function(self, name)
 	
+	if not name then return end
 	-- Get lower case of search term
 	local name = string.lower(name)
 	
+	parts = split(name, ".")
+	name = parts[1]
+	num = parts[2]
+
 	if self.name:lower() == name then
 		return self
 	end
@@ -135,4 +141,8 @@ Room.search = function(self, name)
 			return v
 		end
 	end
+end
+
+Room.setName = function(self, name)
+	self.name = name	
 end

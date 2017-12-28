@@ -10,12 +10,14 @@ local t = {
 		"help",
 		"dummymenu",
 		"attack",
-		"exits"
+		"exits",
+		"manual",
 	},
 	Builder = CommandSet:new{
 		"inspect",
 		"set",
-		"create"
+		"create",
+		"ident",
 	},
 	Moderator = CommandSet:new{
 		"kick",

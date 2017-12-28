@@ -1,8 +1,65 @@
 socket = require "socket"
+
 config = require "config"
 md5 = require "md5"
 colour = require "ansicolors"
 require "utils"
+
+sql = require "sql"
+odbc = require "odbc"
+
+do
+	local logfile
+	--TODO implement a non-positional arg system i.e. --logfile=/var/log/luamud.log
+	if arg[1] then
+		logfile = arg[1]
+	else
+		logfile = "/var/log/luamud.log"
+	end
+	
+	
+	
+	LOG_F, err = io.open(logfile, "a")
+	
+	if not LOG_F then
+		error(err)
+	end
+	
+	_print = print
+	print = function(...)
+		_print(...)
+		
+		local timestamp = os.date("[%d-%b-%Y %H:%M:%S]")
+		
+		LOG_F:write(timestamp .." ".. ... .. "\r\n")
+		LOG_F:flush()
+	end
+end
+
+LOG_F:write(string.rep("=", 80).."\r\n")
+
+print("Starting up server...")
+
+-- Convert line endings from unix to telnet
+config.motd = config.motd:gsub("([^\r])(\n)", "%1\r\n")
+
+sql_pass = config.sql_pass
+
+if not sql_pass then
+	io.write("Enter SQL password: ")	
+	sql_pass = io.read("*l")
+end
+
+local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(config.sql_driver, config.sql_db, config.sql_host, config.sql_port, config.sql_user, sql_pass)
+
+DB_CON, err = odbc.driverconnect(conn_string)
+
+if not DB_CON then
+	print(err)
+	error(err)
+end
+
+print("Connected to database!")
 
 math.randomseed(os.time())
 
@@ -11,28 +68,30 @@ IAC  = "\255"
 WILL = "\251"
 WONT = "\252"
 ECHO = "\001"
+AYT  = "\246"
 
 server = socket.bind("*", config.port)
 
 local ip, port = server:getsockname()
 server:settimeout(0)
 
-print("use telnet localhost "..port.." to connect!")
+print(string.format("Bound to port %i!", port))
 
 require "room"
 require "mobile"
 require "player"
 require "object"
-world_load = require "world_load"
-world_save = require "world_save"
+world_load = require "sql_world_load"
+world_save = require "sql_world_save"
+
+-- To get ser
+require "world_save"
 
 soundex = require "soundex"
 
 rooms, objects, players = world_load.load()
 
 types = {room = Room, player = Player, object = Object}
-
-users = require "users"
 
 clients = {}
 
@@ -53,7 +112,7 @@ loadHelpFiles()
 
 function broadcast(s)
 
-	print("Broadcasting")
+	-- print("Broadcasting")
 	for _,v in pairs(clients) do
 		if v.state == "chat" then
 			v:send(s)
@@ -109,22 +168,25 @@ function Update(dt)
 	end
 end
 
-function main(dt)
+function main()
+	local dt = DT
 	local status, err = pcall(function()
 	local sock = server:accept()
 	
 	if sock then 
-		--DEBUG REMOVE
-		--sock:send(WILL)
-		--sock:send(ECHO)
+		sock:send(IAC..AYT)
+		sock:send(IAC..WONT..ECHO)
 		local s = colour(config.motd..NEWL..handlers.login1.prompt)
 		sock:send(s)
-		print(s)
+		
 		sock:settimeout(1)
 		print(tostring(sock).." has connected")
-		local player = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
-		player = Player:new(player)
-		clients[sock] = player
+		local user = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
+		user.identifier = 0
+		user = Player:new(user)
+		user.name = nil
+		user.user = nil
+		clients[sock] = user
 	end
 	end)
 	
@@ -149,11 +211,15 @@ function main(dt)
 			if handler then
 				handler.f(v, data)
 				-- state may have changed
-				v:sendRaw(v.prompt or handlers[v.state].prompt)
+				v:send(v.prompt or handlers[v.state].prompt, "")
 			end
 		else
 			if err == "closed" then
-				verbs.quit.f(v)
+				if not v.state:find("login") then
+					verbs.quit.f(v)
+				else
+					clients[v.sock] = nil
+				end
 			end
 		end
 	end
@@ -162,37 +228,32 @@ end
 
 TIME = 0
 DT = 0
-prevTime = os.time()
+prevTime = socket.gettime()
+
+err_handler = function(err) 
+	if string.match(err, "interrupted!") then
+		print("SIGINT received, stopping server")
+	elseif err:find("STOP COMMAND") then
+		print("STOP command received in-game, stopping server")
+	else
+		print("The server ran into a problem. The world may be corrupted, review the error before restarting. Error: "..NEWL..err)
+		print(debug.traceback())
+	end
+end
 
 while true do
-	-- Why are we using socket.gettime in one place and os.time in another...
 	curTime = socket.gettime()
 	DT = curTime - prevTime
 	
 	TIME = TIME + DT
 	prevTime = curTime
-	status, err = pcall(main, DT)
+	
+	status, err = xpcall(main, err_handler)
 	if not status then
-
-		if string.match(err, "interrupted!") then
-			print("Stopping program normally, just a Ctrl-C")
-		elseif err:find("STOP COMMAND") then
-			print("Stopping program normally, just a STOP command")
-		else
-			print("The program has halted in the middle of something, the world may be corrupted! Error: "..NEWL..err)
-		end
-				
-		--save the world!
-		
-		--on player quit, save the player's data
-		--	so, we only need to deal with currently connected players
-		
-		--also, save room/items
-		--	serialize, keep do_xxx_str
 		
 		world_save.save()
-		
+		print("Goodbye.")
+		LOG_F:close()
 		break
 	end
-	--if math.floor(TIME) % 10 == 0 then print("Time: "..TIME) end
 end

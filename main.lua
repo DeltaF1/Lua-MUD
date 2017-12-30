@@ -6,7 +6,11 @@ colour = require "ansicolors"
 require "utils"
 
 sql = require "sql"
-odbc = require "odbc"
+
+-- Load the sql driver specified in config.lua
+local SQL_DRIVER = require ("luasql."..config.sql_driver)
+local SQL_ENV = SQL_DRIVER[config.sql_driver]()
+
 
 do
 	local logfile
@@ -14,10 +18,8 @@ do
 	if arg[1] then
 		logfile = arg[1]
 	else
-		logfile = "/var/log/luamud.log"
+		logfile = "luamud.log"
 	end
-	
-	
 	
 	LOG_F, err = io.open(logfile, "a")
 	
@@ -50,9 +52,9 @@ if not sql_pass then
 	sql_pass = io.read("*l")
 end
 
-local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(config.sql_driver, config.sql_db, config.sql_host, config.sql_port, config.sql_user, sql_pass)
+-- local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(config.sql_driver, config.sql_db, config.sql_host, config.sql_port, config.sql_user, sql_pass)
 
-DB_CON, err = odbc.driverconnect(conn_string)
+DB_CON, err = SQL_ENV:connect(config.sql_db, config.sql_user, config.sql_pass, config.sql_host, config.sql_port)
 
 if not DB_CON then
 	print(err)

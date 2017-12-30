@@ -6,7 +6,7 @@ THIS IS THE MESSAGE THAT WILL BE SENT AS THE FIRST TEXT BEFORE LOGGING IN.
 THE COLOUR CAN BE MANIPULATED THROUGH COLOUR CODES.
 ]],
 	
-	sql_driver = "SQL Driver Name here",
+	sql_driver = "mysql",
 	sql_db = "lua_mud",
 	
 	sql_user = "root",

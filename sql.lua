@@ -16,7 +16,30 @@ end
 function sql.rows(sql_statement, ...)
 	local cursor = assert (sql.execute(sql_statement, ...))
 	return function()
-		return cursor:fetch()
+		local row = {}
+		cursor:fetch(row)
+		
+		-- A workaround to deal with the MySQL driver returning everything as strings. This would be way faster in the driver,
+		-- but you work with what you're given. This can probably be optimized, some profiling will be necessary
+		
+		-- TODO: Profile this part of the code
+		
+		local types = cursor:getcoltypes()
+		
+		--print("SQL given types")
+		for i = 1,#types do
+			--print("coltype:",types[i],"value:", row[i])
+			if types[i]:find("number") then
+				row[i] = tonumber(row[i])
+			end
+		end
+		
+		--print("Lua types")
+		for i = 1,#row do
+			--print("luatype:",type(row[i]),"value:",row[i])
+		end
+		
+		return unpack(row)
 	end
 end
 
@@ -27,8 +50,11 @@ function sql.escape(statement)
 		end
 	else
 		sql.escape = function(statement)
-			print("NOT IMPLEMENTED")
-			return statement
+			-- print("NOT IMPLEMENTED")
+			-- FIXME: vulnerable to injection still...
+			return statement:gsub("(\x00)", "\\%1"):gsub("(\n)", "\\%1"):gsub(
+			"(\r)", "\\%1"):gsub("(')", "\\%1"):gsub("(\")", "\\%1"):gsub("(\x1a)", "\\%1"):gsub("([^\\])(\\)([^\\])", "%1\\%2%3"):gsub(
+			"([^\\])(\\)$", "%1\\%2")
 		end
 	end
 	return sql.escape(statement)
@@ -47,14 +73,14 @@ end
 
 function sql.format(sql_statement, ...)
 	for i = 1,arg.n do
-		arg[i] = sql.escape(tostring(arg[i]))
+		arg[i] = sql.escape(arg[i])
 	end
 	return string.format(sql_statement, unpack(arg))
 end
 
 function sql.get_identifier(table, column)
 	
-	res, err = sql.execute("INSERT INTO "..table.."(identifier, "..(column or "name")..") VALUES (NULL, '__new')")
+	res, err = sql.execute("INSERT INTO %s (identifier, %s) VALUES (NULL, '__new')",table, column or "name")
 	
 	if not res then error(err) end
 	
@@ -67,7 +93,7 @@ function sql.get_identifier(table, column)
 	
 	cur:close()
 	
-	return identifier
+	return tonumber(identifier)
 end
 
 return sql

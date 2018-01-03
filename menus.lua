@@ -90,10 +90,10 @@ return {
 				p:send("(OOC) Invalid name!")
 			end
 			
-			stmt = DB_CON:prepare("SELECT identifier FROM characters WHERE name=?")
-			stmt:vbind_param_char(1,d)
+			-- stmt = DB_CON:prepare()
+			-- stmt:vbind_param_char(1,d)
 			
-			cur = stmt:execute()
+			cur = sql.execute("SELECT identifier FROM characters WHERE name=%q", d)
 			
 			identifier = cur:fetch()
 			

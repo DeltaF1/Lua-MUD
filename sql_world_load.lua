@@ -8,13 +8,13 @@ function t.load()
 	
 	-- Cleanup leftover calls to sql.get_identifier
 	for i, table in ipairs({"characters", "rooms", "objects"}) do
-		res, err = DB_CON:execute(string.format("DELETE FROM %s WHERE name='__new'", table))
+		res, err = sql.execute("DELETE FROM %s WHERE name='__new'", table)
 	end
 	DB_CON:execute("DELETE FROM pronouns WHERE i='__new'")
 	
 	PRONOUNS = {}
 	
-	for identifier, i, myself, mine, my in sql.rows(DB_CON, "SELECT * FROM pronouns") do
+	for identifier, i, myself, mine, my in sql.rows("SELECT * FROM pronouns") do
 		PRONOUNS[identifier] = {
 			i=i,
 			myself=myself,
@@ -28,7 +28,7 @@ function t.load()
 	PRONOUNS.neutral = PRONOUNS[3]
 	PRONOUNS.second = PRONOUNS[4]
 	
-	for identifier, desc, name, flags, exits in sql.rows(DB_CON, 'SELECT * FROM rooms') do
+	for identifier, desc, name, flags, exits in sql.rows('SELECT * FROM rooms') do
 		
 		room = {
 			name = name,
@@ -53,7 +53,7 @@ function t.load()
 	
 	rooms.starting = rooms[1]
 	
-	for identifier, user, name, state, room, desc, colour, cmdset, pronouns, hp in sql.rows(DB_CON, "SELECT * FROM characters") do
+	for identifier, user, name, state, room, desc, colour, cmdset, pronouns, hp in sql.rows("SELECT * FROM characters") do
 		character = {
 			identifier = identifier,
 			name = name,
@@ -79,7 +79,7 @@ function t.load()
 		players[player.identifier] = player
 	end
 	
-	for identifier, name, desc, container, container_t in sql.rows(DB_CON, "SELECT * FROM objects") do
+	for identifier, name, desc, container, container_t in sql.rows("SELECT * FROM objects") do
 		local object = {
 			identifier = identifier,
 			name = name,
@@ -99,7 +99,7 @@ function t.load()
 		end
 	end
 	
-	for identifier, obj_type, key, body in sql.rows(DB_CON, "SELECT * FROM user_scripts") do
+	for identifier, obj_type, key, body in sql.rows("SELECT * FROM user_scripts") do
 		local tbl
 		if obj_type == 0 then
 			tbl = rooms

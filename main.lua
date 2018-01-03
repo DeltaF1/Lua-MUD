@@ -54,7 +54,7 @@ end
 
 -- local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(config.sql_driver, config.sql_db, config.sql_host, config.sql_port, config.sql_user, sql_pass)
 
-DB_CON, err = SQL_ENV:connect(config.sql_db, config.sql_user, config.sql_pass, config.sql_host, config.sql_port)
+DB_CON, err = SQL_ENV:connect(config.sql_db, config.sql_user, sql_pass, config.sql_host, config.sql_port)
 
 if not DB_CON then
 	print(err)

@@ -29,10 +29,10 @@
 			before = function(user) user:send(IAC..WILL..ECHO, "") end,
 			f = function(user, data)
 			
-				stmt = DB_CON:prepare("SELECT password FROM users WHERE username = BINARY ?")
-				stmt:vbind_param_char(1, user.name)
+				--stmt = DB_CON:prepare("SELECT password FROM users WHERE username = BINARY ?")
+				--stmt:vbind_param_char(1, user.name)
 
-				cur = stmt:execute()
+				cur = sql.execute("SELECT password FROM users WHERE username = BINARY %q", user.name)
 
 				pass = cur:fetch()
 				
@@ -71,14 +71,14 @@
 		login3 = {
 			before = function(user)
 
-				stmt = DB_CON:prepare("SELECT identifier FROM characters WHERE user=?")
-				stmt:vbind_param_char(1, user.name)
+				-- stmt = DB_CON:prepare("SELECT identifier FROM characters WHERE user=?")
+				-- stmt:vbind_param_char(1, user.name)
 
 				-- cur = stmt:execute()
 
 				user.characters = {}
 
-				for identifier in sql.rows(stmt) do
+				for identifier in sql.rows("SELECT identifier FROM characters WHERE user=%q", user.name) do
 					player = players[identifier]
 					user.characters[player.name] = player
 				end

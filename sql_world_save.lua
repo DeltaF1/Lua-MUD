@@ -1,14 +1,14 @@
 local t = {}
 
-update_room = DB_CON:prepare("UPDATE rooms SET name=?,description=?,flags=?,exits=? WHERE identifier=?")
+--update_room = DB_CON:prepare("UPDATE rooms SET name=?,description=?,flags=?,exits=? WHERE identifier=?")
 
-update_player = DB_CON:prepare("UPDATE characters SET name=?,state=?,room=?,description=?,colour=?,cmdset=?,pronouns=?,hp=?,user=? WHERE identifier=?")
+--update_player = DB_CON:prepare("UPDATE characters SET name=?,state=?,room=?,description=?,colour=?,cmdset=?,pronouns=?,hp=?,user=? WHERE identifier=?")
 
-update_object = DB_CON:prepare("UPDATE objects SET name=?,description=?,container=?,container_t=? WHERE identifier=?")
+--update_object = DB_CON:prepare("UPDATE objects SET name=?,description=?,container=?,container_t=? WHERE identifier=?")
 
-get_pronoun, err = DB_CON:prepare("SELECT identifier FROM pronouns WHERE `i`=? AND `myself`=? AND `mine`=? AND `my`=?")
+--get_pronoun, err = DB_CON:prepare("SELECT identifier FROM pronouns WHERE `i`=? AND `myself`=? AND `mine`=? AND `my`=?")
 
-if not get_pronoun then print(err) end
+--if not get_pronoun then print(err) end
 
 function t.update_player(player)
 	
@@ -50,22 +50,24 @@ end
 
 function t.update_room(room)
 	
-	exits = ""
+	local exits = ""
 	for direction, exit in pairs(room.exits) do
 		if direction == "in" then direction = '"in"' end
 		exits = exits..direction..'='..tostring(exit.identifier)..','
 	end
 
 
-	update_room:vbind_param_char(1,room.name)
-	update_room:vbind_param_char(2,room.desc)
-	update_room:vbind_param_ulong(3,tonumber(room.flags, 2))
-	update_room:vbind_param_char(4,exits)
+	-- update_room:vbind_param_char(1,room.name)
+	-- update_room:vbind_param_char(2,room.desc)
+	-- update_room:vbind_param_ulong(3,tonumber(room.flags, 2))
+	-- update_room:vbind_param_char(4,exits)
 
 
-	update_room:vbind_param_ulong(5,room.identifier)
+	-- update_room:vbind_param_ulong(5,room.identifier)
 
-	res, err = update_room:execute()
+	-- res, err = update_room:execute()
+	
+	res, err = sql.execute("UPDATE rooms SET name=%q,description=%q,flags=%i,exits=%q WHERE identifier=%i", room.name, room.desc, tonumber(room.flags, 2), exits, room.identifier)
 
 	if not res then
 		error(err)

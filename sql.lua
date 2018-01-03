@@ -1,18 +1,60 @@
--- (Hint, sql credentials are found in config.lua)
-
 local sql = {}
 
+--[[
 function sql.rows(connection, sql_statement)
-	local cursor = assert (connection: execute (sql_statement))
+	if type(connection) == "string" then
+		sql_statement = connection
+		connection = nil
+	end
+	local cursor = assert (sql.execute(connection, sql_statement))
+	return function()
+		return cursor:fetch()
+	end
+end
+]]--
+
+function sql.rows(sql_statement, ...)
+	local cursor = assert (sql.execute(sql_statement, ...))
 	return function()
 		return cursor:fetch()
 	end
 end
 
+function sql.escape(statement)
+	if DB_CON.escape then
+		sql.escape = function(statement)
+			return DB_CON:escape(stmt)
+		end
+	else
+		sql.escape = function(statement)
+			print("NOT IMPLEMENTED")
+			return statement
+		end
+	end
+	return sql.escape(statement)
+end
+
+--[[
+function sql.execute(connection, sql_statement, ...)
+	return connection:execute(sql.format(sql_statement, ...));
+end
+]]--
+
+function sql.execute(sql_statement, ...)
+	return DB_CON:execute(sql.format(sql_statement, ...));
+end
+
+
+function sql.format(sql_statement, ...)
+	for i = 1,arg.n do
+		arg[i] = sql.escape(tostring(arg[i]))
+	end
+	return string.format(sql_statement, unpack(arg))
+end
+
 function sql.get_identifier(table, column)
 	
-	-- NOTE: Possible SQL Injection here, no reason to ever call get_identifier without a hardcoded input
-	res, err = DB_CON:execute("INSERT INTO "..table.."(identifier, "..(column or "name")..") VALUES (NULL, '__new')")
+	res, err = sql.execute("INSERT INTO "..table.."(identifier, "..(column or "name")..") VALUES (NULL, '__new')")
 	
 	if not res then error(err) end
 	

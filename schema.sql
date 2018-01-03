@@ -34,7 +34,7 @@ CREATE TABLE `characters` (
   `pronouns` int(11) DEFAULT NULL,
   `hp` int(11) DEFAULT NULL,
   PRIMARY KEY (`identifier`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,7 +51,7 @@ CREATE TABLE `objects` (
   `container` int(11) NOT NULL,
   `container_t` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`identifier`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,7 +68,7 @@ CREATE TABLE `pronouns` (
   `mine` varchar(10) DEFAULT NULL,
   `my` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`identifier`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -85,7 +85,7 @@ CREATE TABLE `rooms` (
   `flags` int(11) NOT NULL DEFAULT '0',
   `exits` varchar(150) NOT NULL,
   PRIMARY KEY (`identifier`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

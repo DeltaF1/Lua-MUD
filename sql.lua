@@ -52,9 +52,10 @@ function sql.escape(statement)
 		sql.escape = function(statement)
 			-- print("NOT IMPLEMENTED")
 			-- FIXME: vulnerable to injection still...
-			return statement:gsub("(\x00)", "\\%1"):gsub("(\n)", "\\%1"):gsub(
-			"(\r)", "\\%1"):gsub("(')", "\\%1"):gsub("(\")", "\\%1"):gsub("(\x1a)", "\\%1"):gsub("([^\\])(\\)([^\\])", "%1\\%2%3"):gsub(
-			"([^\\])(\\)$", "%1\\%2")
+			--return statement:gsub("(\x00)", "\\%1"):gsub("(\n)", "\\%1"):gsub(
+			--"(\r)", "\\%1"):gsub("(')", "\\%1"):gsub("(\")", "\\%1"):gsub("(\x1a)", "\\%1"):gsub("([^\\])(\\)([^\\])", "%1\\%2%3"):gsub(
+			--"([^\\])(\\)$", "%1\\%2")
+			return statement:gsub("([^\\])(')", "%1\\%2"):gsub("([^\\])(\")", "%1\\%2")
 		end
 	end
 	return sql.escape(statement)

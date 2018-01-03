@@ -29,14 +29,11 @@ return {
 			obj.pronouns.mine=parts[3]
 			obj.pronouns.my=parts[4]
 			
-			get_pronoun:vbind_param_char(1,obj.pronouns.i)
-			get_pronoun:vbind_param_char(2,obj.pronouns.myself)
-			get_pronoun:vbind_param_char(3,obj.pronouns.mine)
-			get_pronoun:vbind_param_char(4,obj.pronouns.my)
 			
-			cur = get_pronoun:execute()
+			local cur = sql.execute("SELECT identifier FROM pronouns WHERE `i`=%q AND `myself`=%q AND `mine`=%q AND `my`=%q",
+				obj.pronouns.i, obj.pronouns.myself, obj.pronouns.mine, obj.pronouns.my)
 			
-			identifier = cur:fetch()
+			local identifier = tonumber(cur:fetch())
 			
 			cur:close()
 			
@@ -46,6 +43,7 @@ return {
 				-- It's a new pronoun set
 				identifier = sql.get_identifier("pronouns", "i")
 				
+				--[[
 				stmt = DB_CON:prepare("UPDATE pronouns SET i=?, myself=?, mine=?, my=? WHERE identifier=?")
 			
 				stmt:vbind_param_char(1, obj.pronouns.i)
@@ -54,8 +52,9 @@ return {
 				stmt:vbind_param_char(4, obj.pronouns.my)
 				
 				stmt:vbind_param_ulong(5, identifier)
+				]]--
 				
-				res, err = stmt:execute()
+				res, err = sql.execute("UPDATE pronouns SET i=%q, myself=%q, mine=%q, my=%q WHERE identifier=%i", obj.pronouns.i, obj.pronouns.myself, obj.pronouns.mine, obj.pronouns.my, identifier)
 				if not res then print(err) end
 			end
 			
@@ -95,7 +94,7 @@ return {
 			
 			cur = sql.execute("SELECT identifier FROM characters WHERE name=%q", d)
 			
-			identifier = cur:fetch()
+			local identifier = tonumber(cur:fetch())
 			
 			cur:close()
 			
@@ -124,7 +123,7 @@ return {
 				obj = p._editing_obj
 				
 				obj.user = p.name
-				
+				print("Type of identifier:",type(obj.identifier),"Value:",obj.identifier)
 				players[obj.identifier] = obj
 				world_save.update_player(obj)
 				

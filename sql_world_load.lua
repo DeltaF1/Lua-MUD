@@ -42,13 +42,17 @@ function t.load()
 		room = Room:new(room)
 		
 		rooms[identifier] = room
-		
+		--error()
 	end
 	
 	for identifier, room in pairs(rooms) do
 		for direction, exit in pairs(room.exits) do
 			room.exits[direction] = rooms[exit] or nil
 		end
+	end
+	
+	for k,v in pairs(rooms) do
+		print(k,v)
 	end
 	
 	rooms.starting = rooms[1]

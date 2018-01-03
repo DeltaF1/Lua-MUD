@@ -31,9 +31,15 @@ do
 	print = function(...)
 		_print(...)
 		
+		local arg = {...}
+		
+		for i = 1,#arg do
+			arg[i] = tostring(arg[i])
+		end
+		
 		local timestamp = os.date("[%d-%b-%Y %H:%M:%S]")
 		
-		LOG_F:write(timestamp .." ".. ... .. "\r\n")
+		LOG_F:write(timestamp .." ".. unpack(arg) .. "\r\n")
 		LOG_F:flush()
 	end
 end
@@ -91,7 +97,10 @@ require "world_save"
 
 soundex = require "soundex"
 
+print("Loading world...")
 rooms, objects, players = world_load.load()
+
+print("World loaded!")
 
 types = {room = Room, player = Player, object = Object}
 

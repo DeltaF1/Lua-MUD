@@ -79,7 +79,7 @@
 				user.characters = {}
 
 				for identifier in sql.rows("SELECT identifier FROM characters WHERE user=%q", user.name) do
-					player = players[identifier]
+					local player = players[identifier]
 					user.characters[player.name] = player
 				end
 

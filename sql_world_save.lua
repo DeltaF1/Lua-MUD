@@ -12,6 +12,7 @@ local t = {}
 
 function t.update_player(player)
 	
+	--[[
 	update_player:vbind_param_char(1, player.name)
 	update_player:vbind_param_ulong(2, 0) -- TODO: Create an ordered array of keys of handlers.lua.
 	update_player:vbind_param_ulong(3, player.room and player.room.identifier or nil)
@@ -23,13 +24,16 @@ function t.update_player(player)
 	get_pronoun:vbind_param_char(2,player.pronouns.myself)
 	get_pronoun:vbind_param_char(3,player.pronouns.mine)
 	get_pronoun:vbind_param_char(4,player.pronouns.my)
+	]]--
+
+	local cur = sql.execute("SELECT identifier FROM pronouns WHERE `i`=%q AND `myself`=%q AND `mine`=%q AND `my`=%q",
+	player.pronouns.i, player.pronouns.myself, player.pronouns.mine, player.pronouns.my)
 	
-	cur = get_pronoun:execute()
-	
-	identifier = cur:fetch()
+	local pronoun_identifier = tonumber(cur:fetch())
 	
 	cur:close()
 	
+	--[[
 	if identifier then
 		update_player:vbind_param_ulong(7, identifier)
 	else
@@ -40,8 +44,14 @@ function t.update_player(player)
 	update_player:vbind_param_char(9, player.user)
 	
 	update_player:vbind_param_ulong(10, player.identifier)
-
-	res, err = update_player:execute()
+	]]--
+	
+	local room_identifier = player.room and player.room.identifier or 1
+	
+	-- print("type(room_identifier)",type(room_identifier))
+	
+	res, err = sql.execute("UPDATE characters SET name=%q,state=%i,room=%i,description=%q,colour=%i,cmdset=%i,pronouns=%i,hp=%i,user=%q WHERE identifier=%i",
+		player.name, 0, room_identifier, player.desc, 0, 0, pronoun_identifier or 1, player.hp, player.user, player.identifier)
 
 	if not res then
 		error(err)
@@ -78,9 +88,11 @@ end
 
 function t.update_object(object)
 	
+	--[[
 	update_object:vbind_param_char(1,object.name)
 	update_object:vbind_param_char(2,object.desc)
 	update_object:vbind_param_ulong(3,object.container.identifier)
+	]]--
 	
 	--TODO: support players, objects holding other objects
 	
@@ -90,11 +102,13 @@ function t.update_object(object)
 		container_t = 2
 	end
 	
+	--[[
 	update_object:vbind_param_utinyint(4,container_t)
 	
 	update_object:vbind_param_ulong(5,object.identifier)
+	--]]
 	
-	res, err = update_object:execute()
+	res, err = sql.execute("UPDATE objects SET name=%q,description=%q,container=%i,container_t=%i WHERE identifier=%i", object.name, object.desc, object.container.identifier, container_t, object.identifier)
 	
 	if not res then
 		error(err)

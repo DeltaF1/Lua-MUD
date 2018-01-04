@@ -29,15 +29,16 @@ function sql.rows(sql_statement, ...)
 		--print("SQL given types")
 		for i = 1,#types do
 			--print("coltype:",types[i],"value:", row[i])
-			if types[i]:find("number") then
+			-- if it's a number
+			if types[i]:sub(1,1) == "n" then
 				row[i] = tonumber(row[i])
 			end
 		end
 		
 		--print("Lua types")
-		for i = 1,#row do
+		--for i = 1,#row do
 			--print("luatype:",type(row[i]),"value:",row[i])
-		end
+		--end
 		
 		return unpack(row)
 	end
@@ -50,6 +51,9 @@ function sql.escape(statement)
 		end
 	else
 		sql.escape = function(statement)
+			if type(statement) ~= "string" then
+				return statement
+			end
 			-- print("NOT IMPLEMENTED")
 			-- FIXME: vulnerable to injection still...
 			--return statement:gsub("(\x00)", "\\%1"):gsub("(\n)", "\\%1"):gsub(

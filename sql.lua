@@ -46,7 +46,7 @@ end
 
 function sql.escape(statement)
 	if DB_CON.escape then
-		sql.escape = function(statement)
+		sql.escape = function(stmt)
 			return DB_CON:escape(stmt)
 		end
 	else

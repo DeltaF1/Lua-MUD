@@ -18,7 +18,9 @@ function sql.rows(sql_statement, ...)
 	return function()
 		local row = {}
 		cursor:fetch(row)
-		
+		if #row == 0 then
+			return nil
+		end
 		-- A workaround to deal with the MySQL driver returning everything as strings. This would be way faster in the driver,
 		-- but you work with what you're given. This can probably be optimized, some profiling will be necessary
 		
@@ -77,7 +79,8 @@ end
 
 
 function sql.format(sql_statement, ...)
-	for i = 1,arg.n do
+	local arg = {...}
+	for i = 1, #arg do
 		arg[i] = sql.escape(arg[i])
 	end
 	return string.format(sql_statement, unpack(arg))

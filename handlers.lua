@@ -32,7 +32,7 @@
 				--stmt = DB_CON:prepare("SELECT password FROM users WHERE username = BINARY ?")
 				--stmt:vbind_param_char(1, user.name)
 
-				cur = sql.execute("SELECT password FROM users WHERE username = BINARY %q", user.name)
+				cur = sql.execute("SELECT password FROM users WHERE username = %q", user.name)
 
 				pass = cur:fetch()
 				

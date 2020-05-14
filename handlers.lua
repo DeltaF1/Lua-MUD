@@ -45,7 +45,7 @@
 				-- TODO use salt, and sha256
 				hash = md5.sumhexa(data)
 
-				if pass ~= hash then
+				if pass:lower() ~= hash:lower() then
 					user:send("Incorrect login!")
 					user:setState("login1")
 					return

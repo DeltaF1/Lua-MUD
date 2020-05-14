@@ -92,7 +92,7 @@ function sql.get_identifier(table, column)
 	
 	if not res then error(err) end
 	
-	cur = DB_CON:execute("SELECT LAST_INSERT_ID()")
+	cur = DB_CON:execute("SELECT last_insert_rowid()")
 	
 	-- print("[sql.get_identifier]")
 	-- print(debug.traceback())

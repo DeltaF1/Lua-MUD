@@ -3,7 +3,7 @@ PRAGMA journal_mode = MEMORY;
 BEGIN TRANSACTION;
 CREATE TABLE `characters` (
   `identifier` integer NOT NULL PRIMARY KEY AUTOINCREMENT
-,  `user` varchar(30) NOT NULL
+,  `user` varchar(30) DEFAULT NULL
 ,  `name` varchar(30) DEFAULT NULL
 ,  `state` integer DEFAULT NULL
 ,  `room` integer DEFAULT NULL
@@ -29,10 +29,10 @@ CREATE TABLE `pronouns` (
 );
 CREATE TABLE `rooms` (
   `identifier` integer NOT NULL PRIMARY KEY AUTOINCREMENT
-,  `description` mediumtext NOT NULL
-,  `name` varchar(100) NOT NULL
+,  `description` mediumtext NOT NULL DEFAULT ''
+,  `name` varchar(100) NOT NULL DEFAULT ''
 ,  `flags` integer NOT NULL DEFAULT '0'
-,  `exits` varchar(150) NOT NULL
+,  `exits` varchar(150) NOT NULL DEFAULT ''
 );
 CREATE TABLE `user_scripts` (
   `identifier` integer NOT NULL

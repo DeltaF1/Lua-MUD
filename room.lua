@@ -6,7 +6,7 @@ Room = {
 		desc="",
 		exits={},
 		objects={},
-		flags = 0,
+		flags = '0',
 	} end
 }
 

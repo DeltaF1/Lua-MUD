@@ -87,7 +87,7 @@ messages = {
 -- messages is a metatable
 messages.__index = messages
 
-pronouns = {
+PRONOUNS = {
 	male = {
 		i = "he",
 		my = "his",
@@ -114,6 +114,7 @@ pronouns = {
 	}
 }
 
+
 Player = {}
 
 Player.__index = Player
@@ -126,9 +127,9 @@ Player.default = function()
 		aliases = {},
 		colour = "green",
 		desc = "A person with no distinguishing features, their blank face devoid of any human emotions",
-		pronouns = pronouns.female,
+		pronouns = PRONOUNS.female,
 		messages = {},
-		filename = "misc.lua",
+		user = "__NPC",
 		hp = 5,
 		ap = 0,
 		maxap = 5,
@@ -147,7 +148,7 @@ Player.sub = function(self, s)
 	return s:gsub("{([^}]+)}", function(key)
 		local t,k = resolve(self, key)
 		if not t then
-			print("Invalid key "..key)
+			
 		end
 		return t[k]
 	end)
@@ -163,19 +164,13 @@ Player.do_look = function(self, player)
 	return self.desc
 end
 
--- TODO: Rewrite Player.send to do colour substitution, have optional argument "concat" by default set to
--- NEWL, then sendRaw can be for actually sending raw :P
-Player.send = function(self, msg, concat)
-	if concat == nil then
-		concat = NEWL
-	end
-	self:sendRaw(msg..concat)
-end
 
-Player.sendRaw = function(self, msg)
+Player.send = function(self, msg, concat)
+	concat = concat or NEWL
+	msg = msg or ""
 	
 	if self.room then
-		msg = string.gsub(msg, "([%w_]+)", function(v)
+		msg = string.gsub(msg, "(%S+)", function(v)
 			-- For every word, search the room for an object with that name
 			local obj = self.room:search(v)
 			
@@ -186,12 +181,19 @@ Player.sendRaw = function(self, msg)
 		end)
 	end
 	
+	self:sendRaw(msg..concat)
+end
+
+Player.sendRaw = function(self, msg)
+	
+	msg = msg:gsub("([^\r])(\n)", "%1\r\n")
+	if not self.sock then return end -- TODO: Integrate into AI's text input module
 	self.sock:send(msg)
 end
 
 Player.proxy = function(self)
 	return makeProxy(self,
-		{eq=true, name=true, desc=true, send=true, message=true}
+		{eq=true, name=true, desc=true, send=true, message=true, user=true}
 		-- No set usage yet
 	)
 end
@@ -202,12 +204,12 @@ Player.setMenu = function(self, prompt, f, input)
 	self.state = "menu"
 	self.prompt = prompt
 	self.menu = function(player, data)
-		print("Got data in menu of "..data)
+		
 		for i = 1, #input do
 			patt = "^"..input[i]
-			print("Does the data match '"..patt.."'?")
+			
 			if data:match(patt) then
-				print("Running the menu command!")
+				
 				f(player, data, i)
 				return
 			end
@@ -218,5 +220,12 @@ end
 
 Player.setState = function(self, state)
 	self.prompt = nil
+	
+	local after = handlers[self.state].after
+	if after then after(self) end
+	
+	local before = handlers[state].before
+	if before then before(self) end
+	
 	self.state = state
 end

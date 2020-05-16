@@ -2,8 +2,6 @@
 
 DIR_SEP = package.config:sub(1,1)
 
-print(DIR_SEP)
-
 EDITOR_KEYWORDS = {"and", "break", "do", "else", "elseif",
      "end", "false", "for", "function", "if",
      "in", "local", "nil", "not", "or",
@@ -116,7 +114,7 @@ function isArray(t)
   return true
 end
 
---resolve identifier chain i.e. object.inventory.items.1
+--resolve identifier chain i.e. object.inventory.items.#1
 function resolve(obj, key)
 	local k
 	local keyparts = split(key, "%.")
@@ -152,6 +150,9 @@ tremove = function(t, i)
 end
 
 --create proxy table with get/set list
+
+-- TODO: Make it recursive, so any subtables are also proxied. Allow for ACL with resolve syntax
+-- e.g. "user.send" = true allows for only the send function to be read from self.user
 function makeProxy(t, get, set)
 	return setmetatable({}, {
 		__index = function(self, k)	
@@ -170,4 +171,22 @@ function makeProxy(t, get, set)
 		end,
 		
 	})
+end
+
+-- Houshalter @ stackoverflow.com
+local oct2bin = {
+    ['0'] = '000',
+    ['1'] = '001',
+    ['2'] = '010',
+    ['3'] = '011',
+    ['4'] = '100',
+    ['5'] = '101',
+    ['6'] = '110',
+    ['7'] = '111'
+}
+function getOct2bin(a) return oct2bin[a] end
+function num2bin(n)
+    local s = string.format('%o', n)
+    s = s:gsub('.', oct2bin)
+    return s
 end

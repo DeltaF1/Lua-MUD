@@ -4,17 +4,17 @@ local t = {
 			local s = "Online:"..NEWL
 			for i,v in pairs(players) do
 				if v.state == "chat" then
-					s = s..v.name..NEWL
+					s = s..v.user..NEWL
 				end
 			end
-			player.sock:send(s)
+			player:send(s, "")
 		end
 	},
 	quit = {
 		f = function(player, parts)
 			player.sock:send("Goodbye!"..NEWL)
 			player.sock:close()
-			print(tostring(player.name or player.sock).." has disconnected")
+			print(tostring(player.user or player.name or player.sock).." has disconnected")
 			clients[player.sock] = nil
 			
 			if player.state == "chat" then
@@ -23,16 +23,15 @@ local t = {
 			if player.room then
 				tremove(player.room.players, player)
 			end
-			--save player data to file
-		end
+			world_save.update_player(player)
+		end,
+		aliases = { "exit" }
 	},
 	look = {
 		f = function(player, parts)
 			local obj
-			if #parts < 2 or parts[2] == "@here" then
+			if #parts < 2 then
 				obj = player.room
-			elseif parts[2] == "@me" then
-				obj = player
 			else
 				obj = player.room:search(parts[2])
 			end
@@ -45,7 +44,7 @@ local t = {
 	},
 	go = {
 		f = function(player, parts)
-			local dir = parts[1]=="go" and parts[2] or parts[1]
+			local dir = (parts[1]=="go" or parts[1]=="walk") and parts[2] or parts[1]
 			local ndir
 			for k,v in pairs(dirs) do
 				if contains(k, dir) then
@@ -54,9 +53,12 @@ local t = {
 				end
 			end
 			
+			if not ndir then
+				ndir = player.room.exits[dir] and dir
+			end
+			
 			if ndir then
 				player.room:do_move(player, ndir)
-				
 			else
 				player:send("Invalid direction!")
 			end
@@ -91,12 +93,7 @@ local t = {
 	},
 	pose = {	
 		f = function(player, parts, data)
-			-- Add pronoun parsing!
-			--
-			-- for part in parts:
-			-- 	part = player.pronouns[part] or part
-			--
-			-- pronouns = {I = "she", my = "her", mine = "hers"}
+			
 			
 			local msg = ""
 			if not parts[1]:find("^%..+") then
@@ -107,11 +104,7 @@ local t = {
 			else
 				msg = data
 			end
-			--[[
-			if #parts >= 2 then
-				msg = msg..data:match("[^ ]+ (.+)")
-			end
-			--]]
+
 			msg = msg
 			
 			msg = player.name.." "..msg
@@ -125,7 +118,7 @@ local t = {
 					-- v = v:gsub(ShinMojo pattern (need RegEx or custom pattern builder))
 					
 					-- If pronouns.neutral and last used pronoun ~= nil
-					if p == player then return v end-- secondPersonOfVerb(v)
+					if p == player then return v end -- secondPersonOfVerb(v)
 					local cap = v:multimatch({"([^aeiouy]y)$","(quy)$"})
 					if cap then
 						return v:sub(1, #v-1).."ies"
@@ -140,7 +133,7 @@ local t = {
 					return v.."s"
 				end):gsub("(\\?)(%a+)", function(except, v)
 					if except ~= "" then return v end
-					if p == player then return pronouns.second[v:lower()] end
+					if p == player then return PRONOUNS.second[v:lower()] end
 					return player.pronouns[v:lower()]
 				end
 				):gsub(
@@ -152,7 +145,6 @@ local t = {
 				)
 				
 				p:send(newmsg)
-				--player:send(msg)
 			end
 		end,
 		aliases = {
@@ -167,7 +159,7 @@ local t = {
 			player.room:broadcast(player.name.." "..data:match("%S+ (.+)"))
 		end,
 		aliases = {
-			"e", "/me"
+			"/me"
 		}
 	},
 	stop = {
@@ -216,25 +208,28 @@ local t = {
 			end
 			
 			local name = parts[2]
-			if name == "@here" then
-				obj = player.room
-			elseif name == "@me" then
-				obj = player
-			else
-				obj = player.room:search(name)
-			end
+			
+			obj = player.room:search(name)
+			
 			if not obj then
 				return "object not found!"
 			end
 			
-			-- set hobo pronouns.myself "xirself"
+			
 			
 			local key = parts[3]
 			local obj, k = resolve(obj, key)
 			if not obj then return player:send("Invalid keypath "..key) end
 			print("Setting "..(obj.name or tostring(obj)).." at "..k)
 			
-			local payload = data:match("%S+ %S+ %S+ (.+)")
+			-- e.g. set hobo pronouns.myself "xirself"
+			
+			local payload_parts = {}
+			for i = 4,#parts do
+				payload_parts[#payload_parts+1] = parts[i]
+			end
+			
+			local payload = table.concat(payload_parts, " ")
 			
 			payload = "return "..payload
 			
@@ -256,16 +251,10 @@ local t = {
 			if #parts < 2 then
 				return {"error", "Please supply an object to inspect"}
 			end
-			local obj
 			
 			local name = parts[2]
-			if name == "@here" then
-				obj = player.room
-			elseif name == "@me" then
-				obj = player
-			else
-				obj = player.room:search(name)
-			end
+			
+			local obj = player.room:search(name)
 			
 			if not obj then return player:send("Object not found") end
 			
@@ -344,7 +333,7 @@ local t = {
 			
 			
 			if helpfile then
-				player:send(player:sub(helpfile))
+				player:send(player:sub(helpfile)..NEWL)
 			end
 		end,
 		aliases = {"?"}
@@ -366,17 +355,25 @@ local t = {
 	attr_type = {
 		f = function(player, parts, data)
 			local obj
-			if parts[2] == "@here" then
-				obj = player.room
-			else
-				obj = player.room:search(parts[2])
+			if not parts[2] then
+				return player:send("Missing object")
 			end
+			if not parts[3] then
+				return player:send("Missing path")
+			end
+			
+			obj = player.room:search(parts[2])
+			
+			if not obj then
+				return player:send("Couldn't find object")
+			end
+			
 			local t, k = resolve(obj, parts[3])
 			player:send(type(t[k]))
 		end
 	},
 	edit = {
-		f = function(player, parts)
+		f = function(player, parts, data)
 			if player.room:search(parts[2]) then
 				player._editing_obj = player.room:search(parts[2])
 				player:setState "edit"
@@ -387,16 +384,21 @@ local t = {
 				return {"error", "Please supply an identifier to use"}
 			end
 			
+			local t = parts[2]
 			local class = types[t]
 			
+			if not class then
+				return player:send("Invalid type!")
+			end
 			
-			
-			local t = parts[2]
 			local list = _G[t.."s"]
-			player._editing_obj = list[parts[3]]
+			
+			player._editing_obj = list[tonumber(parts[3])]
 			if not player._editing_obj then
-				player:send(parts[3].." not found, creating it...")
-				player._editing_obj = class.new({identifier = parts[3]})
+				player:send(t.." #"..parts[3].." not found, creating new "..t)
+				player._editing_obj = class:new()
+				list[player._editing_obj.identifier] = player._editing_obj
+				player:send(string.format("New %s created with identifier #%i", t, player._editing_obj.identifier))
 			end
 			
 			player:setState "edit"
@@ -409,7 +411,7 @@ local t = {
 			if target then
 				-- check if it's a mobile?
 				if target.hp then
-					if player.room.flags.SAFE then
+					if player.room.flags:sub(1,1) == "1" then
 						player:send("Cannot start a fight here!")
 					elseif target.arena then
 						target.arena:add(player)
@@ -437,6 +439,38 @@ local t = {
 			for k,v in pairs(player.room.exits) do
 				player:send(k)
 			end
+		end
+	},
+	ident = {
+		f = function(player, parts)
+			if not parts[2] then
+				obj = player.room
+			else
+				obj = player.room:search(parts[2])
+			end
+			
+			if obj then
+				player:send(("Identifier of %q is %i"):format(obj.name, obj.identifier))
+			else
+				player:send("Object not found!")
+			end
+		end
+	},
+	manual = {
+		f = function(player, parts)
+			player:send(
+[[INTRODUCTION
+
+To interact with the world, type commands into the prompt in the following format
+
+>command argument1 argument2 argument3 ...
+
+e.g.
+
+>walk north
+
+Type 'help' to show a list of available commands, and type 'help command' to read a more detailed helpfile.
+]])
 		end
 	}
 }

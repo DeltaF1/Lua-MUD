@@ -5,7 +5,7 @@ Syntax
 emote <phrase>
 
 Aliases
-e /me
+/me
 
 Example
 /me laughs and falls off {pronouns.my} stool.

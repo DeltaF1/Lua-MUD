@@ -28,11 +28,6 @@ CREATE TABLE `pronouns` (
 ,  `my` varchar(10) DEFAULT NULL
 );
 
-REPLACE INTO pronouns VALUES (1, "he","himself","his","his");
-REPLACE INTO pronouns VALUES (2, "she","herself","hers","her");
-REPLACE INTO pronouns VALUES (3, "they","themself","theirs","their");
-REPLACE INTO pronouns VALUES (4, "you","yourself","yours","your");
-
 CREATE TABLE `rooms` (
   `identifier` integer NOT NULL PRIMARY KEY AUTOINCREMENT
 ,  `description` mediumtext NOT NULL DEFAULT ''
@@ -57,4 +52,10 @@ CREATE TABLE `users` (
 ,  UNIQUE (`username`)
 );
 
-END TRANSACTION;
+-- Defaults:
+INSERT INTO rooms(identifier,description,name) VALUES(1, "A plain white room. With work, it could become something great.", "Canvas");
+
+REPLACE INTO pronouns VALUES (1, "he","himself","his","his");
+REPLACE INTO pronouns VALUES (2, "she","herself","hers","her");
+REPLACE INTO pronouns VALUES (3, "they","themself","theirs","their");
+REPLACE INTO pronouns VALUES (4, "you","yourself","yours","your");

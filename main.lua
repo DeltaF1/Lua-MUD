@@ -7,10 +7,6 @@ require "utils"
 
 sql = require "sql"
 
--- Load the sql driver specified in config.lua
-local SQL_DRIVER = require ("luasql."..config.sql_driver)
-local SQL_ENV = SQL_DRIVER[config.sql_driver]()
-
 
 do
 	local logfile
@@ -49,18 +45,24 @@ LOG_F:write(string.rep("=", 80).."\r\n")
 print("Starting up server...")
 
 -- Convert line endings from unix to telnet
-config.motd = config.motd:gsub("([^\r])(\n)", "%1\r\n")
+config.server_info.motd = config.server_info.motd:gsub("([^\r])(\n)", "%1\r\n")
 
-sql_pass = config.sql_pass
+local sql_params = config.sql_params
+
+-- Load the sql driver specified in config.lua
+local SQL_DRIVER = require ("luasql."..sql_params.sql_driver)
+local SQL_ENV = SQL_DRIVER[sql_params.sql_driver]()
+
+sql_pass = sql_params.sql_pass
 
 if not sql_pass then
 	io.write("Enter SQL password: ")	
 	sql_pass = io.read("*l")
 end
 
--- local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(config.sql_driver, config.sql_db, config.sql_host, config.sql_port, config.sql_user, sql_pass)
+-- local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(sql_params.sql_driver, sql_params.sql_db, sql_params.sql_host, sql_params.sql_port, sql_params.sql_user, sql_pass)
 
-DB_CON, err = SQL_ENV:connect(config.sql_db, config.sql_user, sql_pass, config.sql_host, config.sql_port)
+DB_CON, err = SQL_ENV:connect(sql_params.sql_db, sql_params.sql_user, sql_pass, sql_params.sql_host, sql_params.sql_port)
 
 if not DB_CON then
 	print(err)
@@ -78,7 +80,7 @@ WONT = "\252"
 ECHO = "\001"
 AYT  = "\246"
 
-server = socket.bind("*", config.port)
+server = socket.bind("*", config.server_info.port)
 
 local ip, port = server:getsockname()
 server:settimeout(0)
@@ -187,7 +189,7 @@ function main()
 	if sock then 
 		sock:send(IAC..AYT)
 		sock:send(IAC..WONT..ECHO)
-		local s = colour(config.motd..NEWL..handlers.login1.prompt)
+		local s = colour(config.server_info.motd..NEWL..handlers.login1.prompt)
 		sock:send(s)
 		
 		sock:settimeout(1)

@@ -34,6 +34,8 @@ function sql.rows(sql_statement, ...)
 			-- if it's a number
 			if types[i]:sub(1,1) == "n" then
 				row[i] = tonumber(row[i])
+			elseif type(row[i])  == "string" then
+				row[i] = row[i]:gsub("''", "'")
 			end
 		end
 		

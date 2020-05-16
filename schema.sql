@@ -1,6 +1,8 @@
 PRAGMA synchronous = OFF;
 PRAGMA journal_mode = MEMORY;
 BEGIN TRANSACTION;
+-- TODO: Remove crap above
+-- TODO: Figure out defaults and stuff.
 CREATE TABLE `characters` (
   `identifier` integer NOT NULL PRIMARY KEY AUTOINCREMENT
 ,  `user` varchar(30) DEFAULT NULL
@@ -15,11 +17,12 @@ CREATE TABLE `characters` (
 );
 CREATE TABLE `objects` (
   `identifier` integer NOT NULL PRIMARY KEY AUTOINCREMENT
-,  `name` varchar(30) NOT NULL
-,  `description` mediumtext NOT NULL
-,  `container` integer NOT NULL
+,  `name` varchar(30) NOT NULL DEFAULT ''
+,  `description` mediumtext NOT NULL DEFAULT ''
+,  `container` integer NOT NULL DEFAULT 0
 ,  `container_t` integer NOT NULL DEFAULT '0'
 );
+-- TODO: Add default pronoun set as part of this script
 CREATE TABLE `pronouns` (
   `identifier` integer NOT NULL PRIMARY KEY AUTOINCREMENT
 ,  `i` varchar(10) DEFAULT NULL

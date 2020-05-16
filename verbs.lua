@@ -24,7 +24,8 @@ local t = {
 				tremove(player.room.players, player)
 			end
 			world_save.update_player(player)
-		end
+		end,
+		aliases = { "exit" }
 	},
 	look = {
 		f = function(player, parts)

@@ -34,8 +34,7 @@
 
 				cur = sql.execute("SELECT password FROM users WHERE username = %q", user.name)
 
-				pass = cur:fetch()
-				
+				pass = cur:fetch() or ""
 				cur:close()
 				-- Get hash of user.name..data..salt
 			

@@ -91,16 +91,21 @@ require "room"
 require "mobile"
 require "player"
 require "object"
-world_load = require "sql_world_load"
-world_save = require "sql_world_save"
+--world_load = require "sql_world_load"
+--world_save = require "sql_world_save"
 
 -- To get ser
-require "world_save"
+--require "world_save"
+
+ser = require "world_save".ser
+
+db = require "filesystem_store"
 
 soundex = require "soundex"
 
 print("Loading world...")
-rooms, objects, players = world_load.load()
+
+objects = {}
 
 print("World loaded!")
 
@@ -236,6 +241,15 @@ function main()
 			end
 		end
 	end
+	-- Do game ticks
+	for id, object in pairs(objects) do
+		if object.on_tick then
+			object:on_tick()
+		end
+	end
+
+	-- sleep
+	socket.select(nil,nil,0.1)
 	return true
 end
 
@@ -263,8 +277,9 @@ while true do
 	
 	status, err = xpcall(main, err_handler)
 	if not status then
-		
-		world_save.save()
+		for i = 1, #objects do
+			db.store_object(objects[i])
+		end
 		print("Goodbye.")
 		LOG_F:close()
 		break

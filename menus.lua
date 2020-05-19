@@ -29,30 +29,13 @@ return {
 			obj.pronouns.mine=parts[3]
 			obj.pronouns.my=parts[4]
 			
-			
-			local cur = sql.execute("SELECT identifier FROM pronouns WHERE `i`=%q AND `myself`=%q AND `mine`=%q AND `my`=%q",
-				obj.pronouns.i, obj.pronouns.myself, obj.pronouns.mine, obj.pronouns.my)
-			
-			local identifier = tonumber(cur:fetch())
-			
-			cur:close()
-			
+      local identifier = 1
 			if identifier then
 				obj.pronouns = PRONOUNS[identifier]
+				print("obj.pronouns = "..tostring(obj.pronouns))
 			else
 				-- It's a new pronoun set
 				identifier = sql.get_identifier("pronouns", "i")
-				
-				--[[
-				stmt = DB_CON:prepare("UPDATE pronouns SET i=?, myself=?, mine=?, my=? WHERE identifier=?")
-			
-				stmt:vbind_param_char(1, obj.pronouns.i)
-				stmt:vbind_param_char(2, obj.pronouns.myself)
-				stmt:vbind_param_char(3, obj.pronouns.mine)
-				stmt:vbind_param_char(4, obj.pronouns.my)
-				
-				stmt:vbind_param_ulong(5, identifier)
-				]]--
 				
 				res, err = sql.execute("UPDATE pronouns SET i=%q, myself=%q, mine=%q, my=%q WHERE identifier=%i", obj.pronouns.i, obj.pronouns.myself, obj.pronouns.mine, obj.pronouns.my, identifier)
 				if not res then print(err) end
@@ -92,13 +75,7 @@ return {
 			-- stmt = DB_CON:prepare()
 			-- stmt:vbind_param_char(1,d)
 			
-			cur = sql.execute("SELECT identifier FROM characters WHERE name=%q", d)
-			
-			local identifier = tonumber(cur:fetch())
-			
-			cur:close()
-			
-			if identifier then
+      if p.characters[d] then		
 				p:send("(OOC) That name is taken!")
 				return
 			end
@@ -125,8 +102,8 @@ return {
 				obj.user = p.name
 				print("Type of identifier:",type(obj.identifier),"Value:",obj.identifier)
 				players[obj.identifier] = obj
-				world_save.update_player(obj)
-				
+				print("obj.pronouns = "..tostring(obj.pronouns))
+			  db.store_object(obj)	
 			else
 				p:send("Cancelling character creation...")
 				
@@ -186,7 +163,7 @@ return {
 				-- objects[p._editing_obj.identifier] = p._editing_obj
 				print("Adding object")
 				objects[p._editing_obj.identifier] = p._editing_obj
-				p._editing_obj.container = p.room
+				p._editing_obj.room = p.room
 				table.insert(p.room.objects, p._editing_obj)
 			else
 				print("Adding character")

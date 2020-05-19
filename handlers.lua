@@ -16,8 +16,6 @@
 				end
 
 				user.name = data
-				
-
 
 				user:setState "login2"
 
@@ -29,28 +27,23 @@
 			before = function(user) user:send(IAC..WILL..ECHO, "") end,
 			f = function(user, data)
 			
-				--stmt = DB_CON:prepare("SELECT password FROM users WHERE username = BINARY ?")
-				--stmt:vbind_param_char(1, user.name)
-
-				cur = sql.execute("SELECT password FROM users WHERE username = %q", user.name)
-
-				pass = cur:fetch() or ""
-				cur:close()
 				-- Get hash of user.name..data..salt
 			
 				--ADD SALT
 
 				--FOR THE LOVE OF GOD DON'T USE MD5
 				-- TODO use salt, and sha256
-				hash = md5.sumhexa(data)
+	
+        userData = db.get_user(user.name)
 
-				if pass:lower() ~= hash:lower() then
+        hash = md5.sumhexa(data)
+
+				if not userData or userData.passhash:lower() ~= hash:lower() then
 					user:send("Incorrect login!")
 					user:setState("login1")
 					return
 				end
-
-
+        
 				for k,v in pairs(clients) do
 					if v ~= user and ((v.state:find("login3") and v.name == user.name) or (v.user and v.user == user.name)) then
 						user:send("Error: Already logged in!")
@@ -69,18 +62,12 @@
 		},
 		login3 = {
 			before = function(user)
-
-				-- stmt = DB_CON:prepare("SELECT identifier FROM characters WHERE user=?")
-				-- stmt:vbind_param_char(1, user.name)
-
-				-- cur = stmt:execute()
-
-				user.characters = {}
-
-				for identifier in sql.rows("SELECT identifier FROM characters WHERE user=%q", user.name) do
-					local player = players[identifier]
-					user.characters[player.name] = player
-				end
+				local characters = db.get_user(user.name).characters 
+        user.characters = {} 
+        for i = 1, #characters do
+          local char = db.get_or_load(characters[i])
+          user.characters[char.name] = char
+        end
 
 				user:send()
 				for k,v in pairs(user.characters) do
@@ -132,8 +119,8 @@
 
 				table.insert(player.room.players, player)
 
-
-				player:send(player.room:do_look(player))
+        print(getmetatable(player.room))
+        player:send(player.room:do_look(player))
 
 				-- Announce the player entering the server
 				player.room:broadcast("With a small crack "..player.name.." appears, along with a brisk wind", player)

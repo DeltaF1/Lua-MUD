@@ -22,7 +22,7 @@ Mobile.new = function(self,o)
 	end
 	
 	if not o.identifier then
-		o.identifier = sql.get_identifier("characters")	
+		o.identifier = db.reserve_id() 
 	end
 	
 	setmetatable(o.messages, messages)

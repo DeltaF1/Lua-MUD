@@ -128,7 +128,7 @@ Player.default = function()
 		colour = "green",
 		desc = "A person with no distinguishing features, their blank face devoid of any human emotions",
 		pronouns = PRONOUNS.female,
-		messages = {},
+		messages = {standing="{name} is standing here"},
 		user = "__NPC",
 		hp = 5,
 		ap = 0,

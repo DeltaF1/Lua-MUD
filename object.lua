@@ -15,7 +15,7 @@ Object.new = function(self,o)
 	local o = o or {}
 	
 	if not o.identifier then
-		o.identifier = sql.get_identifier("objects")
+		o.identifier = db.reserve_id() 
 	end
 	
 	-- Fill in missing values

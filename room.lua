@@ -20,7 +20,7 @@ Room.new = function(self,o)
 	end
 	
 	if not o.identifier then
-		o.identifier = sql.get_identifier("rooms")
+		o.identifier = db.reserve_id()
 	end
 	
 	return setmetatable(o, self)

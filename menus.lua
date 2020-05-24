@@ -97,13 +97,15 @@ return {
 		function(p,d,i)
 			p:send("")
 			if i == 1 then
-				obj = p._editing_obj
+				local obj = p._editing_obj
 				
 				obj.user = p.name
-				print("Type of identifier:",type(obj.identifier),"Value:",obj.identifier)
-				players[obj.identifier] = obj
 				print("obj.pronouns = "..tostring(obj.pronouns))
-			  db.store_object(obj)	
+			  -- TODO: Replace this with some sort of archetype system?
+        obj.__meta = "char"
+        objects[db.store_object(obj)] = obj
+        db.update_object(objects[obj.identifier])
+        db.add_character(obj.user, obj)
 			else
 				p:send("Cancelling character creation...")
 				
@@ -154,21 +156,21 @@ return {
 			print("Creating object of type "..p._editing_obj._type)
 			local t = p._editing_obj._type
 			p._editing_obj._type = nil
-			if t == "room" then
+			local obj = p._editing_obj
+      obj.__meta = t
+      db.store_object(obj)
+      objects[obj.identifier] = obj
+      db.update_object(obj)
+      if t == "room" then
 				print("Adding room")
-				rooms[p._editing_obj.identifier] = p._editing_obj
 				p:setMenu(unpack(menus.room_dir))
 				return
 			elseif t == "object" then
-				-- objects[p._editing_obj.identifier] = p._editing_obj
 				print("Adding object")
-				objects[p._editing_obj.identifier] = p._editing_obj
 				p._editing_obj.room = p.room
 				table.insert(p.room.objects, p._editing_obj)
 			else
 				print("Adding character")
-				-- players[p._editing_obj.identifier(or maybe p._editing_obj.name)] = p._editing_obj
-				players[p._editing_obj.identifier] = p._editing_obj
 				table.insert(p.room.players, p._editing_obj)
 			end
 			p._editing_obj = nil

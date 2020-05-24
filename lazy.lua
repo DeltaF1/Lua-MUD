@@ -1,39 +1,29 @@
 local load = function(tbl, id)
-	db.update_object(id, tbl)
+  setmetatable(tbl, nil)
+  tbl.__id = nil
+  db.update_object(tbl, id)
 end
 
 local lazy = {
 
 	__index = function(tbl, index)
 		load(tbl, tbl.__id)
-    print("tbl loaded")
-    print(tbl.name)
-    error()
-    return "GARBAGE"
+    return tbl[index]
 	end,
 	__newindex = function(tbl, index, val)
 		load(tbl, tbl.__id)
-    print("tbl loaded")
-    print(tbl.name)
-		error()
+    tbl[index] = val
 	end,
 	__ipairs = function(tbl)
 		load(tbl, tbl.__id)
-    print("tbl loaded")
-    print(tbl.name)
-		error()
 		return ipairs(tbl)
 	end,
 	__pairs = function(tbl)
 		load(tbl, tbl.__id)
-    print("tbl loaded")
-    print(tbl.name)
-		error()
 		return pairs(tbl)
 	end,
 }
 
 return function(id)
-	return db.get_or_load(id)
-  --return setmetatable({__id=id}, lazy)
+  return setmetatable({__id=id}, lazy)
 end

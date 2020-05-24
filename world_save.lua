@@ -2,8 +2,10 @@ local tostring = tostring
 local pairs = pairs
 local table = table
 
+local t = {}
+
 -- Serialize a table
-function ser(obj, newl, indent, tables)
+function t.ser(obj, newl, indent, tables)
 	-- Previously serialized tables, to prevent stack overflows
 	if getmetatable(obj) == CommandSet then
 		--Serialize the keys
@@ -16,7 +18,7 @@ function ser(obj, newl, indent, tables)
 	local s = --[[string.rep("  ", indent-1)..]]'{'..newl
 	for k,v in pairs(obj) do
 		-- Discard function keys. If they're built in they'll be part of a superclass, if they're custom they'll be encoded in xxx_str
-		if type(v) ~= "function" then				
+		if type(v) ~= "function" and type(v) ~= "userdata"  then				
 			s = s .. indentStr
 			if type(k) == "string" then
 				-- Remove the "_str" from custom function keys
@@ -38,13 +40,14 @@ function ser(obj, newl, indent, tables)
 			
 			if type(v) == "string" then
 				v = v:gsub(NEWL, "\\".."\\".."NEWL")
-				v = v:gsub('["\']', '\\"')
+				v = v:gsub('\\','\\\\')
+				v = v:gsub('"', '\\"')
 				v = '"'..v..'"'
 			elseif type(v) == "table" then
 				-- If it has an identifier, then encode that instead of the table
 				
 				if v.identifier then
-					v = '"'..v.identifier..'"'
+					v = 'ID('..v.identifier..')'
 				-- If it's a table not yet seen, encode it
 				elseif not contains(tables, v) then
 					table.insert(tables, v)
@@ -60,8 +63,6 @@ function ser(obj, newl, indent, tables)
 	return s
 end
 
-local t = {}
-
 function t.save()
 	for dir, tbl in pairs{["rooms"]=rooms, ["objects"]=objects, ["players"]=players} do
 		saveTable(tbl, dir)
@@ -71,7 +72,7 @@ function t.save()
 	
 end
 
-function saveTable(tbl, dir)
+local function saveTable(tbl, dir)
 	local files = {}
 	for k,v in pairs(tbl) do
 		files[v.filename] = files[v.filename] or {}

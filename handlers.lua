@@ -115,11 +115,11 @@
 				player.colour = colours[math.random(#colours)]
 
 				-- This should probably be adjustable for different spawnrooms or something
-				player.room = player.room or rooms.starting
+        STARTING_ROOM = db.get_lazy(2)
+				player.room = player.room or STARTING_ROOM
 
 				table.insert(player.room.players, player)
 
-        print(getmetatable(player.room))
         player:send(player.room:do_look(player))
 
 				-- Announce the player entering the server
@@ -195,12 +195,22 @@
 			f = function(player, data)
 				local parts = split(data)
 				local key = parts[1]
-				
-				if key == "quit" then
-					player._editing_obj = nil
-					player:setState "chat"
-					return
-				end
+			
+        if #parts == 1 then
+		    	if key == "quit" or key == "save" then
+            db.store_object(player._editing_obj)
+            db.reload(player._editing_obj)
+            player._editing_obj = nil
+		    		player:setState "chat"
+		    		return
+          elseif key == "abort" then
+            -- soft reload from disk
+            db.reload(player._editing_obj)
+            player._editing_obj = nil
+            player:setState "chat"
+            return
+          end
+        end
 			
 				t, key = resolve(player._editing_obj, key)
 				local val = table.concat(parts, " ", 2)

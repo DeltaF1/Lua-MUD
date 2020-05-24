@@ -5,9 +5,6 @@ md5 = require "md5"
 colour = require "ansicolors"
 require "utils"
 
-sql = require "sql"
-
-
 do
 	local logfile
 	--TODO implement a non-positional arg system i.e. --logfile=/var/log/luamud.log
@@ -47,30 +44,6 @@ print("Starting up server...")
 -- Convert line endings from unix to telnet
 config.server_info.motd = config.server_info.motd:gsub("([^\r])(\n)", "%1\r\n")
 
-local sql_params = config.sql_params
-
--- Load the sql driver specified in config.lua
-local SQL_DRIVER = require ("luasql."..sql_params.sql_driver)
-local SQL_ENV = SQL_DRIVER[sql_params.sql_driver]()
-
-sql_pass = sql_params.sql_pass
-
-if not sql_pass then
-	io.write("Enter SQL password: ")	
-	sql_pass = io.read("*l")
-end
-
--- local conn_string = ("Driver=%s;Database=%s;Server=%s;Port=%i;Uid=%s;Pwd=%s"):format(sql_params.sql_driver, sql_params.sql_db, sql_params.sql_host, sql_params.sql_port, sql_params.sql_user, sql_pass)
-
-DB_CON, err = SQL_ENV:connect(sql_params.sql_db, sql_params.sql_user, sql_pass, sql_params.sql_host, sql_params.sql_port)
-
-if not DB_CON then
-	print(err)
-	error(err)
-end
-
-print("Connected to database!")
-
 math.randomseed(os.time())
 
 NEWL = "\r\n"
@@ -91,11 +64,6 @@ require "room"
 require "mobile"
 require "player"
 require "object"
---world_load = require "sql_world_load"
---world_save = require "sql_world_save"
-
--- To get ser
---require "world_save"
 
 ser = require "world_save".ser
 
@@ -201,8 +169,8 @@ function main()
 		print(tostring(sock).." has connected")
 		local user = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
 		user.identifier = 0
-		user = Player:new(user)
-		user.name = nil
+		user = setmetatable(user, Player)
+    user.name = nil
 		user.user = nil
 		clients[sock] = user
 	end
@@ -242,12 +210,15 @@ function main()
 		end
 	end
 	-- Do game ticks
-	for id, object in pairs(objects) do
-		if object.on_tick then
-			object:on_tick()
-		end
+  
+  for id, object in pairs(objects) do
+		-- only tick objects that are not lazy loaded
+    if not object.__id then
+      if object.on_tick then
+    		object:on_tick()
+    	end
+    end
 	end
-
 	-- sleep
 	socket.select(nil,nil,0.1)
 	return true
@@ -277,8 +248,8 @@ while true do
 	
 	status, err = xpcall(main, err_handler)
 	if not status then
-		for i = 1, #objects do
-			db.store_object(objects[i])
+		for i, object in pairs(objects) do
+			db.store_object(object)
 		end
 		print("Goodbye.")
 		LOG_F:close()

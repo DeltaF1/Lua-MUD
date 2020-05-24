@@ -23,11 +23,10 @@ local env = {
 local lazy = require "lazy"
 
 function t.get_lazy(id)
-	if objects[id] then
-		return objects[id]
-	else
-		return lazy(id)
-	end
+	if not objects[id] then
+	  objects[id] = lazy(id)
+  end
+  return objects[id]
 end
 
 local function resolve_refs(object, seen)
@@ -45,8 +44,12 @@ end
 
 local function load_file(filename) --> object
 	-- loadfile takes in a "mode" paramter. If precompiled bytecode is preferable then change to "bt"
-	return loadfile(filename, "t", env)()
+  local f = loadfile(filename, "t", env)
+  if f then return f()
+  else return f end
 end
+
+local load_scripts = require "scripts"
 
 function t.load_object(identifier)
 	-- Assert that the identifier is a number
@@ -55,8 +58,16 @@ function t.load_object(identifier)
 	-- execute a path traversal attack
 	assert(type(identifier) == "number")
 	local data = load_file(generate_filename(identifier))
+  if not data then return nil end
+
+  data.identifier = identifier
 
 	resolve_refs(data)
+
+  load_scripts(data) 
+
+  --data:on_load()
+  if data.players then data.players = {} end
 
 	-- TODO: fixme ???
 	if data.__meta == "room" then
@@ -71,9 +82,25 @@ function t.load_object(identifier)
 	return data
 end
 
-function t.update_object(id, object)
-	local loaded = t.load_object(id)
-	for k,v in pairs(loaded) do
+-- TODO:
+--
+-- Define explicit ephemeral storage (that might persist a soft reload such as this)
+function t.reload(object, id)
+  id = id or object.identifier
+
+  -- clear
+  for k,v in pairs(object) do
+    object[k] = nil
+  end
+  setmetatable(object, nil)
+  t.update_object(object, id)
+end
+
+function t.update_object(object, id)
+	id = id or object.identifier
+  local loaded = t.load_object(id)
+	if not loaded then return nil end
+  for k,v in pairs(loaded) do
 		object[k] = v
 	end
   if getmetatable(loaded) then
@@ -85,7 +112,7 @@ end
 function t.get_or_load(id)
 	if not objects[id] then
 		objects[id] = {}
-		t.update_object(id, objects[id])
+		t.update_object(objects[id], id)
 	end
 	return objects[id]
 end
@@ -98,13 +125,17 @@ local function id_exists(id)
 	end
 end
 
+local function write(obj, filename)
+	local f = io.open(filename, "w")
+	f:write("return "..ser(obj))
+	f:close()
+end
+
 function t.store_object(object)
 	if not object.identifier then
 		object.identifier = t.reserve_id()
 	end
-	local f = io.open(generate_filename(object.identifier), "w")
-	f:write(ser(object))
-	f:close()
+	write(object, generate_filename(object.identifier))
 	return object.identifier
 end
 
@@ -131,14 +162,13 @@ function t.get_user(name)
 	return users[name]
 end
 
-function t.add_character(name, id)
+function t.add_character(name, object)
+  local id = object.identifier
 	local users = loadfile(PREFIX.."users.lua", "t", {})()
 
 	table.insert(users[name].characters, id)
 
-	local f = io.open("users.lua", "w")
-	f:write(ser(users))
-	f:close()
+	write(users, PREFIX.."users.lua")
 end
 
 return t

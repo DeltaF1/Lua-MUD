@@ -23,7 +23,7 @@ local t = {
 			if player.room then
 				tremove(player.room.players, player)
 			end
-			world_save.update_player(player)
+			db.store_object(player)
 		end,
 		aliases = { "exit" }
 	},

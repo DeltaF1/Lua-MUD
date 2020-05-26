@@ -157,10 +157,14 @@ return {
 			local t = p._editing_obj._type
 			p._editing_obj._type = nil
 			local obj = p._editing_obj
-      obj.__meta = t
+      if t == "room" then
+        obj.scripts[#obj.scripts + 1] = "container"
+        obj.scripts[#obj.scripts + 1] = "room"
+        obj.scripts[#obj.scripts + 1] = "roomExits"
+      end
+      obj:updateScripts()
       db.store_object(obj)
       objects[obj.identifier] = obj
-      db.update_object(obj)
       if t == "room" then
 				print("Adding room")
 				p:setMenu(unpack(menus.room_dir))

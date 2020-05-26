@@ -83,7 +83,7 @@ Room.do_move = function(self, player, dir)
 	local destination = self.exits[dir]
 	
 	if destination then
-		self:do_exit(player:proxy(), dir)
+		self:do_exit(player, dir)
 		player.room = destination
 		tremove(self.players, player)
 		 --fix "leaves to the up"
@@ -93,8 +93,8 @@ Room.do_move = function(self, player, dir)
 		-- print("running player.room:do_enter")
 		local f = player.room.do_enter
 		
-		f(player.room, player:proxy(),dir)
-		--player.room:do_enter(player:proxy(), dir)
+		f(player.room, player,dir)
+		--player.room:do_enter(player, dir)
 	else
 		player:send("Can't go that way!")
 	end

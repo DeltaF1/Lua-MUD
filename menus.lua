@@ -142,7 +142,7 @@ return {
 	obj_name = {
 		"What is the name of the object? ",
 		function(p,d,i)
-			p._editing_obj:setName(d)
+			p._editing_obj.name = d
 			p:setMenu(unpack(menus.obj_desc))
 		end,
 		{"."}

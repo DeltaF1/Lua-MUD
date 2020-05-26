@@ -32,7 +32,7 @@ do
 		
 		local timestamp = os.date("[%d-%b-%Y %H:%M:%S]")
 		
-		LOG_F:write(timestamp .." ".. unpack(arg) .. "\r\n")
+		LOG_F:write(timestamp .." ".. (unpack(arg) or "nil") .. "\r\n")
 		LOG_F:flush()
 	end
 end
@@ -60,22 +60,13 @@ server:settimeout(0)
 
 print(string.format("Bound to port %i!", port))
 
-require "room"
-require "mobile"
-require "player"
-require "object"
-
+Object = require "object"
 ser = require "world_save".ser
-
 db = require "filesystem_store"
 
 soundex = require "soundex"
 
-print("Loading world...")
-
 objects = {}
-
-print("World loaded!")
 
 types = {room = Room, player = Player, object = Object}
 
@@ -136,6 +127,33 @@ dirs = {
 	[{"out"}]="out",
 }
 
+PRONOUNS = {
+	male = {
+		i = "he",
+		my = "his",
+		mine = "his",
+		myself = "himself"
+	},
+	female = {
+		i = "she",
+		my = "her",
+		mine = "hers",
+		myself = "herself"
+	},
+	neutral = {
+		i = "they",
+		my = "their",
+		mine = "theirs",
+		myself = "themself"
+	},
+	second = {
+		i = "you",
+		my = "your",
+		mine = "yours",
+		myself = "yourself"
+	}
+}
+
 handlers = require "handlers"
 verbs = require "verbs"
 cmdsets = require "commandSets"
@@ -167,9 +185,14 @@ function main()
 		
 		sock:settimeout(1)
 		print(tostring(sock).." has connected")
-		local user = {["sock"]=sock, state="login1"} --send = function() add_to_queue (msg..NEWL) end
+		local user = {sock=sock, state="login1"}
+    user.scripts = {
+      "object",
+      "socket",
+      "playerState"
+    }
 		user.identifier = 0
-		user = setmetatable(user, Player)
+		user = Object:new(user)
     user.name = nil
 		user.user = nil
 		clients[sock] = user

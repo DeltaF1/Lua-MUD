@@ -18,7 +18,7 @@ function t.ser(obj, newl, indent, tables)
 	local s = --[[string.rep("  ", indent-1)..]]'{'..newl
 	for k,v in pairs(obj) do
 		-- Discard function keys. If they're built in they'll be part of a superclass, if they're custom they'll be encoded in xxx_str
-		if type(v) ~= "function" and type(v) ~= "userdata"  then				
+		if type(v) ~= "function" and type(v) ~= "userdata" and not (type(k) == "string" and  k:match("^__")) then				
 			s = s .. indentStr
 			if type(k) == "string" then
 				-- Remove the "_str" from custom function keys

@@ -85,6 +85,24 @@ function shallowcopy(orig)
     return copy
 end
 
+function deepcopy(value, seen)
+  if type(value) == "table" then
+    seen = seen or {}
+    local t = {}
+    for k,v in pairs(value) do
+      if seen[v] then
+        t[k] = seen[v]
+      else
+        t[k] = deepcopy(v, seen)
+        seen[k] = t[k] 
+      end
+    end
+    return t
+  else
+    return value
+  end
+end
+
 -- Bart Kiers @ stackoverflow.com
 function case_insensitive_pattern(pattern)
 

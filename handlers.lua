@@ -16,8 +16,7 @@
 				end
 
 				user.name = data
-
-				user:setState "login2"
+				user:setState("login2")
 
 
 			end,
@@ -55,7 +54,7 @@
 
 				user.user = user.name
 
-				user:setState "login3"
+				user:setState("login3")
 			end,
 			after = function(user) user:send(IAC..WONT..ECHO, "") end,
 			prompt = colour("%{red}Please enter your password: ")
@@ -110,25 +109,26 @@
 					player.cmdset = player.cmdset:union(cmdsets.All)
 				end
 
+        player.__loaded = true
+
 				--CommandSet:new(keys(verbs))
 				-- Mainly for debugging, eventually colours will mean something. Maybe class/rank?
 				player.colour = colours[math.random(#colours)]
 
 				-- This should probably be adjustable for different spawnrooms or something
-        STARTING_ROOM = db.get_lazy(2)
+        STARTING_ROOM = db.load_object(3)
 				player.room = player.room or STARTING_ROOM
+				table.insert(player.room.objects, player)
 
-				table.insert(player.room.players, player)
-
-        player:send(player.room:do_look(player))
+        player:send(player.room:getDesc(player).desc)
 
 				-- Announce the player entering the server
 				player.room:broadcast("With a small crack "..player.name.." appears, along with a brisk wind", player)
 
 				-- To make sure the prompt is properly updated
-				user:setState "chat"
+				user:setState("chat")
 				player.state = "login3"
-				player:setState "chat"
+				player:setState("chat")
 			end,
 			prompt = "Select the character to play, type 'new' to make a new one: "
 		},
@@ -201,13 +201,13 @@
             db.store_object(player._editing_obj)
             db.reload(player._editing_obj)
             player._editing_obj = nil
-		    		player:setState "chat"
+		    		player:setState("chat")
 		    		return
           elseif key == "abort" then
             -- soft reload from disk
             db.reload(player._editing_obj)
             player._editing_obj = nil
-            player:setState "chat"
+            player:setState("chat")
             return
           end
         end

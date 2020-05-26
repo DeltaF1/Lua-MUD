@@ -64,20 +64,10 @@ function t.load_object(identifier)
 
 	resolve_refs(data)
 
-  load_scripts(data) 
-
-  --data:on_load()
+  data = Object:new(data)
+  data:call("onLoad")
+  -- FIXME data:on_load()?
   if data.players then data.players = {} end
-
-	-- TODO: fixme ???
-	if data.__meta == "room" then
-		print("Loaded a room!")
-    setmetatable(data, Room)
-	elseif data.__meta == "object" then
-		setmetatable(data, Object)
-	elseif data.__meta == "char" then
-		setmetatable(data, Player)
-	end
 
 	return data
 end
@@ -92,7 +82,6 @@ function t.reload(object, id)
   for k,v in pairs(object) do
     object[k] = nil
   end
-  setmetatable(object, nil)
   t.update_object(object, id)
 end
 
@@ -103,10 +92,8 @@ function t.update_object(object, id)
   for k,v in pairs(loaded) do
 		object[k] = v
 	end
-  if getmetatable(loaded) then
-    setmetatable(object, getmetatable(loaded))
-  end
-	return object
+  object = Object:new(object)
+  return object
 end
 
 function t.get_or_load(id)
@@ -133,7 +120,10 @@ end
 
 function t.store_object(object)
 	if not object.identifier then
-		object.identifier = t.reserve_id()
+		print("object doesn't have id!")
+    print(ser(object))
+    object.identifier = t.reserve_id()
+
 	end
 	write(object, generate_filename(object.identifier))
 	return object.identifier

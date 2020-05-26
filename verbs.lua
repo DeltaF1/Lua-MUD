@@ -16,12 +16,12 @@ local t = {
 			player.sock:close()
 			print(tostring(player.user or player.name or player.sock).." has disconnected")
 			clients[player.sock] = nil
-			
+	    player.__loaded = false		
 			if player.state == "chat" then
 				player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air", player)
 			end
 			if player.room then
-				tremove(player.room.players, player)
+				tremove(player.room.objects, player)
 			end
 			db.store_object(player)
 		end,
@@ -33,10 +33,10 @@ local t = {
 			if #parts < 2 then
 				obj = player.room
 			else
-				obj = player.room:search(parts[2])
+				obj = player.room:search(parts[2])[1]
 			end
 			if not obj then return player:send("Could not find "..parts[2]) end
-			player:send(obj:do_look(player))
+			player:send(obj:getDesc(player).desc)
 		end,
 		aliases = {
 			"ex", "x", "examine"
@@ -109,7 +109,7 @@ local t = {
 			
 			msg = player.name.." "..msg
 			
-			for i,p in ipairs(player.room.players) do
+			for i,p in ipairs(player.room.objects) do
 				local newmsg = msg:gsub("%.(%a+)", function(v)
 					-- for verb in gmatch(%.%S+) do verb..s or verb[conjugations]
 				
@@ -254,7 +254,7 @@ local t = {
 			
 			local name = parts[2]
 			
-			local obj = player.room:search(name)
+			local obj = player.room:search(name)[1]
 			
 			if not obj then return player:send("Object not found") end
 			
@@ -347,11 +347,30 @@ local t = {
 			local t = parts[2]
 			
 			if not contains({"object","room","player"}, t) then return player:send("Invalid type '"..t.."'") end
-			player._editing_obj = types[t]:new({})
+			player._editing_obj = Object:new()
 			player._editing_obj._type = t
 			player:setMenu(unpack(menus.obj_name))
 		end
 	},
+  dig = {
+    f = function(player, parts, data)
+      if #parts < 2 then
+        return {"error", "Please supply a direction"}
+      end
+      local dir = parts[2]
+
+      local room = {name="Blank", desc="Nothing here", exits={}, players={}, objects={}} 
+      room.__meta = "room"
+      local id = db.store_object(room)
+      objects[id] = db.update_object(room)
+
+      player.room.exits[dir] = room 
+			local oppdir = oppdirs[dir]
+			if oppdir then
+				room.exits[oppdir] = player.room
+		  end
+    end,
+  },
 	attr_type = {
 		f = function(player, parts, data)
 			local obj
@@ -375,8 +394,8 @@ local t = {
 	edit = {
 		f = function(player, parts, data)
 			if player.room:search(parts[2]) then
-				player._editing_obj = player.room:search(parts[2])
-				player:setState "edit"
+				player._editing_obj = player.room:search(parts[2])[1]
+				player:setState("edit")
 				return
 			elseif #parts < 2 then
 				return {"error", "Please supply a type to edit, or the name of a visible object!"}
@@ -401,7 +420,7 @@ local t = {
 				player:send(string.format("New %s created with identifier #%i", t, player._editing_obj.identifier))
 			end
 			
-			player:setState "edit"
+			player:setState("edit")
 		end
 	},
 	attack = {

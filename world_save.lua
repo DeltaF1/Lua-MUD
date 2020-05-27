@@ -45,8 +45,9 @@ function t.ser(obj, newl, indent, tables)
 				v = '"'..v..'"'
 			elseif type(v) == "table" then
 				-- If it has an identifier, then encode that instead of the table
-				
-				if v.identifier then
+			  if v.__id then
+          v = 'ID('..v.__id..')'
+        elseif rawget(v, "identifier") then
 					v = 'ID('..v.identifier..')'
 				-- If it's a table not yet seen, encode it
 				elseif not contains(tables, v) then

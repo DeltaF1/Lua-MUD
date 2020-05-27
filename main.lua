@@ -237,9 +237,10 @@ function main()
   for id, object in pairs(objects) do
 		-- only tick objects that are not lazy loaded
     if not object.__id then
-      if object.on_tick then
-    		object:on_tick()
-    	end
+      local tick = object.onTick
+      if tick then
+    	  tick(object)
+      end
     end
 	end
 	-- sleep

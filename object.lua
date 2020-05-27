@@ -36,29 +36,45 @@ Object.new = function(self,o)
 end
 
 function Object:updateScripts()
-  self.__middleware = Middleware() 
-  for i = 1, #(self.scripts or {}) do
+  self.__middleware = Middleware()
+  local loaded = {}
+  for i = 1, #self.scripts do
     local k = self.scripts[i]
+    self:loadScript(k, loaded)
+  end
+end
 
-    local script = require("scripts."..k)
-    for k,v in pairs(script.data or {}) do
-      if self[k] == nil then
-        self[k] = deepcopy(v)
-      end
+function Object:loadScript(scriptName, loaded)
+  loaded = loaded or {}
+  if loaded[scriptName] then return end
+  loaded[scriptName] = require("scripts."..scriptName)
+  local script = loaded[scriptName]
+  if script.dependencies then
+    for j = 1, #script.dependencies do
+      self:loadScript(script.dependencies[j], loaded)
     end
-    
-    for methodName,middleware in pairs(script.prepend or {}) do
-      for j = 1, #middleware do
-        local func = middleware[j]
-        self.__middleware:prepend(methodName, func)
-      end
+  end
+  
+  for k,v in pairs(script.data or {}) do
+    if self[k] == nil then
+      self[k] = deepcopy(v)
     end
+  end
 
-    for methodName,middleware in pairs(script.methods or {}) do
-      for j = 1, #middleware do
-        local func = middleware[j]
-        self.__middleware:append(methodName, func)
+  for methodName,middleware in pairs(script.insert or {}) do
+    for j = 1, #middleware do
+      local func, pos = unpack(middleware[j])
+      if pos < 0 then
+        pos = #(self.__middleware[methodName] or {}) + pos + 1
       end
+      self.__middleware:insert(methodName, func, pos)
+    end
+  end
+
+  for methodName,middleware in pairs(script.methods or {}) do
+    for j = 1, #middleware do
+      local func = middleware[j]
+      self.__middleware:append(methodName, func)
     end
   end
 end

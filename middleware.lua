@@ -14,10 +14,10 @@ function middleware:append(name, func)
   funcs[#funcs + 1] = func
 end
 
-function middleware:prepend(name, func)
+function middleware:insert(name, func, pos)
   if not self[name] then self[name] = {} end
   local funcs = self[name]
-  table.insert(funcs, 1, func)  
+  table.insert(funcs, pos, func)  
 end
 
 function middleware:remove(name, func)
@@ -36,22 +36,18 @@ function middleware:call(obj, name, args)
   local funcs = self[name]
   if not funcs then return nil end
   local i = 0
-  local res = {}
-  local function next()
-    i = i + 1
+  local ret, b
+  for i = 1, #funcs do
     local f = funcs[i]
     if f then
-      return f(obj, args, res, next)
+      ret, b  = f(obj, args, ret)
+      if ret == STOP then
+        return b
+      end
     end
   end
-
-  retCode = next()
-  if retCode ~= nil then
-    return retCode
-  end
-  return res
+  
+  return ret
 end
-
-middleware.__call = middleware.call
 
 return new

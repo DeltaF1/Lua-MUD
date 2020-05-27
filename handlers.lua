@@ -117,10 +117,10 @@
 
 				-- This should probably be adjustable for different spawnrooms or something
         STARTING_ROOM = db.load_object(3)
-				player.room = player.room or STARTING_ROOM
-				table.insert(player.room.objects, player)
+				player.room = player:getRoom() or STARTING_ROOM
+        player.room:add(player)
 
-        player:send(player.room:getDesc(player).desc)
+        player:send(player.room:getDesc(player))
 
 				-- Announce the player entering the server
 				player.room:broadcast("With a small crack "..player.name.." appears, along with a brisk wind", player)
@@ -153,6 +153,7 @@
 			
 				-- First word sent
 				local cmd = parts[1]
+        if not cmd then return end
 
 				-- Declare verb and name of verb
 				local verb

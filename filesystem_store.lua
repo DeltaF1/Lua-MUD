@@ -7,6 +7,12 @@ local function generate_filename(id)
 	return PREFIX..tostring(id)..".lua"
 end
 
+local function exists(filename)
+  local f = io.open(filename, "r")
+  if f ~= nil then return true, f:close()
+  else return f end
+end
+
 -- This table serves as an Out-Of-Band way to denote references to otheir entities
 local foreign_metatable = {}
 -- This env will be used to load the data file
@@ -34,7 +40,11 @@ local function resolve_refs(object, seen)
 	for k,v in pairs(object) do
 		if getmetatable(v) == foreign_metatable then
 			v = v[1]
-      object[k] = t.get_lazy(v)
+      if exists(generate_filename(v)) then
+        object[k] = t.get_lazy(v)
+      else
+        object[k] = nil
+      end
 		elseif type(v) == "table" and not seen[v] then
 			seen[v] = true
 			resolve_refs(v)
@@ -67,7 +77,7 @@ function t.load_object(identifier)
   data = Object:new(data)
   data:call("onLoad")
   -- FIXME data:on_load()?
-  if data.players then data.players = {} end
+  if data:getPlayers() then data.players = {} end
 
 	return data
 end

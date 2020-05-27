@@ -172,7 +172,7 @@ return {
 			elseif t == "object" then
 				print("Adding object")
 				p._editing_obj.room = p.room
-				table.insert(p.room.objects, p._editing_obj)
+        p.room:add(p._editing_obj)
 			else
 				print("Adding character")
 				table.insert(p.room.players, p._editing_obj)

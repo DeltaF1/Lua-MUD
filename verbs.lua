@@ -20,7 +20,7 @@ local t = {
 			if player.state == "chat" then
 				player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air", player)
 			end
-			if player.room then
+			if player:getRoom() then
 				tremove(player.room.objects, player)
 			end
 			db.store_object(player)
@@ -36,7 +36,7 @@ local t = {
 				obj = player.room:search(parts[2])[1]
 			end
 			if not obj then return player:send("Could not find "..parts[2]) end
-			player:send(obj:getDesc(player).desc)
+			player:send(obj:getDesc(player))
 		end,
 		aliases = {
 			"ex", "x", "examine"
@@ -58,7 +58,7 @@ local t = {
 			end
 			
 			if ndir then
-				player.room:do_move(player, ndir)
+				player.room:doMove(player, ndir)
 			else
 				player:send("Invalid direction!")
 			end
@@ -144,7 +144,7 @@ local t = {
 					"^%a", function(l) return l:upper() end
 				)
 				
-				p:send(newmsg)
+				p:call("send", {newmsg})
 			end
 		end,
 		aliases = {
@@ -333,7 +333,7 @@ local t = {
 			
 			
 			if helpfile then
-				player:send(player:sub(helpfile)..NEWL)
+				player:send(helpfile..NEWL)
 			end
 		end,
 		aliases = {"?"}
@@ -360,15 +360,38 @@ local t = {
       local dir = parts[2]
 
       local room = {name="Blank", desc="Nothing here", exits={}, players={}, objects={}} 
-      room.__meta = "room"
-      local id = db.store_object(room)
-      objects[id] = db.update_object(room)
+      room.scripts = {
+        "object",
+        "container",
+        "room",
+        "roomExits"
+      }
+      room = Object:new(room)
+      db.store_object(room)
+      objects[room.identifier] = room 
 
       player.room.exits[dir] = room 
 			local oppdir = oppdirs[dir]
 			if oppdir then
 				room.exits[oppdir] = player.room
 		  end
+    end,
+  },
+  reload = {
+    f = function(player, parts, data)
+      if #parts < 2 then
+        return {"error", "Please specify an object"}
+      end
+
+      local name = parts[2]
+
+      local obj = player.room:search(name)[1]
+
+      if not obj then
+        return {"error", "Object not found"}
+      end
+
+      db.reload(obj)
     end,
   },
 	attr_type = {
@@ -393,8 +416,9 @@ local t = {
 	},
 	edit = {
 		f = function(player, parts, data)
-			if player.room:search(parts[2]) then
-				player._editing_obj = player.room:search(parts[2])[1]
+			local obj = player.room:search(parts[2])[1]
+      if obj then
+				player._editing_obj = obj
 				player:setState("edit")
 				return
 			elseif #parts < 2 then

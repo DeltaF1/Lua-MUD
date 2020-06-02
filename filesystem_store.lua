@@ -1,7 +1,7 @@
+return function(PREFIX)
 local t = {}
 
--- TODO: pull from args table
-local PREFIX = "data/"
+local PREFIX = (PREFIX or "data").."/"
 
 local function generate_filename(id)
 	return PREFIX..tostring(id)..".lua"
@@ -9,27 +9,37 @@ end
 
 local function exists(filename)
   local f = io.open(filename, "r")
-  if f ~= nil then return true, f:close()
-  else return f end
+  if f then
+    f:close()
+    return true
+  end
 end
+
+local function id_exists(id)
+  return exists(generate_filename(id))
+end
+
 
 -- This table serves as an Out-Of-Band way to denote references to otheir entities
 local foreign_metatable = {}
 -- This env will be used to load the data file
 --
--- Any malicious code will have no access to functions like 
+-- Any malicious code will have no access to functions like io or os 
 local env = {
 	-- In the future if multiple tables come back, then the
 	-- table could be passed as a second parameter to ID
 	ID = function(value)
-		return setmetatable({value}, foreign_metatable)
+    return t.get_or_load(value)
 	end,
 }
 
 local lazy = require "lazy"
 
 function t.get_lazy(id)
-	if not objects[id] then
+	if not id_exists(id) then
+    return nil
+  end
+  if not objects[id] then
 	  objects[id] = lazy(id)
   end
   return objects[id]
@@ -54,9 +64,13 @@ end
 
 local function load_file(filename) --> object
 	-- loadfile takes in a "mode" paramter. If precompiled bytecode is preferable then change to "bt"
-  local f = loadfile(filename, "t", env)
+  local f, err = loadfile(filename, "t", env)
   if f then return f()
-  else return f end
+  else
+    print("Error loading file '"..flename.."':")
+    print(err)
+    return nil
+  end
 end
 
 local load_scripts = require "scripts"
@@ -72,26 +86,24 @@ function t.load_object(identifier)
 
   data.identifier = identifier
 
-	resolve_refs(data)
+	--resolve_refs(data)
 
   data = Object:new(data)
   data:call("onLoad")
-  -- FIXME data:on_load()?
-  if data:getPlayers() then data.players = {} end
 
 	return data
 end
 
--- TODO:
---
--- Define explicit ephemeral storage (that might persist a soft reload such as this)
 function t.reload(object, id)
   id = id or object.identifier
 
   -- clear
   for k,v in pairs(object) do
-    object[k] = nil
+    if not k:match("^__") then
+      object[k] = nil
+    end
   end
+
   t.update_object(object, id)
 end
 
@@ -107,19 +119,15 @@ function t.update_object(object, id)
 end
 
 function t.get_or_load(id)
-	if not objects[id] then
+	if not id_exists(id) then
+    print("attempted to load missing id:"..tostring(id))
+    return nil
+  end
+  if not objects[id] then
 		objects[id] = {}
 		t.update_object(objects[id], id)
 	end
 	return objects[id]
-end
-
-local function id_exists(id)
-	local f = io.open(generate_filename(id))
-	if f then
-		f:close()
-		return true
-	end
 end
 
 local function write(obj, filename)
@@ -170,5 +178,5 @@ function t.add_character(name, object)
 
 	write(users, PREFIX.."users.lua")
 end
-
 return t
+end

@@ -62,7 +62,9 @@ print(string.format("Bound to port %i!", port))
 
 Object = require "object"
 ser = require "world_save".ser
-db = require "filesystem_store"
+makeDb = require "filesystem_store"
+db = makeDb("data")
+backupDb = makeDb("data.bak")
 
 soundex = require "soundex"
 
@@ -112,7 +114,7 @@ oppdirs = {
 	out="in"
 }
 
-dirs = {
+short_dirs = {
 	[{"north", "n"}]="north",
 	[{"south", "s"}]="south",
 	[{"east", "e"}]="east",
@@ -126,6 +128,15 @@ dirs = {
 	[{"in"}]="in",
 	[{"out"}]="out",
 }
+
+function dirFromShort(dir)
+  for shortnames,longname in pairs(short_dirs) do
+    if contains(shortnames, dir) then
+      return longname
+    end
+	end
+  return dir
+end
 
 PRONOUNS = {
 	male = {
@@ -159,19 +170,6 @@ verbs = require "verbs"
 cmdsets = require "commandSets"
 menus = require "menus"
 
-updateHandlers = {}
-
-function Update(dt)
-	for i = 1,#updateHandlers do
-		local handler = updateHandlers[i]
-		if type(handler) == "table" then
-			handler:update(dt)
-		elseif type(handler) == "function" then
-			handler(dt)
-		end
-	end
-end
-
 function main()
 	local dt = DT
 	local status, err = pcall(function()
@@ -185,11 +183,12 @@ function main()
 		
 		sock:settimeout(1)
 		print(tostring(sock).." has connected")
-		local user = {sock=sock, state="login1"}
+		local user = {__sock=sock, state="login1"}
     user.scripts = {
       "object",
       "socket",
-      "playerState"
+      "playerState",
+      "highlight"
     }
 		user.identifier = 0
 		user = Object:new(user)
@@ -203,13 +202,11 @@ function main()
 		error("There was an error trying to accept a new connection: "..NEWL..err)
 	end
 	
-	Update(dt)
-	
 	local ready = socket.select(keys(clients), nil, 0.01)
 	
 	for i,sock in ipairs(ready) do
 		local v = clients[sock]
-		local data, err = v.sock:receive()
+		local data, err = sock:receive()
 		if data then
 			
 			--print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
@@ -218,16 +215,20 @@ function main()
 			local handler = handlers[v.state]
 			
 			if handler then
+        for i, obj in pairs(objects) do
+          backupDb.store_object(obj)
+        end
+        -- Run command
 				handler.f(v, data)
 				-- state may have changed
-				v:send(v.prompt or handlers[v.state].prompt, "")
+				v:send(v:getPrompt() or handlers[v.state].prompt, "")
 			end
 		else
 			if err == "closed" then
 				if not v.state:find("login") then
 					verbs.quit.f(v)
 				else
-					clients[v.sock] = nil
+					clients[v.__sock] = nil
 				end
 			end
 		end
@@ -255,15 +256,25 @@ prevTime = socket.gettime()
 err_handler = function(err) 
 	if string.match(err, "interrupted!") then
 		print("SIGINT received, stopping server")
+    loop = false
 	elseif err:find("STOP COMMAND") then
 		print("STOP command received in-game, stopping server")
+    loop = false
 	else
 		print("The server ran into a problem. The world may be corrupted, review the error before restarting. Error: "..NEWL..err)
 		print(debug.traceback())
+    for i, obj in pairs(objects) do
+      if not obj.__id then
+        local sock = obj:get__sock()
+        backupDb.reload(obj)
+        obj.__sock = sock
+      end
+    end
 	end
 end
 
-while true do
+loop = true
+while loop do
 	curTime = socket.gettime()
 	DT = curTime - prevTime
 	
@@ -271,12 +282,10 @@ while true do
 	prevTime = curTime
 	
 	status, err = xpcall(main, err_handler)
-	if not status then
-		for i, object in pairs(objects) do
-			db.store_object(object)
-		end
-		print("Goodbye.")
-		LOG_F:close()
-		break
-	end
 end
+
+for i, object in pairs(objects) do
+  db.store_object(object)
+end
+print("Goodbye.")
+LOG_F:close()

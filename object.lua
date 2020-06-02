@@ -6,7 +6,7 @@ Object.__index = Object
 Object.__index = function(self, key)
   local v = Object[key]
   if v then return v
-  elseif rawget(self, "__middleware") and rawget(self, "__middleware")[key] then
+  elseif rawget(self, "__middleware") and rawget(self.__middleware, key) then
         -- TODO: Should calls to nonexistent
         -- methods error or just do nothing?
         -- Polymorphism vs. ease of debugging
@@ -67,14 +67,14 @@ function Object:loadScript(scriptName, loaded)
       if pos < 0 then
         pos = #(self.__middleware[methodName] or {}) + pos + 1
       end
-      self.__middleware:insert(methodName, func, pos)
+      self.__middleware:insert_middleware(methodName, func, pos)
     end
   end
 
   for methodName,middleware in pairs(script.methods or {}) do
     for j = 1, #middleware do
       local func = middleware[j]
-      self.__middleware:append(methodName, func)
+      self.__middleware:append_middleware(methodName, func)
     end
   end
 end

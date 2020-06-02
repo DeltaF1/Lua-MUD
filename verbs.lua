@@ -12,10 +12,10 @@ local t = {
 	},
 	quit = {
 		f = function(player, parts)
-			player.sock:send("Goodbye!"..NEWL)
-			player.sock:close()
+			player.__sock:send("Goodbye!"..NEWL)
+			player.__sock:close()
 			print(tostring(player.user or player.name or player.sock).." has disconnected")
-			clients[player.sock] = nil
+			clients[player.__sock] = nil
 	    player.__loaded = false		
 			if player.state == "chat" then
 				player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air", player)
@@ -45,20 +45,10 @@ local t = {
 	go = {
 		f = function(player, parts)
 			local dir = (parts[1]=="go" or parts[1]=="walk") and parts[2] or parts[1]
-			local ndir
-			for k,v in pairs(dirs) do
-				if contains(k, dir) then
-					ndir = v
-					break
-				end
-			end
+			dir = dirFromShort(dir)			
 			
-			if not ndir then
-				ndir = player.room.exits[dir] and dir
-			end
-			
-			if ndir then
-				player.room:doMove(player, ndir)
+      if player.room.exits[dir] then
+				player.room:doMove(player, dir)
 			else
 				player:send("Invalid direction!")
 			end
@@ -209,7 +199,7 @@ local t = {
 			
 			local name = parts[2]
 			
-			obj = player.room:search(name)
+			obj = player.room:search(name)[1]
 			
 			if not obj then
 				return "object not found!"
@@ -268,11 +258,10 @@ local t = {
 	},
 	save = {
 		f = function(player, parts)
-			for _,v in pairs(players) do
-				v:send("Saving world...")
-			end
-			world_save.save()
-		end
+		  for i, obj in pairs(objects) do
+        db.store_object(obj)
+      end
+    end
 	},
 	help = {
 		f = function(player, parts)
@@ -357,14 +346,12 @@ local t = {
       if #parts < 2 then
         return {"error", "Please supply a direction"}
       end
-      local dir = parts[2]
+      local dir = dirFromShort(parts[2])
 
       local room = {name="Blank", desc="Nothing here", exits={}, players={}, objects={}} 
       room.scripts = {
         "object",
-        "container",
         "room",
-        "roomExits"
       }
       room = Object:new(room)
       db.store_object(room)
@@ -404,7 +391,7 @@ local t = {
 				return player:send("Missing path")
 			end
 			
-			obj = player.room:search(parts[2])
+			obj = player.room:search(parts[2])[1]
 			
 			if not obj then
 				return player:send("Couldn't find object")
@@ -416,7 +403,8 @@ local t = {
 	},
 	edit = {
 		f = function(player, parts, data)
-			local obj = player.room:search(parts[2])[1]
+			name = table.concat(parts, " ", 2)
+      local obj = player.room:search(name)[1]
       if obj then
 				player._editing_obj = obj
 				player:setState("edit")
@@ -489,7 +477,7 @@ local t = {
 			if not parts[2] then
 				obj = player.room
 			else
-				obj = player.room:search(parts[2])
+				obj = player.room:search(parts[2])[1]
 			end
 			
 			if obj then
@@ -515,7 +503,75 @@ e.g.
 Type 'help' to show a list of available commands, and type 'help command' to read a more detailed helpfile.
 ]])
 		end
-	}
+	},
+  take = {
+    f = function(player, parts)
+      local obj = player.room:search(parts[2])[1]
+
+      if obj then 
+        if obj:getMovable(player) then
+          player.room:remove(obj)
+          player:add(obj)
+          player:send(obj:call("onPickup") or obj:getName().." taken!")
+        else
+          player:send("Can't pick up "..obj:getName())
+        end
+      else
+        player:send("Object not found")
+      end
+    end
+  },
+  drop = {
+    f = function(player, parts)
+      local obj = player:search(parts[2])[1]
+
+      if obj and obj ~= player then
+        player:remove(obj)
+        player.room:add(obj)
+        obj:call("onDrop", {player, player.room})
+        player:send("Dropped "..obj.name)
+      else
+        player:send("Can't find object to drop")
+      end
+    end
+  },
+  tp = {
+    f = function(player, parts)
+      if #parts < 3 then
+        return {"error", "Please supply two IDs"}
+      end
+      local obj, destination = db.get_or_load(tonumber(parts[2])), db.get_or_load(tonumber(parts[3]))
+
+      if obj and destination then
+        if obj:getRoom() then
+          obj:getRoom():remove(object)
+        end
+        obj.room = destination
+        destination:add(obj)
+      elseif not obj then
+        player:send("Invalid object")
+      else
+        player:send("Invalid desination")
+      end
+
+    end
+  },
+  unlock = {
+    f = function(player, parts)
+      local dir = dirFromShort(parts[2])
+      local locks = player.room:getLocks()
+      if locks and locks[dir] then
+        if locks[dir]:unlock(player) then
+          player:send("Your key fits!")
+          return
+        else
+          player:send("Your keys don't fit")
+        end
+      else
+        player:send("Nothing to unlock")
+      end
+    end,
+  }
 }
 
 for k,v in pairs(t) do

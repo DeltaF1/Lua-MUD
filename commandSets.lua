@@ -90,6 +90,9 @@ local t = {
 		"attack",
 		"exits",
 		"manual",
+    "take",
+    "drop",
+    "unlock",
 	},
 	Builder = CommandSet:new{
 		"inspect",

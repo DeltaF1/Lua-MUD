@@ -11,7 +11,7 @@
 
 				-- If there are any non alphanumeric characters in the data
 				if data:find("%W") then
-					user.sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)")
+					user.__sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)")
 					return
 				end
 
@@ -80,7 +80,7 @@
 
 				if data == "new" then
 					user:send("You find yourself in a vortex of sound and colour, arcane energies swirling all around. Before you is a small pocket of calm, an orb of clay floating in the center.")
-					user._editing_obj = Player:new()
+					user._editing_obj = Object:new()
 					user:setMenu(unpack(menus.char_gender))
 					return
 				end
@@ -88,13 +88,13 @@
 				player = user.characters[data]
 
 				if not player then
-					user:send("Invalid character name")	
+					user:send("Invalid character name")
 					return
 				end
 
 				-- player.user = user
-				player.sock = user.sock
-				clients[user.sock] = player
+				player.__sock = user.__sock
+				clients[user.__sock] = player
 
 				-- TODO: Move this to world_load
 				if not player.cmdset then
@@ -116,7 +116,8 @@
 				player.colour = colours[math.random(#colours)]
 
 				-- This should probably be adjustable for different spawnrooms or something
-        STARTING_ROOM = db.load_object(3)
+        -- Maybe a world_meta config file
+        STARTING_ROOM = db.get_or_load(3)
 				player.room = player:getRoom() or STARTING_ROOM
         player.room:add(player)
 
@@ -139,9 +140,6 @@
 				if #data == 0 then
 					return
 				end
-
-				
-
 
 				-- Get parts of data. e.g. "Why is the rum always gone?" will become {"Why", "is", "the", "rum", "always", "gone?"}
 				local parts = split(data)
@@ -182,13 +180,15 @@
 							end
 						end
 					end
-				end
+        else
+          player:send("Verb not found")
+        end
 			end,
-			prompt = "> "
+			prompt = "%{green}> %{reset}"
 		},
 		menu = {
 			f = function(player, data)
-				player.menu(player, data)
+				player.__menu(player, data)
 			end,
 			prompt = "menu> "
 		},
@@ -196,8 +196,9 @@
 			f = function(player, data)
 				local parts = split(data)
 				local key = parts[1]
-			
-        if #parts == 1 then
+		  	if #parts < 1 then
+          return
+        elseif #parts == 1 then
 		    	if key == "quit" or key == "save" then
             db.store_object(player._editing_obj)
             db.reload(player._editing_obj)

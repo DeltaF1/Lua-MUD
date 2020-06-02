@@ -8,19 +8,23 @@ local function new()
   return setmetatable({}, middleware)
 end
 
-function middleware:append(name, func)
+function middleware:append_middleware(name, func)
   if not self[name] then self[name] = {} end
   local funcs = self[name]
+  if type(funcs) == "function" then
+    print(name)
+    print(scriptName)
+  end
   funcs[#funcs + 1] = func
 end
 
-function middleware:insert(name, func, pos)
+function middleware:insert_middleware(name, func, pos)
   if not self[name] then self[name] = {} end
   local funcs = self[name]
   table.insert(funcs, pos, func)  
 end
 
-function middleware:remove(name, func)
+function middleware:remove_middleware(name, func)
   local funcs = self[name]
   if not funcs then return end
   for i = #funcs, 1, -1 do

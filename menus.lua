@@ -23,23 +23,13 @@ return {
 		function(p,d,i)
 			obj = p._editing_obj
 			parts = split(d, '/')
-			
+		  
+      obj.pronouns = {}
+
 			obj.pronouns.i=parts[1]
 			obj.pronouns.myself=parts[2]
 			obj.pronouns.mine=parts[3]
 			obj.pronouns.my=parts[4]
-			
-      local identifier = 1
-			if identifier then
-				obj.pronouns = PRONOUNS[identifier]
-				print("obj.pronouns = "..tostring(obj.pronouns))
-			else
-				-- It's a new pronoun set
-				identifier = sql.get_identifier("pronouns", "i")
-				
-				res, err = sql.execute("UPDATE pronouns SET i=%q, myself=%q, mine=%q, my=%q WHERE identifier=%i", obj.pronouns.i, obj.pronouns.myself, obj.pronouns.mine, obj.pronouns.my, identifier)
-				if not res then print(err) end
-			end
 			
 			p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
 			p:setMenu(unpack(menus.char_desc))
@@ -101,10 +91,14 @@ return {
 				
 				obj.user = p.name
 				print("obj.pronouns = "..tostring(obj.pronouns))
-			  -- TODO: Replace this with some sort of archetype system?
-        obj.__meta = "char"
+        obj.scripts = {
+          "object",
+          "player",
+          "socket",
+          "highlight",
+        }
+        obj:updateScripts()
         objects[db.store_object(obj)] = obj
-        db.update_object(objects[obj.identifier])
         db.add_character(obj.user, obj)
 			else
 				p:send("Cancelling character creation...")
@@ -158,9 +152,9 @@ return {
 			p._editing_obj._type = nil
 			local obj = p._editing_obj
       if t == "room" then
-        obj.scripts[#obj.scripts + 1] = "container"
         obj.scripts[#obj.scripts + 1] = "room"
-        obj.scripts[#obj.scripts + 1] = "roomExits"
+      elseif t == "scenery" then
+        obj.scenery = true
       end
       obj:updateScripts()
       db.store_object(obj)

@@ -21,20 +21,27 @@ function t.ser(obj, newl, indent, tables)
 		if type(v) ~= "function" and type(v) ~= "userdata" and not (type(k) == "string" and  k:match("^__")) then				
 			s = s .. indentStr
 			if type(k) == "string" then
-				-- Remove the "_str" from custom function keys
-				if k:match("do_[^_]+_str") then
-					k = k:match("(do_[^_]+)")
-				end
-				
-				-- If the key is only alphanumeric, and doesn't start with a number, leave it as is. Otheriwse add ["key"] syntax
+				 -- If the key is only alphanumeric, and doesn't start with a number, leave it as is. Otheriwse add ["key"] syntax
 				if contains(EDITOR_KEYWORDS, k) or not k:match("^[%a_][%w_]*$") then
 					k = '["'..k..'"]'
 				end
 				
 			-- If the key is a number index add brackets. e.g. {[1]="foo", [2]="bar"}
-			elseif type(k) == "number" then
+			else
+        if type(k) == "table" then
+          if k.__id then
+            k = 'ID('..k.__id..')'
+          elseif rawget(k, "identifier") then
+			  		k = 'ID('..k.identifier..')'
+			  	-- If it's a table not yet seen, encode it
+			  	elseif not contains(tables, k) then
+			  		table.insert(tables, k)
+			  		k = ser(k, newl, indent+1, tables)
+			  	end
+        end
+        
 				k = "["..k.."]"
-			end
+      end
 			
 			s = s ..k..' = '
 			

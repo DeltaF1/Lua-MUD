@@ -1,0 +1,11 @@
+return {
+  name = "Starting Room",
+  desc = "An empty room",
+  objects = {},
+  exits = {},
+  aliases = {},
+  scripts = {
+    "room"
+  },
+  identifier = 1,
+}

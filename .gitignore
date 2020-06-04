@@ -1,3 +1,7 @@
 *.bak
 capture/
 config.lua
+scripts/
+data/
+
+luamud.log

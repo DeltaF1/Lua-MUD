@@ -91,7 +91,13 @@ function t.load()
 			}
 		
 		object = Object:new(object)
-		
+	
+		for script_name in sql.rows("SELECT script_name FROM object_scripts WHERE object_id=%q", object.identifier) do
+			local script = require("scripts.objects."..script_name)
+			for k,v in pairs(script) do
+				object[k] = v
+			end
+		end
 		
 		-- TODO: Deal with players holding objects, objects holding other objects
 		if container_t ==  0 then
@@ -99,8 +105,10 @@ function t.load()
 			
 			table.insert(room.objects, object)
 			
-			object.container = room
+			object.room = room
 		end
+
+		objects[identifier] = object
 	end
 	
 	for identifier, obj_type, key, body in sql.rows("SELECT * FROM user_scripts") do

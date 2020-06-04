@@ -108,7 +108,7 @@ function t.update_object(object)
 	update_object:vbind_param_ulong(5,object.identifier)
 	--]]
 	
-	res, err = sql.execute("UPDATE objects SET name=%q,description=%q,container=%i,container_t=%i WHERE identifier=%i", object.name, object.desc, object.container.identifier, container_t, object.identifier)
+	res, err = sql.execute("UPDATE objects SET name=%q,description=%q,container=%i,container_t=%i WHERE identifier=%i", object.name, object.desc, object.room.identifier, container_t, object.identifier)
 	
 	if not res then
 		error(err)

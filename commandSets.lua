@@ -84,7 +84,7 @@ local t = {
 		"emote",
 		"pose",
 		"quit",
-		"chat",
+		"say",
 		"help",
 		"dummymenu",
 		"attack",

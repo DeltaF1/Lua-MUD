@@ -148,29 +148,26 @@ return {
 			p._editing_obj.desc = d
 			
 			print("Creating object of type "..p._editing_obj._type)
-			local t = p._editing_obj._type
-			p._editing_obj._type = nil
 			local obj = p._editing_obj
+			local t = obj._type
+			obj._type = nil
       if t == "room" then
         obj.scripts[#obj.scripts + 1] = "room"
       elseif t == "scenery" then
         obj.scenery = true
       end
       obj:updateScripts()
-      db.store_object(obj)
       objects[obj.identifier] = obj
       if t == "room" then
 				print("Adding room")
 				p:setMenu(unpack(menus.room_dir))
 				return
-			elseif t == "object" then
-				print("Adding object")
-				p._editing_obj.room = p.room
-        p.room:add(p._editing_obj)
 			else
-				print("Adding character")
-				table.insert(p.room.players, p._editing_obj)
+				print("Adding object")
+				obj.room = p.room
+        p.room:add(obj)
 			end
+      db.store_object(obj)
 			p._editing_obj = nil
 			p:setState("chat")
 		end,

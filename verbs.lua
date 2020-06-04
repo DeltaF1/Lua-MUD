@@ -67,7 +67,7 @@ local t = {
 			"walk"
 		}
 	},
-	chat = {
+	say = {
 		f = function(player, parts, data)
 			if #parts < 2 then
 				return {"error", "Please supply a sentence to say"}
@@ -76,10 +76,8 @@ local t = {
 			local msg = data:match("[^ ]+ (.+)")
 			
 			player.room:broadcast(player.name..' says "'..msg..'"', player)
+      player:send('You say "'..msg..'"')
 		end,
-		aliases = {
-			"say"
-		}
 	},
 	pose = {	
 		f = function(player, parts, data)
@@ -335,9 +333,12 @@ local t = {
 			
 			local t = parts[2]
 			
-			if not contains({"object","room","player"}, t) then return player:send("Invalid type '"..t.."'") end
-			player._editing_obj = Object:new()
-			player._editing_obj._type = t
+			if not contains({"object","room","player", "scenery"}, t) then return player:send("Invalid type '"..t.."'") end
+			
+      local obj = Object:new()
+			obj._type = t
+      objects[obj.identifier] = obj
+      player._editing_obj = obj
 			player:setMenu(unpack(menus.obj_name))
 		end
 	},
@@ -544,7 +545,7 @@ Type 'help' to show a list of available commands, and type 'help command' to rea
 
       if obj and destination then
         if obj:getRoom() then
-          obj:getRoom():remove(object)
+          obj:getRoom():remove(obj)
         end
         obj.room = destination
         destination:add(obj)

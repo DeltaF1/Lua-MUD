@@ -117,7 +117,7 @@
 
 				-- This should probably be adjustable for different spawnrooms or something
         -- Maybe a world_meta config file
-        STARTING_ROOM = db.get_or_load(3)
+        STARTING_ROOM = db.get_or_load(1)
 				player.room = player:getRoom() or STARTING_ROOM
         player.room:add(player)
 
@@ -214,20 +214,33 @@
           end
         end
 			
-				t, key = resolve(player._editing_obj, key)
+				local t, key = resolve(player._editing_obj, key)
 				local val = table.concat(parts, " ", 2)
 				print("key = "..tostring(key).." val = "..tostring(val))
 				if not key then return end
-				
+			  
+        if val:sub(1,1) == '"' then
+          -- It's an explicit string, don't try and parse it further
+          val = val:match('"(.*)"')
+        elseif tonumber(val) then
+          val = tonumber(val)
+        elseif val == "nil" then
+          val = nil
+        elseif val:sub(1,1) == '[' then
+          -- It's an identifier
+          val = val:match('%[(.*)%]')
+          if tonumber(val) then
+            obj = db.get_or_load(tonumber(val))
+          else
+            obj = player.room:search(val)[1]
+          end
+          if not obj then
+            player:send(("Identifier %q was not found, setting to nil..."):format(val))
+          end
+          val = obj
+        end
 
-				-- TODO: = loadstring(val)
-				
-				payload = "return "..val
-			
-				local success, newval = pcall(loadstring(payload))
-			
-				if not success then player:send(newval); return end
-				t[key] = newval
+				t[key] = val
 			end,
 			prompt = "edit> "
 		},

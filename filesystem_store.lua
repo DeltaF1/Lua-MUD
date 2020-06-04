@@ -67,7 +67,7 @@ local function load_file(filename) --> object
   local f, err = loadfile(filename, "t", env)
   if f then return f()
   else
-    print("Error loading file '"..flename.."':")
+    print("Error loading file '"..filename.."':")
     print(err)
     return nil
   end
@@ -141,7 +141,6 @@ function t.store_object(object)
 		print("object doesn't have id!")
     print(ser(object))
     object.identifier = t.reserve_id()
-
 	end
 	write(object, generate_filename(object.identifier))
 	return object.identifier

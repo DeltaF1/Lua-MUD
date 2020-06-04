@@ -8,66 +8,66 @@ EDITOR_KEYWORDS = {"and", "break", "do", "else", "elseif",
      "repeat", "return", "then", "true", "until", "while"}
 
 function keys(t)
-	local rt = {}
-	for k,_ in pairs(t) do table.insert(rt, k) end
-	return rt
+  local rt = {}
+  for k,_ in pairs(t) do table.insert(rt, k) end
+  return rt
 end
 
 function string.compare(s1, s2)
-	assert(s1 and s2, "string.compare takes two arguments!")
-	
-	local len = math.min(#s1, #s2)
-	
-	for i = 1, len do
-		local num1 = s1:lower():sub(i,i):byte()
-		local num2 = s2:lower():sub(i,i):byte()
-		if num1 ~= num2 then
-			return num1 < num2 and 1 or -1
-		end
-	end
-	return 0
+  assert(s1 and s2, "string.compare takes two arguments!")
+  
+  local len = math.min(#s1, #s2)
+  
+  for i = 1, len do
+    local num1 = s1:lower():sub(i,i):byte()
+    local num2 = s2:lower():sub(i,i):byte()
+    if num1 ~= num2 then
+      return num1 < num2 and 1 or -1
+    end
+  end
+  return 0
 end
 
 function stripControlChars(str)
     local s = ""
     for i = 1, str:len() do
-	if str:byte(i) >= 32 and str:byte(i) <= 126 then
-  	    s = s .. str:sub(i,i)
-	end
+  if str:byte(i) >= 32 and str:byte(i) <= 126 then
+        s = s .. str:sub(i,i)
+  end
     end
     return s
 end
 
 function split(s, sep)
-	local t = {}
-	local sep = sep or " "..NEWL
-	
-	-- For every substring made up of non separator characters, add to t
-	for i in string.gmatch(s, "[^"..sep.."]+") do table.insert(t, i) end
-	return t
+  local t = {}
+  local sep = sep or " "..NEWL
+  
+  -- For every substring made up of non separator characters, add to t
+  for i in string.gmatch(s, "[^"..sep.."]+") do table.insert(t, i) end
+  return t
 end
 
 function files(dir)
-	local s
-	if DIR_SEP == "\\" then
-		s = io.popen("dir "..dir.." /b /a-d"):read("*all")
-	else
-		s = io.popen("ls -p "..dir.." | grep -v /"):read("*all")
-	end
-		
-	return split(s)
+  local s
+  if DIR_SEP == "\\" then
+    s = io.popen("dir "..dir.." /b /a-d"):read("*all")
+  else
+    s = io.popen("ls -p "..dir.." | grep -v /"):read("*all")
+  end
+    
+  return split(s)
 end
 
 function makeFile(dir)
-	os.execute()
+  os.execute()
 end
 
 function string.multimatch(s, patterns)
-	for _,v in ipairs(patterns) do
-		local capture = s:match(v)
-		if capture then return capture end
-	end
-	return nil
+  for _,v in ipairs(patterns) do
+    local capture = s:match(v)
+    if capture then return capture end
+  end
+  return nil
 end
 
 -- lua-users.org
@@ -134,37 +134,37 @@ end
 
 --resolve identifier chain i.e. object.inventory.items.#1
 function resolve(obj, key)
-	local k
-	local keyparts = split(key, "%.")
-	-- for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
-	
-	for i, part in ipairs(keyparts) do
-		local num = part:match("#(%d+)")
-		if num then part = tonumber(num) end
-		k = part
-		if i == #keyparts then break end
-		if type(obj[part]) == "table" then
-			obj = obj[part]
-		elseif i ~= #keyparts then
-			return nil
-		end
-	end
-	
-	return obj, k
+  local k
+  local keyparts = split(key, "%.")
+  -- for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
+  
+  for i, part in ipairs(keyparts) do
+    local num = part:match("#(%d+)")
+    if num then part = tonumber(num) end
+    k = part
+    if i == #keyparts then break end
+    if type(obj[part]) == "table" then
+      obj = obj[part]
+    elseif i ~= #keyparts then
+      return nil
+    end
+  end
+  
+  return obj, k
 end
 
 contains = function (t, i)
-	for j,v in ipairs(t) do
-		if v == i then return true end
-	end
-	return false
+  for j,v in ipairs(t) do
+    if v == i then return true end
+  end
+  return false
 end
 
 tremove = function(t, i)
-	for j = #t, 1, -1 do
-		if t[j] == i then table.remove(t, j) end
-	end
-	return t
+  for j = #t, 1, -1 do
+    if t[j] == i then table.remove(t, j) end
+  end
+  return t
 end
 
 --create proxy table with get/set list
@@ -172,23 +172,23 @@ end
 -- TODO: Make it recursive, so any subtables are also proxied. Allow for ACL with resolve syntax
 -- e.g. "user.send" = true allows for only the send function to be read from self.user
 function makeProxy(t, get, set)
-	return setmetatable({}, {
-		__index = function(self, k)	
-			if get then assert(get[k], "Read-access error in script!") end
-			local v = t[k]
-			if type(v) == "function" then
-				return function(proxy, ...)
-					return v(t, ...)
-				end
-			end
-			return v
-		end,
-		__newindex = function(self, k, v)
-			assert(set and type(v):match("^"..set[k]), "Write-access error in script!")
-			t[k] = v
-		end,
-		
-	})
+  return setmetatable({}, {
+    __index = function(self, k)  
+      if get then assert(get[k], "Read-access error in script!") end
+      local v = t[k]
+      if type(v) == "function" then
+        return function(proxy, ...)
+          return v(t, ...)
+        end
+      end
+      return v
+    end,
+    __newindex = function(self, k, v)
+      assert(set and type(v):match("^"..set[k]), "Write-access error in script!")
+      t[k] = v
+    end,
+    
+  })
 end
 
 -- Houshalter @ stackoverflow.com

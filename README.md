@@ -7,7 +7,8 @@ This is a framework written in lua, designed to be the server-side of a [MUD (Mu
 ## What dependencies does this have?
 NOTE: SQL support is currently deprecated in favour of flat file storage. The db api may be rewritten to use SQL libraries again in the future
 - ~~[LuaSQL](https://keplerproject.github.io/luasql/) with an appropriate driver installed~~
-- ~~e.g. for SQLite3 run `luarocks install luasql-sqlite3`~~
+  - ~~e.g. for SQLite3 run `luarocks install luasql-sqlite3`~~
+- luasocket
 
 ## How do I use this?
 1. Download or clone the source

@@ -1,0 +1,33 @@
+EDITING
+
+Type 'edit <name>' to edit an object
+
+Once in the edit prompt, type '<name> <value>' to assign values on the edited object
+
+Type "save" save and quit exit mode
+Type "abort" to quit exit mode without modifying the object
+
+e.x:
+edit> desc A small porcelain vase.
+
+## Names
+name takes the form of a path separated by periods. This allows you to edit sub-tables of objects
+e.x:
+edit> exits.north [1001]
+You can also use the syntax '#<number>' to access an array member
+e.x:
+edit> aliases.#4 ceramic
+
+## Values
+Values are interpreted as strings unless they
+- are numeric
+- are in the form of [<id>] where <id> is a number referencing another object
+- are the literal string '{}' 
+
+To avoid this parsing (e.g. to use a literal square bracket as a name or description) surround the value in quotes (")
+e.x:
+edit> name "[34]"
+edit> desc "100.3"
+
+## Arrays
+If a given name refers to a table, then typing '<name> append <value>' will append the given value to the table

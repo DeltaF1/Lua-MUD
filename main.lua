@@ -41,9 +41,6 @@ LOG_F:write(string.rep("=", 80).."\r\n")
 
 print("Starting up server...")
 
--- Convert line endings from unix to telnet
-config.server_info.motd = config.server_info.motd:gsub("([^\r])(\n)", "%1\r\n")
-
 math.randomseed(os.time())
 
 NEWL = "\r\n"
@@ -52,6 +49,10 @@ WILL = "\251"
 WONT = "\252"
 ECHO = "\001"
 AYT  = "\246"
+
+-- Convert line endings from unix to telnet
+config.server_info.motd = config.server_info.motd:gsub("NEWL", NEWL)
+config.server_info.motd = config.server_info.motd:gsub("([^\r])(\n)", "%1\r\n")
 
 server = socket.bind("*", config.server_info.port)
 
@@ -63,8 +64,8 @@ print(string.format("Bound to port %i!", port))
 Object = require "object"
 ser = require "world_save".ser
 makeDb = require "filesystem_store"
-db = makeDb("data")
-backupDb = makeDb("data.bak")
+db = makeDb(config.db_info.dataDir)
+backupDb = makeDb(config.db_info.backupDataDir)
 
 soundex = require "soundex"
 
@@ -111,7 +112,9 @@ oppdirs = {
   up="down",
   down="up",
   ["in"]="out",
-  out="in"
+  out="in",
+  aft="fore",
+  fore="aft",
 }
 
 short_dirs = {
@@ -127,7 +130,51 @@ short_dirs = {
   [{"northwest", "nw"}]="northwest",
   [{"in"}]="in",
   [{"out"}]="out",
+  [{"back","backward","backwards"}]="aft",
+  [{"forewards","foreward"}]="fore",
 }
+
+function vecadd(v1,v2)
+  return {v1[1]+v2[1], v1[2]+v2[2]}
+end
+
+-- TODO: Add 3rd dimension
+
+dirvecs = {
+  north = {0,1},
+  west = {-1,0},
+  east = {1,0},
+  south = {0,-1},
+}
+
+for _, ns in pairs{"north", "south"} do
+  for _, ew in pairs{"east", "west"} do
+    dirvecs[ns..ew] = vecadd(dirvecs[ns], dirvecs[ew])
+  end
+end
+
+function bfs(target, starting)
+  local open = {starting}
+  local vecs = {[starting] = {0,0}}
+  local seen = {}
+  while #open > 0 do
+    local room = table.remove(open, 1)
+    seen[room] = true
+    for dir, other in pairs(room.exits) do
+      if not seen[other] then
+        local vec = dirvecs[dir]
+        if vec then
+          vec = vecadd(vec, vecs[room]) 
+          vecs[other] = vec
+          if vec[1] == target[1] and vec[2] == target[2] then
+            return other
+          end
+          table.insert(open, other)
+        end
+      end
+    end
+  end
+end
 
 function dirFromShort(dir)
   for shortnames,longname in pairs(short_dirs) do
@@ -182,7 +229,7 @@ function main()
     sock:send(s)
     
     sock:settimeout(1)
-    print(tostring(sock).." has connected")
+    print(tostring(sock:getpeername()).." has connected")
     local user = {__sock=sock, state="login1"}
     user.scripts = {
       "object",
@@ -238,10 +285,7 @@ function main()
   for id, object in pairs(objects) do
     -- only tick objects that are not lazy loaded
     if not object.__id then
-      local tick = object.onTick
-      if tick then
-        tick(object)
-      end
+      object:call("onTick")
     end
   end
   -- sleep

@@ -1,0 +1,6 @@
+BUILDING
+
+Some guidelines:
+- Use third-person descriptions
+- Prefer an omniscient narrator style
+- End descriptions and roomDesc's with periods

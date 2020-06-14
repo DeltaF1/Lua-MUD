@@ -73,8 +73,6 @@ local function load_file(filename) --> object
   end
 end
 
-local load_scripts = require "scripts"
-
 function t.load_object(identifier)
 	-- Assert that the identifier is a number
 	--

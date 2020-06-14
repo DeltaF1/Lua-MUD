@@ -1,0 +1,3 @@
+[submodule "lua-tracery"]
+	path = lua-tracery
+	url = https://github.com/DeltaF1/lua-tracery

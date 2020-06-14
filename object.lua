@@ -57,7 +57,10 @@ function Object:loadScript(scriptName, loaded)
   
   for k,v in pairs(script.data or {}) do
     if self[k] == nil then
-      self[k] = deepcopy(v)
+      local t, key = resolve(self, k)
+      if t then
+        t[key] = deepcopy(v)
+      end
     end
   end
 

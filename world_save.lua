@@ -7,7 +7,7 @@ local t = {}
 -- Serialize a table
 function t.ser(obj, newl, indent, tables)
   -- Previously serialized tables, to prevent stack overflows
-  if getmetatable(obj) == CommandSet then
+  if getmetatable(obj) and getmetatable(obj) == CommandSet then
     --Serialize the keys
     obj = keys(obj)
   end
@@ -46,7 +46,7 @@ function t.ser(obj, newl, indent, tables)
       s = s ..k..' = '
       
       if type(v) == "string" then
-        v = v:gsub(NEWL, "\\".."\\".."NEWL")
+        v = v:gsub(NEWL, "\\"..NEWL)
         v = v:gsub('\\','\\\\')
         v = v:gsub('"', '\\"')
         v = '"'..v..'"'
@@ -96,14 +96,7 @@ local function saveTable(tbl, dir)
         local oldsock = object.sock
         object.sock = nil
       end
-      if object.players then
-        local oldplayers = object.players
-        object.players = {}
-      end
       s = s..object.identifier.." = "..ser(object).."\n\n"
-      if object.players then
-        object.players = oldplayers
-      end
       if oldsock then object.sock = oldsock end
     end
     s = s.."--[[END OF FILE]]--"

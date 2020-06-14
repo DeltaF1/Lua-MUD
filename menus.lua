@@ -12,7 +12,7 @@ return {
         return
       end
       
-      p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
+      --p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
       p:setMenu(unpack(menus.char_desc))
     end, 
     {"m","f","n","o"}
@@ -31,7 +31,6 @@ return {
       obj.pronouns.mine=parts[3]
       obj.pronouns.my=parts[4]
       
-      p:send("The ball of clay begins to stretch and deform, tendrils of material extruding outwards to form crude limbs.")
       p:setMenu(unpack(menus.char_desc))
     end,
     {"%w+/%w+/%w+/%w+$"}
@@ -44,7 +43,7 @@ return {
       
       obj.desc = d
       
-      p:send("The golem begins to take on more humanistic characteristics, and facial features push themself out of the surface of its head.")
+      --p:send("The golem begins to take on more humanistic characteristics, and facial features push themself out of the surface of its head.")
       p:setMenu(unpack(menus.char_name))
     end,
     {"."}
@@ -59,23 +58,25 @@ return {
       -- TODO: implement name.# syntax for multiple objects w/ same name
       
       if contains({"quit"}, d) then
-        p:send("(OOC) Invalid name!")
+        p:send("Invalid name!")
       end
       
       -- stmt = DB_CON:prepare()
       -- stmt:vbind_param_char(1,d)
       
-      if p.characters[d] then    
-        p:send("(OOC) That name is taken!")
-        return
+      local obj = p._editing_obj
+      local user = db.get_user(obj.user)
+      for _,id in ipairs(user.characters) do
+        if db.get_or_load(id).name == d then    
+          p:send("You already have a character by that name!")
+          return
+        end
       end
-      
-      obj = p._editing_obj
       
       obj.name = d
       
       -- TODO: Edit flavor text
-      p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
+      -- p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
       
       p:setMenu(unpack(menus.char_confirm))
     end,
@@ -89,23 +90,20 @@ return {
       if i == 1 then
         local obj = p._editing_obj
         
-        obj.user = p.name
-        print("obj.pronouns = "..tostring(obj.pronouns))
         obj.scripts = {
           "object",
           "player",
           "socket",
-          "highlight",
+          "highlight"
         }
         obj:updateScripts()
         objects[db.store_object(obj)] = obj
         db.add_character(obj.user, obj)
       else
-        p:send("Cancelling character creation...")
-        
-        p._editing_obj = nil
+        p:send("You step away from the mirror and shake your head. That can't be right, let's try again...")
       end
-      p:setState("login3")
+      p._editing_obj = nil
+      p:popMenu()
     end,
     {"[Yy].*$", "[Nn].*$"}
   },

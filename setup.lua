@@ -1,7 +1,4 @@
-print("If you have not already done so, please set up your SQL server with the provided schema.sql")
-
 defaults = require "default_config" 
-
 
 fancy = {
 	sql_driver = "Database driver [mysql, sqlite3]",
@@ -25,25 +22,14 @@ function config(table, legend)
 	end
 end
 
-config(defaults.sql_params, fancy)
-
--- attempt to connect to database
---
--- Ask for admin username/password
-
 config(defaults.server_info, {port="Server port for clients to connect to", motd="Welcome message before users login"})
 
-function ser(table)
-	if type(table) == "table" then
-		local s = "{"
-		for k,v in pairs(table) do
-			s = s..("[%q]=%s,"):format(k,ser(v))
-		end
-		return s.."}"
-	else
-		return "[["..tostring(table).."]]"
-	end
-end
+config(defaults.db_info, {})
+config(defaults.world_info, {})
+
+require "utils"
+NEWL = "\r\n"
+ser = require("world_save").ser
 
 -- write to config.lua
 local f = io.open("config.lua", "w")

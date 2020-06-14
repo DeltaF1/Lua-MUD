@@ -1,6 +1,7 @@
 return {
   data = {
     state = "chat",
+    __states = {},
   },
   methods = {
     setState = {
@@ -37,5 +38,17 @@ return {
         end
       end,
     },
+    pushMenu = {
+      function(self, args, ret)
+        self._last_state = self.state
+        self:call("setMenu", args)
+      end
+    },
+
+    popMenu = {
+      function(self, args, ret)
+        self:setState(self._last_state)
+      end
+    }
   },
 }

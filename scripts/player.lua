@@ -7,6 +7,7 @@ return {
     "object",
     "playerState",
     "container",
+    "character",
   },
 
   methods = {
@@ -16,7 +17,8 @@ return {
       end,
       function(self, args, ret)
         self:send(ret)
-      end
+      end,
+      -- TODO: move this to character class
     },
     onLoad = {
       function(self, args)

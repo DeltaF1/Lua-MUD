@@ -6,7 +6,7 @@ return {
   },
   methods = {
     broadcast = {
-      function(self, args, res, next)
+      function(self, args, res)
         local message, source = unpack(args)
         for i = 1, #self.objects do
           local player = self.objects[i]    
@@ -18,11 +18,11 @@ return {
     },
     
     getDesc = {
-      function(self, args, res, next)
+      function(self, args, res)
         return self.name..NEWL..NEWL..res
       end,
 
-      function(self, args, res, next)
+      function(self, args, res)
         local source = args[1]
         local containerList = "" 
         for i = 1, #self.objects do

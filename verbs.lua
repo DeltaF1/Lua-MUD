@@ -165,30 +165,6 @@ local t = {
       end)
     end
   },
-  --[[
-  run = {
-    f = function(player, parts, data)
-      -- NOT SAFE
-      local payload = data:match("[^ ]+ (.+)")
-      
-      -- OH GOD WHY
-      local f = loadstring(payload)
-      
-      _print = print
-      print = function(msg)
-        _print(msg)
-        player:send(tostring(msg))
-      end
-      
-      -- THE HUMANITY
-      local result, err = pcall(f)
-      
-      print = _print
-      
-      -- HAVE MERCY ON MY SOUL
-      player:send(tostring(err or result))
-    end
-  },--]]
   set = {
     f = function(player, parts, data)
       if #parts < 2 then
@@ -226,7 +202,7 @@ local t = {
       payload = "return "..payload
       
       -- PLEASE SANDBOX THIS FOR THE LOVE OF GOD
-      local success, newval = pcall(loadstring(payload))
+      --local success, newval = pcall(loadstring(payload, {}))
       
       if not success then player:send(newval); return end
       
@@ -324,7 +300,7 @@ local t = {
       
       
       if helpfile then
-        player:send(helpfile..NEWL)
+        player:send(helpfile)
       end
     end,
     aliases = {"?"}
@@ -346,14 +322,14 @@ local t = {
       player:setMenu(unpack(menus.obj_name))
     end
   },
-  dig = {
+  bore = {
     f = function(player, parts, data)
       if #parts < 2 then
         return {"error", "Please supply a direction"}
       end
       local dir = dirFromShort(parts[2])
 
-      local room = {name="Blank", desc="Nothing here", exits={}, players={}, objects={}} 
+      local room = {name="Blank", desc="Nothing here"}
       room.scripts = {
         "object",
         "room",
@@ -549,7 +525,6 @@ Type 'help' to show a list of available commands, and type 'help command' to rea
 
       if obj and destination then
         if obj:getRoom() then
-          print("removing")
           obj:getRoom():remove(obj)
         end
         obj.room = destination

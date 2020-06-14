@@ -18,7 +18,7 @@ return {
       end,
     },
     setMenu = {
-      function(self, args, res, next)
+      function(self, args)
         local prompt, f, input = unpack(args) 
         input = input or {"y","n"}
         self.state = "menu"

@@ -6,8 +6,8 @@ return {
   methods = {
     attach = {
       function(self, args, _, next)
-        local room, dir = args.room, args.dir
-        local oppdir = oppdirs[dir]
+        local room, dir, oppdir = unpack(args)
+        local oppdir = oppdir or oppdirs[dir]
         
         self.exits[dir] = room
         
@@ -18,8 +18,8 @@ return {
     },
     detach = {
       function(self, args, _, next)
-        local dir = args.dir
-        local oppdir = oppdirs[dir]
+        local dir, oppdir = unpack(args)
+        local oppdir = oppdir or oppdirs[dir]
         if oppdir and self.exits[dir] then
           self.exits[dir].exits[oppdir] = nil
           self.exits[dir] = nil
@@ -30,24 +30,32 @@ return {
     doMove = {
       function(self, args)
         local player, dir = unpack(args)
-        local destination = self.exits[dir]
+        local destination = self:getExit(dir, player)
 
         if destination then
           self:call("onExit", {player=player, dir=dir})
 
-          player:call("onExit")
+          player:call("onExit", {dir})
           
           tremove(self.objects, player)
           destination:add(player)
 
           player.room = destination
-          player:call("onEnter")
+          player:call("onEnter", {dir})
 
-          --destination:call("onEnter")
+          destination:call("onEnter")
+          return destination
         else
-          player:send("Can't go that way!")
+          player:call("send", {"Can't go that way!"})
           return STOP
         end
+      end
+    },
+    getExit = {
+      function(self, args)
+        local dir, object = unpack(args)
+
+        return self.exits[dir]
       end
     },
   },

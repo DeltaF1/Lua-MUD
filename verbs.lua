@@ -33,13 +33,14 @@ local t = {
   },
   look = {
     f = function(player, parts)
-      local obj
+      local obj, name
       if #parts < 2 then
         obj = player.room
       else
-        obj = player.room:search(parts[2])[1]
+        name = table.concat(parts, " ", 2)
+        obj = player.room:search(name)[1]
       end
-      if not obj then return player:send("Could not find "..parts[2]) end
+      if not obj then return player:send("Could not find "..name) end
       player:send(obj:getDesc(player))
     end,
     aliases = {
@@ -552,7 +553,42 @@ Type 'help' to show a list of available commands, and type 'help command' to rea
         player:send("Nothing to unlock")
       end
     end,
-  }
+  },
+  attach = {
+    f = function(player, parts)
+      local dir, dest, room
+      if #parts < 2 then
+        for _,dir in ipairs({"north", "south", "east", "west"}) do
+          verbs.attach.f(player, {"attach ", dir})
+        end
+        return
+      else
+        dir = dirFromShort(parts[2])
+        room = player.room
+        if #parts == 2 then
+          local target = dirvecs[dir]
+          if target then
+            dest = bfs(target, room)
+          end
+        else
+          dest = db.get_or_load(tonumber(parts[3]))
+        end
+        if not dest then
+          -- verbs should maybe return a string to be printed?
+          player:send("Destination not found")
+          return
+        end
+      end
+
+      -- room:attach(dir, dest)
+      room.exits[dir] = dest
+
+      if oppdirs[dir] then
+        local opp = oppdirs[dir]
+        dest.exits[opp] = room
+      end
+    end,
+  },
 }
 
 for k,v in pairs(t) do

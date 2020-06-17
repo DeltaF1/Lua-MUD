@@ -309,9 +309,7 @@ err_handler = function(err)
     print(debug.traceback())
     for i, obj in pairs(objects) do
       if not obj.__id then
-        local sock = obj:get__sock()
         backupDb.reload(obj)
-        obj.__sock = sock
       end
     end
   end

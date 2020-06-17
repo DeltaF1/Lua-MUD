@@ -224,7 +224,7 @@ local t = {
       local name = parts[2]
       
       local obj = player.room:search(name)[1]
-      
+      obj = obj or db.get_or_load(tonumber(name))
       if not obj then return player:send("Object not found") end
       
       player:send(ser(obj, NEWL))
@@ -339,11 +339,8 @@ local t = {
       db.store_object(room)
       objects[room.identifier] = room 
 
-      player.room.exits[dir] = room 
-      local oppdir = oppdirs[dir]
-      if oppdir then
-        room.exits[oppdir] = player.room
-      end
+      player.room:attach(room, dir)
+      player.room:doMove(player, dir)
     end,
   },
   reload = {
@@ -362,6 +359,15 @@ local t = {
 
       db.reload(obj)
     end,
+  },
+  ["load"] = {
+    f = function(player, parts, data)
+      local id = tonumber(parts[2])
+
+      if id then
+        db.get_or_load(id)
+      end
+    end
   },
   attr_type = {
     f = function(player, parts, data)
@@ -387,6 +393,7 @@ local t = {
     f = function(player, parts, data)
       name = table.concat(parts, " ", 2)
       local obj = player.room:search(name)[1]
+      obj = obj or db.get_or_load(tonumber(name))
       if obj then
         player._editing_obj = obj
         player:setState("edit")

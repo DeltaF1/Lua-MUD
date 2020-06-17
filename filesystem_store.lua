@@ -15,7 +15,7 @@ local function exists(filename)
   end
 end
 
-local function id_exists(id)
+function t.id_exists(id)
   return exists(generate_filename(id))
 end
 
@@ -36,7 +36,7 @@ local env = {
 local lazy = require "lazy"
 
 function t.get_lazy(id)
-	if not id_exists(id) then
+	if not t.id_exists(id) then
     return nil
   end
   if not objects[id] then
@@ -78,7 +78,8 @@ function t.load_object(identifier)
 	--
 	-- If identifier were a string then loadfile might
 	-- execute a path traversal attack
-	assert(type(identifier) == "number")
+	if not identifier then return nil end
+  assert(type(identifier) == "number")
 	local data = load_file(generate_filename(identifier))
   if not data then return nil end
 
@@ -117,7 +118,7 @@ function t.update_object(object, id)
 end
 
 function t.get_or_load(id)
-	if not id_exists(id) then
+	if not objects[id] and not t.id_exists(id) then
     print("attempted to load missing id:"..tostring(id))
     return nil
   end

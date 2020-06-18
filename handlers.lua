@@ -77,12 +77,13 @@ return {
       end
 
       if data == "new" then
-        --user._editing_obj = Object:new()
-        --user._editing_obj.user = user.name
-        --user:pushMenu(unpack(menus.char_gender))
+        user._editing_obj = Object:new()
+        user._editing_obj.user = user.name
+        user:pushMenu(unpack(menus.char_gender))
+        return
         -- TODO: Drop into the world here
-        player = db.load_object(194)
-        player.identifier = nil
+        --player = db.load_object(194)
+        --player.identifier = nil
       else
         player = user.characters[data]
       end
@@ -104,7 +105,7 @@ return {
       player.cmdset = CommandSet:new(player.cmdset)
       player.cmdset = player.cmdset:union(cmdsets.Default)
       
-      if player.name == "Delta" then
+      if player.user == config.admin_name then
         player.cmdset = player.cmdset:union(cmdsets.All)
       end
 

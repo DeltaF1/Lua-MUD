@@ -1,4 +1,6 @@
+local md5 = require "md5"
 return function(PREFIX)
+
 local t = {}
 
 local PREFIX = (PREFIX or "data").."/"
@@ -147,7 +149,8 @@ end
 
 local function get_max()
 	local f = io.open(PREFIX.."max_id.txt", "r")
-	local max = f:read("*number")
+	if not f then return 1 end
+  local max = f:read("*number")
 	f:close()
 	return max
 end
@@ -162,19 +165,40 @@ function t.reserve_id()
 	return max
 end
 
-function t.get_user(name)
-	local users = loadfile(PREFIX.."users.lua", "t", {})()
+function t.get_users()
+  local users = loadfile(PREFIX.."users.lua", "t", {})
+  if users then
+    return users()
+  else
+    return {}
+  end
+end
 
-	return users[name]
+function t.get_user(name)
+	return t.get_users()[name]
 end
 
 function t.add_character(name, object)
   local id = object.identifier
-	local users = loadfile(PREFIX.."users.lua", "t", {})()
+	local users = t.get_users()
 
 	table.insert(users[name].characters, id)
 
 	write(users, PREFIX.."users.lua")
 end
+
+-- Creates a new user or updates the password of an existing user
+function t.add_user(name, password)
+  local users = t.get_users()
+  
+  local user = users[name] or {}
+  user.characters = user.characters or {}
+  user.passhash = md5.sumhexa(password)
+
+  users[name] = user
+
+  write(users, PREFIX.."users.lua")
+end
+
 return t
 end

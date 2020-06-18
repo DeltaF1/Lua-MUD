@@ -20,4 +20,7 @@ NOTE: SQL support is currently deprecated in favour of flat file storage. The db
 4. Run 'lua setup.lua' to set up the configuration for the server
 5. Run 'lua main.lua' to start the server
 6. Log in to the server using the admin username and password you set up in step 4
-  - Any characters created with this account will have full command access  
+  - Any characters created with this account will have full command access
+
+## Building guide Coming Soon
+

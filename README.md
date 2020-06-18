@@ -9,6 +9,7 @@ NOTE: SQL support is currently deprecated in favour of flat file storage. The db
 - ~~[LuaSQL](https://keplerproject.github.io/luasql/) with an appropriate driver installed~~
   - ~~e.g. for SQLite3 run `luarocks install luasql-sqlite3`~~
 - luasocket
+- [xml2lua](https://github.com/manoelcampos/xml2lua)
 
 ## How do I use this?
 1. Download or clone the source
@@ -16,4 +17,7 @@ NOTE: SQL support is currently deprecated in favour of flat file storage. The db
 3. Setup your world files
   - Rename data/1.lua.example to data/1.lua for a 1-room world example OR
   - Load in the data/ directory from an existing world
-4. Run 'lua main.lua' inside the source directory, and take note of the port it is bound to. Players can connect to the server via telnet, or via any one of a number of pre-existing MUD clients.
+4. Run 'lua setup.lua' to set up the configuration for the server
+5. Run 'lua main.lua' to start the server
+6. Log in to the server using the admin username and password you set up in step 4
+  - Any characters created with this account will have full command access  

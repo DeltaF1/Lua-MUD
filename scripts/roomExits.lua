@@ -35,9 +35,10 @@ return {
         if destination then
           self:call("onExit", {player=player, dir=dir})
 
+          tremove(self.objects, player)
+          
           player:call("onExit", {dir})
           
-          tremove(self.objects, player)
           destination:add(player)
 
           player.room = destination

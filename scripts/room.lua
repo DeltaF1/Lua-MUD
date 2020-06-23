@@ -34,9 +34,32 @@ return {
           end
         end
         if #containerList > 0 then
-          return res..NEWL..NEWL..containerList
+          res = res..NEWL..NEWL..containerList
         end
+        exits = colour("%{yellow}exits: ["..self:getExitsDesc().."]")
+        res = res..NEWL..exits
         return res
+      end,
+    },
+
+    getExitsDesc = {
+      function(self, args, ret)
+        return self:getExits()
+      end,
+      function(self, args, ret)
+        return table.concat(keys(ret), ", ")
+      end
+    },
+    onTick = {
+      function(self, args, ret)
+        if self.__checkedConsistency then return end
+        self.__checkedConsistency = true 
+        for k,v in pairs(self:getExits()) do
+          if not v.exits or not v:getExits() then
+            print(("WARNING: room %q is attempting to link to room %q (which has no exits)"):format(self.identifier, v.identifier or "NIL"))
+            print(ser(v))
+          end
+        end
       end,
     },
   },

@@ -147,6 +147,17 @@ function t.store_object(object)
 	return object.identifier
 end
 
+-- WARNING
+-- THIS HAS NO WAY TO CLEAN UP DANGLING REFERENCES TO THE OBJECT
+-- ENSURE THAT NOBODY IS POINTING TO THIS OBJECT BEFORE CALLING
+function t.delete_object(object)
+  local identifier = tonumber(object) or object.identifier
+  if type(identifier) ~= "number" then return nil end
+  objects[identifier] = nil
+  -- TODO: use LFS or something similar
+  os.execute("rm "..generate_filename(identifier)) 
+end
+
 local function get_max()
 	local f = io.open(PREFIX.."max_id.txt", "r")
 	if not f then return 1 end

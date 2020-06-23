@@ -79,15 +79,14 @@ local t = {
       end
       
       local msg = data:match("[^ ]+ (.+)")
-      
-      player.room:broadcast(player.name..' says "'..msg..'"', player)
-      player:send('You say "'..msg..'"')
+      local third = xml.wrapText(xml.wrapText(player.name, "char", {id=player.identifier})..' says "'..xml.wrapText(msg, "msg")..'"', "say")
+      player.room:broadcast(third, player)
+      local second = xml.wrapText('You say "'..xml.wrapText(msg, "msg")..'"', "say")
+      player:send(second)
     end,
   },
   pose = {  
     f = function(player, parts, data)
-      
-      
       local msg = ""
       if not parts[1]:find("^%..+") then
         if #parts < 2 then

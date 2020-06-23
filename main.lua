@@ -4,6 +4,7 @@ config = require "config"
 md5 = require "md5"
 colour = require "ansicolors"
 require "utils"
+xml = require "xmlparser"
 
 do
   local logfile
@@ -219,6 +220,12 @@ verbs = require "verbs"
 cmdsets = require "commandSets"
 menus = require "menus"
 
+_deferred = {}
+
+function deferred(object, method, args)
+  _deferred[#_deferred+1] = {object, method, args}
+end
+
 function main()
   local dt = DT
   local status, err = pcall(function()
@@ -283,13 +290,19 @@ function main()
     end
   end
   -- Do game ticks
-  
+
   for id, object in pairs(objects) do
     -- only tick objects that are not lazy loaded
     if getmetatable(object) ~= lazy_mt then
       object:call("onTick")
     end
   end
+
+  while #_deferred > 0 do
+    local event = table.remove(_deferred)
+    event[1]:call(event[2], event[3])
+  end
+
   -- sleep
   socket.select(nil,nil,0.1)
   return true

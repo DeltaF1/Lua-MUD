@@ -1,7 +1,7 @@
 *.bak
 capture/
 config.lua
-scripts/
+scripts/*.lua
 data/
 
 luamud.log

@@ -9,9 +9,11 @@ return {
       function(self, args, res)
         local message, source = unpack(args)
         for i = 1, #self.objects do
-          local player = self.objects[i]    
-          if not source or source ~= player then 
-            player:call("send", {message})
+          local player = self.objects[i]
+          -- calling "send" could potentially trigger an object to go away, which makes an object dissapear...
+          -- therefore have to check player's existence
+          if player and (not source or source ~= player) then 
+            deferred(player, "send", {message})
           end
         end
       end,

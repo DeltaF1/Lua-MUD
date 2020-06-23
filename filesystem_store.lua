@@ -125,7 +125,7 @@ function t.get_or_load(id)
     return nil
   end
   if not objects[id] then
-		objects[id] = {}
+		objects[id] = {__id=id}
 		t.update_object(objects[id], id)
 	end
 	return objects[id]

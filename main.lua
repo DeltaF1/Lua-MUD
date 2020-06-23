@@ -284,7 +284,7 @@ function main()
   
   for id, object in pairs(objects) do
     -- only tick objects that are not lazy loaded
-    if not object.__id then
+    if getmetatable(object) ~= lazy_mt then
       object:call("onTick")
     end
   end

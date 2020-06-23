@@ -4,7 +4,7 @@ local load = function(tbl, id)
   db.update_object(tbl, id)
 end
 
-local lazy = {
+lazy_mt = {
 
 	__index = function(tbl, index)
 		load(tbl, tbl.__id)
@@ -25,5 +25,5 @@ local lazy = {
 }
 
 return function(id)
-  return setmetatable({__id=id}, lazy)
+  return setmetatable({__id=id}, lazy_mt)
 end

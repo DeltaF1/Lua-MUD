@@ -314,13 +314,16 @@ local t = {
       
       local t = parts[2]
       
-      if not contains({"object","room","player", "scenery"}, t) then return player:send("Invalid type '"..t.."'") end
-      
-      local obj = Object:new()
+      local obj = template(t)
       obj._type = t
       objects[obj.identifier] = obj
       player._editing_obj = obj
-      player:setMenu(unpack(menus.obj_name))
+      player:setState("edit")
+      if contains(obj.scripts, "room") then
+        player:pushMenu(unpack(menus.room_dir))
+      else
+        player.room:add(obj)
+      end
     end
   },
   bore = {
@@ -455,10 +458,7 @@ local t = {
   exits = {
     f = function(player, parts)
       player:send("The available exits are:")
-      
-      for k,v in pairs(player.room.exits) do
-        player:send(k)
-      end
+      player:send("%{yellow}["..player.room:getExitsDesc(player).."]")
     end
   },
   ident = {

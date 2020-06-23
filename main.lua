@@ -212,6 +212,8 @@ PRONOUNS = {
   }
 }
 
+Grammar = require "lua-tracery.tracery".Grammar
+template = require "template"
 handlers = require "handlers"
 verbs = require "verbs"
 cmdsets = require "commandSets"

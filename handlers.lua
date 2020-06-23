@@ -11,14 +11,57 @@ return {
       end
       -- If there are any non alphanumeric characters in the data
       if data:find("%W") then
-        user.__sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)")
+        user.__sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)
         return
       end
+      
+      if data == "new" then
+        user:setState("newAccount1")
+      else
+        user.name = data
+        user:setState("login2")
+      end
 
-      user.name = data
-      user:setState("login2")
     end,
-    prompt = colour("%{green}Please enter your username:")
+    prompt = colour("%{green}Please enter your username (new to create a new account):")
+  },
+  newAccount1 = {
+    f = function(user, data)
+      if data:find("%W") then
+        user.__sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)
+      elseif db.get_user(data) or data == "new" then
+        user.__sock:send("Account with that name already exists!"..NEWL)
+      else
+        user.name = data
+        user:setState("newAccount2")
+      end
+    end,
+    prompt = "New account name: "
+  },
+  newAccount2 = {
+    f = function(user, data)
+      if #data < 8 then
+        user.__sock:send("Please enter a password that is at least 8 characters long"..NEWL)
+      else
+        user.password = data
+        user:setState("newAccount3")
+      end
+    end,
+    before = function(user) user:send(IAC..WILL..ECHO, "") end,
+    prompt = "Enter your password (DO NOT REUSE ANY OTHER PASSWORDS): ",
+  },
+  newAccount3 = {
+    f = function(user, data)
+      if data == user.password then
+        user.password = nil
+        db.add_user(user.name, data)
+        user:setState("login1")
+      else
+        user.__sock:send("Password doesn't match!"..NEWL)
+      end
+    end,
+    prompt = "Confirm your password: ",
+    after = function(user) user:send(IAC..WONT..ECHO, "") end,
   },
   login2 = {
     before = function(user) user:send(IAC..WILL..ECHO, "") end,

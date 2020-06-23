@@ -200,10 +200,14 @@ return {
       local verb
       local key
 
+      if player.room:getExit(cmd, player) then
+        verb = player.cmdset:find("go")
+      end
+
       if player.room.cmdset and player.room.cmdset:find(cmd) then
-        verb = player.room.cmdset:find(cmd)
+        verb = player.room.cmdset:find(cmd) or verb
       else
-        verb = player.cmdset:find(cmd)
+        verb = player.cmdset:find(cmd) or verb
       end
 
       if verb then

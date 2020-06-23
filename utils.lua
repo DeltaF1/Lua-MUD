@@ -208,3 +208,7 @@ function num2bin(n)
     s = s:gsub('.', oct2bin)
     return s
 end
+
+function string.capitalize(s)
+  return s:sub(1,1):upper()..s:sub(2)
+end

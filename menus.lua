@@ -56,8 +56,11 @@ return {
       
       -- ARCH: Allow multple characters to have the same name?
       -- TODO: implement name.# syntax for multiple objects w/ same name
-      
-      if contains({"quit"}, d) then
+
+      -- Strip out trailing whitespace
+      name = d:match("(.-)%s*$")
+
+      if contains({"quit", "new"}, name) then
         p:send("Invalid name!")
       end
       
@@ -67,20 +70,20 @@ return {
       local obj = p._editing_obj
       local user = db.get_user(obj.user)
       for _,id in ipairs(user.characters) do
-        if db.get_or_load(id).name == d then    
+        if db.get_or_load(id).name == name then    
           p:send("You already have a character by that name!")
           return
         end
       end
       
-      obj.name = d
+      obj.name = name
       
       -- TODO: Edit flavor text
       -- p:send("The clay golem before you jerks, life filling its eyes as you utter its name. With a flash, you are looking through the eyes of the golem. As you look at your malformed limbs, the chaotic energies surround you, eating away, refining your features. The vortex swirls around you, and you feel yourself blink out of this hellscape, into an absolute darkness.")
       
       p:setMenu(unpack(menus.char_confirm))
     end,
-    {"%w+$"}
+    {"%w[%w'%- ]+"}
   },
   
   char_confirm = {
@@ -180,8 +183,7 @@ return {
       if oppdir then
         p._editing_obj.exits[oppdir] = p.room
       end
-      p._editing_obj = nil
-      p:setState("chat")
+      p:popMenu()
     end,
     {"."}
   }

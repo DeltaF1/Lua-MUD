@@ -155,11 +155,7 @@ return {
 
       player.colour = colours[math.random(#colours)]
 
-      local STARTING_ROOM = db.load_object(tonumber(config.world_info.starting_room))
-      -- Calling load_object creates an orphaned room since it's not 
-      -- added to the objects_table
-      STARTING_ROOM.identifier = 0
-      -- Prevents the player from reloading into the base room
+      local STARTING_ROOM = db.get_or_load(tonumber(config.world_info.starting_room))
       player.room = player:getRoom() or STARTING_ROOM
       player.room:add(player)
 

@@ -22,7 +22,7 @@ return {
     e.g. she/herself/hers/her: ",
     function(p,d,i)
       obj = p._editing_obj
-      parts = split(d, '/')
+      parts = utils.split(d, '/')
       
       obj.pronouns = {}
 
@@ -60,7 +60,7 @@ return {
       -- Strip out trailing whitespace
       name = d:match("(.-)%s*$")
 
-      if contains({"quit", "new"}, name) then
+      if utils.contains({"quit", "new"}, name) then
         p:send("Invalid name!")
       end
       

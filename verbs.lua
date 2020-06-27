@@ -129,7 +129,7 @@ local t = {
           return player.pronouns[v:lower()]
         end
         ):gsub(
-          case_insensitive_pattern(p.name), "you"
+          utils.case_insensitive_pattern(p.name), "you"
         ):gsub(
           "([%.%?%!]) (%a)", function(punctuation, letter) return punctuation.." "..letter:upper() end
         ):gsub(
@@ -186,7 +186,7 @@ local t = {
       
       
       local key = parts[3]
-      local obj, k = resolve(obj, key)
+      local obj, k = utils.resolve(obj, key)
       if not obj then return player:send("Invalid keypath "..key) end
       print("Setting "..(obj.name or tostring(obj)).." at "..k)
       
@@ -318,7 +318,7 @@ local t = {
       objects[obj.identifier] = obj
       player._editing_obj = obj
       player:setState("edit")
-      if contains(obj.scripts, "room") then
+      if utils.contains(obj.scripts, "room") then
         player:pushMenu(unpack(menus.room_dir))
       else
         player.room:add(obj)
@@ -387,7 +387,7 @@ local t = {
         return player:send("Couldn't find object")
       end
       
-      local t, k = resolve(obj, parts[3])
+      local t, k = utils.resolve(obj, parts[3])
       player:send(type(t[k]))
     end
   },

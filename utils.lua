@@ -1,13 +1,9 @@
+local utils = {}
 -- I know, I know, this file may as well  be named "RandomCodeThatHasNoHome.lua"
 
 DIR_SEP = package.config:sub(1,1)
 
-EDITOR_KEYWORDS = {"and", "break", "do", "else", "elseif",
-     "end", "false", "for", "function", "if",
-     "in", "local", "nil", "not", "or",
-     "repeat", "return", "then", "true", "until", "while"}
-
-function keys(t)
+function utils.keys(t)
   local rt = {}
   for k,_ in pairs(t) do table.insert(rt, k) end
   return rt
@@ -28,7 +24,20 @@ function string.compare(s1, s2)
   return 0
 end
 
-function stripControlChars(str)
+function string.capitalize(s)
+  return s:sub(1,1):upper()..s:sub(2)
+end
+
+function utils.split(s, sep)
+  local t = {}
+  local sep = sep or " "..NEWL
+  
+  -- For every substring made up of non separator characters, add to t
+  for i in string.gmatch(s, "[^"..sep.."]+") do table.insert(t, i) end
+  return t
+end
+
+function utils.stripControlChars(str)
     local s = ""
     for i = 1, str:len() do
   if str:byte(i) >= 32 and str:byte(i) <= 126 then
@@ -38,16 +47,7 @@ function stripControlChars(str)
     return s
 end
 
-function split(s, sep)
-  local t = {}
-  local sep = sep or " "..NEWL
-  
-  -- For every substring made up of non separator characters, add to t
-  for i in string.gmatch(s, "[^"..sep.."]+") do table.insert(t, i) end
-  return t
-end
-
-function files(dir)
+function utils.files(dir)
   local s
   if DIR_SEP == "\\" then
     s = io.popen("dir "..dir.." /b /a-d"):read("*all")
@@ -55,7 +55,7 @@ function files(dir)
     s = io.popen("ls -p "..dir.." | grep -v /"):read("*all")
   end
     
-  return split(s)
+  return utils.split(s)
 end
 
 function makeFile(dir)
@@ -71,7 +71,7 @@ function string.multimatch(s, patterns)
 end
 
 -- lua-users.org
-function shallowcopy(orig)
+function utils.shallowcopy(orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
@@ -85,7 +85,7 @@ function shallowcopy(orig)
     return copy
 end
 
-function deepcopy(value, seen)
+function utils.deepcopy(value, seen)
   if type(value) == "table" then
     seen = seen or {}
     local t = {}
@@ -93,7 +93,7 @@ function deepcopy(value, seen)
       if seen[v] then
         t[k] = seen[v]
       else
-        t[k] = deepcopy(v, seen)
+        t[k] = utils.deepcopy(v, seen)
         seen[k] = t[k] 
       end
     end
@@ -104,7 +104,7 @@ function deepcopy(value, seen)
 end
 
 -- Bart Kiers @ stackoverflow.com
-function case_insensitive_pattern(pattern)
+function utils.case_insensitive_pattern(pattern)
 
   -- find an optional '%' (group 1) followed by any character (group 2)
   local p = pattern:gsub("(%%?)(.)", function(percent, letter)
@@ -123,7 +123,7 @@ function case_insensitive_pattern(pattern)
 end
 
 -- kikito @ stackoverflow.com
-function isArray(t)
+function utils.isArray(t)
   local i = 0
   for _ in pairs(t) do
       i = i + 1
@@ -133,9 +133,9 @@ function isArray(t)
 end
 
 --resolve identifier chain i.e. object.inventory.items.#1
-function resolve(obj, key)
+function utils.resolve(obj, key)
   local k
-  local keyparts = split(key, "%.")
+  local keyparts = utils.split(key, "%.")
   -- for part in key:gmatch("([^%.]+)") do table.insert(keyparts, part) end
   
   for i, part in ipairs(keyparts) do
@@ -153,14 +153,14 @@ function resolve(obj, key)
   return obj, k
 end
 
-contains = function (t, i)
+function utils.contains(t, i)
   for j,v in ipairs(t) do
     if v == i then return true end
   end
   return false
 end
 
-tremove = function(t, i)
+function utils.tremove(t, i)
   for j = #t, 1, -1 do
     if t[j] == i then table.remove(t, j) end
   end
@@ -209,6 +209,5 @@ function num2bin(n)
     return s
 end
 
-function string.capitalize(s)
-  return s:sub(1,1):upper()..s:sub(2)
-end
+
+return utils

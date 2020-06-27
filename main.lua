@@ -3,7 +3,7 @@ socket = require "socket"
 config = require "config"
 md5 = require "md5"
 colour = require "ansicolors"
-require "utils"
+utils = require "utils"
 xml = require "xmlparser"
 
 do
@@ -72,14 +72,12 @@ soundex = require "soundex"
 
 objects = {}
 
-types = {room = Room, player = Player, object = Object}
-
 clients = {}
 
 helpfiles = {}
 
 function loadHelpFiles()
-  for _,v in ipairs(files("helpfiles")) do
+  for _,v in ipairs(utils.files("helpfiles")) do
     local f = io.open("helpfiles"..DIR_SEP..v)
     local key = f:read("*line")
     local content = f:read("*all"):gsub("\n", NEWL)
@@ -92,8 +90,6 @@ end
 loadHelpFiles()
 
 function broadcast(s)
-
-  -- print("Broadcasting")
   for _,v in pairs(clients) do
     if v.state == "chat" then
       v:send(s)
@@ -179,7 +175,7 @@ end
 
 function dirFromShort(dir)
   for shortnames,longname in pairs(short_dirs) do
-    if contains(shortnames, dir) then
+    if utils.contains(shortnames, dir) then
       return longname
     end
   end
@@ -258,7 +254,7 @@ function main()
     error("There was an error trying to accept a new connection: "..NEWL..err)
   end
   
-  local ready = socket.select(keys(clients), nil, 0.01)
+  local ready = socket.select(utils.keys(clients), nil, 0.01)
   
   for i,sock in ipairs(ready) do
     local v = clients[sock]
@@ -267,7 +263,7 @@ function main()
       
       --print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
       
-      data = stripControlChars(data)
+      data = utils.stripControlChars(data)
       local handler = handlers[v.state]
       
       if handler then
@@ -281,6 +277,7 @@ function main()
       end
     else
       if err == "closed" then
+        print(tostring(player.user or player.name or player.__sock).. "has disconnected")
         if not v.state:find("login") then
           verbs.quit.f(v)
         else

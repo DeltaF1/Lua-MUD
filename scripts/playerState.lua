@@ -26,7 +26,7 @@ return {
         self.__menu = function(player, data)
 
           for i = 1, #input do
-            patt = "^"..input[i]
+            local patt = "^"..input[i]
 
             if data:match(patt) then
 

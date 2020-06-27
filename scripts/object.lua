@@ -19,7 +19,7 @@ local methods = {
       if not message then return nil end
 
       return message:gsub("{([^}]+)}", function(key)
-	    	local t,k = resolve({self=self,args=args}, key)
+	    	local t,k = utils.resolve({self=self,args=args}, key)
 	    	if not t then
 	        print("missing key "..key)
           return ""	

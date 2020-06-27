@@ -1,4 +1,4 @@
-local stripTags = require "xmlparser".stripTags
+local stripTags = xml.stripTags
 return {
   data = {},
   methods = {
@@ -14,7 +14,7 @@ return {
       end,
 
       function(self, args, res)
-        success, stripped  = pcall(stripTags, res)
+        local success, stripped  = pcall(stripTags, res)
         if not success then
           if res:match("<") then
             print("Error parsing XML:")

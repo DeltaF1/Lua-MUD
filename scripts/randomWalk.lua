@@ -8,7 +8,7 @@ return {
   methods = {
     onRandomWalk = {
       function(self)
-        local exits = keys(self.room:getExits())
+        local exits = utils.keys(self.room:getExits())
 
         local dir = exits[math.random(#exits)]
         self:call("walk", {dir})

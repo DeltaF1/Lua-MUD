@@ -13,7 +13,7 @@ CommandSet.__index = CommandSet
 
 function CommandSet:new(t)
   -- If it is an array
-  if t and isArray(t) then
+  if t and utils.isArray(t) then
     local arr = t
     t = {}
     -- For every verb in the array
@@ -23,7 +23,7 @@ function CommandSet:new(t)
     end
   else
     -- If the table is a CommandSet, set ourselves to a copy of its
-    t = shallowcopy(t) or {}
+    t = utils.shallowcopy(t) or {}
   end
   
   return setmetatable(t, self)
@@ -112,7 +112,7 @@ local t = {
     "set-priv"
   },
   All = CommandSet:new(
-    keys(verbs)
+    utils.keys(verbs)
   )
 }
 

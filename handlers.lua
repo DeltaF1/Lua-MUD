@@ -185,7 +185,7 @@ return {
       end
 
       -- Get parts of data. e.g. "Why is the rum always gone?" will become {"Why", "is", "the", "rum", "always", "gone?"}
-      local parts = split(data)
+      local parts = utils.split(data)
       
       -- replace parts like "@here" or "@me" with names of objects
       for i, part in ipairs(parts) do
@@ -241,7 +241,7 @@ return {
   },
   edit = {
     f = function(player, data)
-      local parts = split(data)
+      local parts = utils.split(data)
       local key = parts[1]
       if #parts < 1 then
         return
@@ -259,7 +259,7 @@ return {
         end
       end
       
-      local t, key = resolve(player._editing_obj, key)
+      local t, key = utils.resolve(player._editing_obj, key)
       local val
       if parts[2] == "append" and type(t[key]) == "table" then
         val = table.concat(parts, " ", 3)
@@ -305,7 +305,7 @@ return {
 
   combat = {
     f = function(player, data)
-      parts = split(data)
+      parts = utils.split(data)
 
       local arena = player.arena
 
@@ -315,7 +315,7 @@ return {
       end
       if verb == "attack" then -- hard coded D:
         local target = player.room:search(parts[2])
-        if contains(arena.mobiles, target) then
+        if utils.contains(arena.mobiles, target) then
           if player.ap > 3 then -- hard coded D:
             player.ap = player.ap - 3
             target:damage(1) -- hard coded D:

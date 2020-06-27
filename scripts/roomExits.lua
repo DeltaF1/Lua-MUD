@@ -35,7 +35,7 @@ return {
         if destination then
           self:call("onExit", {player=player, dir=dir})
 
-          tremove(self.objects, player)
+          utils.tremove(self.objects, player)
           
           player:call("onExit", {dir})
           

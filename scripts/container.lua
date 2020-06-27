@@ -33,7 +33,7 @@ return {
       function(self, args, retval)
         local obj = args[1]
         
-        tremove(self.objects, obj)
+        utils.tremove(self.objects, obj)
       end,
     },
     search = {
@@ -44,7 +44,7 @@ return {
         if self.name:lower() == name then res[#res+1] = self end
         for i = 1, #self.objects do
           local obj = self.objects[i]
-          if obj.name:lower() == name or contains(obj.aliases, name) then
+          if obj.name:lower() == name or utils.contains(obj.aliases, name) then
             res[#res+1] = obj
           end
         end

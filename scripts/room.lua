@@ -38,7 +38,7 @@ return {
         if #containerList > 0 then
           res = res..NEWL..NEWL..containerList
         end
-        exits = colour("%{yellow}exits: ["..self:getExitsDesc().."]")
+        local exits = colour("%{yellow}exits: ["..self:getExitsDesc().."]")
         res = res..NEWL..exits
         return res
       end,
@@ -49,7 +49,7 @@ return {
         return self:getExits()
       end,
       function(self, args, ret)
-        return table.concat(keys(ret), ", ")
+        return table.concat(utils.keys(ret), ", ")
       end
     },
     onTick = {

@@ -4,14 +4,20 @@ local table = table
 
 local t = {}
 
+local EDITOR_KEYWORDS = {"and", "break", "do", "else", "elseif",
+     "end", "false", "for", "function", "if",
+     "in", "local", "nil", "not", "or",
+     "repeat", "return", "then", "true", "until", "while"}
+
+
 -- Serialize a table
 function t.ser(obj, newl, indent, tables)
-  -- Previously serialized tables, to prevent stack overflows
   if getmetatable(obj) and getmetatable(obj) == CommandSet then
     --Serialize the keys
-    obj = keys(obj)
+    obj = utils.keys(obj)
   end
   local newl = newl or "\n"
+  -- Previously serialized tables, to prevent stack overflows
   local tables = tables or {}
   local indent = indent or 1
   local indentStr = string.rep("  ", indent)
@@ -22,7 +28,7 @@ function t.ser(obj, newl, indent, tables)
       s = s .. indentStr
       if type(k) == "string" then
          -- If the key is only alphanumeric, and doesn't start with a number, leave it as is. Otheriwse add ["key"] syntax
-        if contains(EDITOR_KEYWORDS, k) or not k:match("^[%a_][%w_]*$") then
+        if utils.contains(EDITOR_KEYWORDS, k) or not k:match("^[%a_][%w_]*$") then
           k = '["'..k..'"]'
         end
         
@@ -34,7 +40,7 @@ function t.ser(obj, newl, indent, tables)
           elseif rawget(k, "identifier") then
             k = 'ID('..k.identifier..')'
           -- If it's a table not yet seen, encode it
-          elseif not contains(tables, k) then
+          elseif not utils.contains(tables, k) then
             table.insert(tables, k)
             k = ser(k, newl, indent+1, tables)
           end
@@ -57,7 +63,7 @@ function t.ser(obj, newl, indent, tables)
         elseif rawget(v, "identifier") then
           v = 'ID('..v.identifier..')'
         -- If it's a table not yet seen, encode it
-        elseif not contains(tables, v) then
+        elseif not utils.contains(tables, v) then
           table.insert(tables, v)
           v = ser(v, newl, indent+1, tables)
         end

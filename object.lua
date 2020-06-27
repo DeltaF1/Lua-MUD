@@ -42,13 +42,24 @@ function Object:updateScripts()
     local k = self.scripts[i]
     self:loadScript(k, loaded)
   end
+  
+  --[[
+  if exists("scripts.objscripts."..id) then
+    self:loadScript("objscripts."..id, loaded)
+  end
+  ]]
 end
 
 function Object:loadScript(scriptName, loaded)
   loaded = loaded or {}
   if loaded[scriptName] then return end
-  loaded[scriptName] = require("scripts."..scriptName)
-  local script = loaded[scriptName]
+  local success, script = pcall(require, "scripts."..scriptName)
+  if not success then
+	print("Error loading script \""..scriptName..'"')
+	print(tostring(script))
+	return nil
+  end
+  loaded[scriptName] = script 
   if script.dependencies then
     for j = 1, #script.dependencies do
       self:loadScript(script.dependencies[j], loaded)

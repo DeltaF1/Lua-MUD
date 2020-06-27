@@ -69,10 +69,12 @@ return {
       
       local obj = p._editing_obj
       local user = db.get_user(obj.user)
-      for _,id in ipairs(user.characters) do
-        if db.get_or_load(id).name == name then    
-          p:send("You already have a character by that name!")
-          return
+      if name ~= obj.name then
+        for _,id in ipairs(user.characters) do
+          if db.get_or_load(id).name == name then    
+            p:send("You already have a character by that name!")
+            return
+          end
         end
       end
       

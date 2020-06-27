@@ -1,3 +1,4 @@
+unpack = unpack or table.unpack
 socket = require "socket"
 
 config = require "config"
@@ -280,7 +281,9 @@ function main()
         v:send(v:getPrompt() or handlers[v.state].prompt, "")
       end
     else
+      print(tostring(v.user or v.name or v.sock).." had an error: "..tostring(err))
       if err == "closed" then
+      	print(tostring(v.user or v.name or v.sock).." has disconnected")
         if not v.state:find("login") then
           verbs.quit.f(v)
         else

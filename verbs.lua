@@ -18,14 +18,13 @@ local t = {
     f = function(player, parts)
       player.__sock:send("Goodbye!"..NEWL)
       player.__sock:close()
-      print(tostring(player.user or player.name or player.sock).." has disconnected")
       clients[player.__sock] = nil
       player.__loaded = false    
       if player.state == "chat" then
         player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air", player)
       end
       if player:getRoom() then
-        tremove(player.room.objects, player)
+        utils.tremove(player.room.objects, player)
       end
       db.store_object(player)
     end,

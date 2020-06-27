@@ -223,6 +223,8 @@ function deferred(object, method, args)
   _deferred[#_deferred+1] = {object, method, args}
 end
 
+IDLE_TIME = {}
+
 function main()
   local dt = DT
   local status, err = pcall(function()
@@ -234,7 +236,7 @@ function main()
     local s = colour(config.server_info.motd..NEWL..handlers.login1.prompt)
     sock:send(s)
     
-    sock:settimeout(1)
+    sock:settimeout(0.01)
     print(tostring(sock:getpeername()).." has connected")
     local user = {__sock=sock, state="login1"}
     user.scripts = {
@@ -248,6 +250,7 @@ function main()
     user.name = nil
     user.user = nil
     clients[sock] = user
+    IDLE_TIME[sock] = TIME
   end
   end)
   
@@ -257,7 +260,14 @@ function main()
   
   local ready = socket.select(utils.keys(clients), nil, 0.01)
   
+  for sock, time in pairs(IDLE_TIME) do
+    if TIME-time >= 1000 and not utils.contains(ready, sock) then
+      table.insert(ready, sock)
+    end
+  end
+
   for i,sock in ipairs(ready) do
+    IDLE_TIME[sock] = TIME
     local v = clients[sock]
     local data, err = sock:receive()
     if data then

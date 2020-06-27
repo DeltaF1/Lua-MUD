@@ -33,7 +33,7 @@ return {
         local destination = self:getExit(dir, player)
 
         if destination then
-          self:call("onExit", {player=player, dir=dir})
+          self:call("onExit", {player, dir}) 
 
           utils.tremove(self.objects, player)
           

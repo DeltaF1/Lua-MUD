@@ -48,6 +48,9 @@ return {
             res[#res+1] = obj
           end
         end
+	if #res == 0 and args.printMissing ~= false then
+          print("[search]"..'"'..self:getName()..'" ('..tostring(self.identifier)..") didn't contain \""..name..'"')
+        end
         return res
       end
     }

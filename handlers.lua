@@ -4,7 +4,7 @@ local colours = {"red","green","yellow","blue","magenta","cyan"}
 return {
   login1 = {
     f = function(user, data)
-      print(user.__sock:getpeername()..": Initial text: "..data)
+      print((user.__sock:getpeername() or "nil")..": Initial text: "..(data or "nil"))
       -- Can't set user's name to a 0-length string
       if #data == 0 then
         return
@@ -21,7 +21,6 @@ return {
         user.name = data
         user:setState("login2")
       end
-
     end,
     prompt = colour("%{green}Please enter your username (new to create a new account):")
   },
@@ -199,6 +198,10 @@ return {
       -- Declare verb and name of verb
       local verb
       local key
+      
+      if player.room:getExit(cmd, player) then
+        verb = player.cmdset:find("go")
+      end
 
       if player.room:getExit(cmd, player) then
         verb = player.cmdset:find("go")

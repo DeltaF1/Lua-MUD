@@ -49,7 +49,7 @@ local t = {
   },
   go = {
     f = function(player, parts)
-      local dir = (parts[1]=="go" or parts[1]=="walk") and parts[2] or parts[1]
+      local dir = (parts[1]=="go" or parts[1]=="walk" or parts[1]=="climb") and parts[2] or parts[1]
       dir = dirFromShort(dir)      
       
       if player.room.exits[dir] then
@@ -69,7 +69,7 @@ local t = {
       "southwest", "sw",
       "northeast", "ne",
       "northwest", "nw",
-      "walk"
+      "walk", "climb"
     }
   },
   say = {
@@ -426,7 +426,7 @@ local t = {
       player:setState("edit")
     end
   },
-  attack = {
+  --[[attack = {
     f = function(player, parts)
       local target = player.room:search(parts[2])
       
@@ -453,7 +453,7 @@ local t = {
         return {"error", "Please provide a target to attack!"}
       end
     end
-  },
+  },]]
   exits = {
     f = function(player, parts)
       player:send("The available exits are:")

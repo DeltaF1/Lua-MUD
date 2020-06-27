@@ -10,7 +10,7 @@ return {
             -- For every word, search the room for an object with that name
             local a, name, b = v:match("([^%a']*)([%a']+)([^%a]*)")
             if not name then return nil end
-            local obj = self.room:search(name)[1]
+            local obj = self.room:call("search", {name, printMissing=false})[1]
 
             -- If that name means an object, highlight it
             if obj and obj.colour then

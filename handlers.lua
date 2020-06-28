@@ -173,13 +173,12 @@ return {
   },
   chat = {
     f = function(player, data)
-
       -- Don't do anything
       if #data == 0 then
         return
       end
 
-      -- Get parts of data. e.g. "Why is the rum always gone?" will become {"Why", "is", "the", "rum", "always", "gone?"}
+      -- Get parts of data. e.g. "walk to the north" becomes {"walk", "to", "the", "north"}
       local parts = utils.split(data)
       
       -- replace parts like "@here" or "@me" with names of objects
@@ -190,32 +189,24 @@ return {
       -- First word sent
       local cmd = parts[1]
       if not cmd then return end
-
-      -- Declare verb and name of verb
-      local verb
-      local key
       
+      -- verb object
+      local verb
+      -- if the text is an exit in this room then choose the "go" verb
       if player.room:getExit(cmd, player) then
         verb = player.cmdset:find("go")
       end
 
-      if player.room:getExit(cmd, player) then
-        verb = player.cmdset:find("go")
-      end
-
-      if player.room.cmdset and player.room.cmdset:find(cmd) then
-        verb = player.room.cmdset:find(cmd) or verb
-      else
-        verb = player.cmdset:find(cmd) or verb
-      end
+      -- if the text is a verb the player has access to,
+      -- then do that instead, falling back on the "go" verb if no verbs match
+      verb = player.cmdset:find(cmd) or verb
 
       if verb then
-        key = verb.name
+        local key = verb.name
         -- Run the verb, passing in the player, split parts, and original data string
-        --
-        -- If the player is puppeting, send with the puppeted NPC as the player argument
         local res = verb.f(player, parts, data)
 
+        -- Half-complete standardized error handling for verbs
         if res and type(res) == "table" then
           if res[1] == "error" then
             -- Send the error message

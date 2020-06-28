@@ -261,7 +261,9 @@ function main()
   local ready = socket.select(utils.keys(clients), nil, 0.01)
   
   for sock, time in pairs(IDLE_TIME) do
-    if TIME-time >= 1000 and not utils.contains(ready, sock) then
+    if not clients[sock] then
+      IDLE_TIME[sock] = nil
+    elseif TIME-time >= 1000 and not utils.contains(ready, sock) then
       table.insert(ready, sock)
     end
   end
@@ -286,8 +288,8 @@ function main()
         -- state may have changed
         v:send(v:getPrompt() or handlers[v.state].prompt, "")
       end
-    else
-      print(tostring(v.user or v.name or v.sock).." had an error: "..tostring(err))
+    elseif v then
+      print(tostring(v.user or v.name or v.sock or sock:getpeername()).." had an error: "..tostring(err))
       if err == "closed" then
       	print(tostring(v.user or v.name or v.sock).." has disconnected")
         if not v.state:find("login") then

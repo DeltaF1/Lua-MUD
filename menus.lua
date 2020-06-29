@@ -70,7 +70,8 @@ return {
       local obj = p._editing_obj
       local user = db.get_user(obj.user)
       if name ~= obj.name then
-        for _,id in ipairs(user.characters) do
+        -- TODO: menus should take in client as well
+        for _,id in ipairs(p.__puppeteer.characters) do
           if db.get_or_load(id).name == name then    
             p:send("You already have a character by that name!")
             return
@@ -103,7 +104,7 @@ return {
         }
         obj:updateScripts()
         objects[db.store_object(obj)] = obj
-        db.add_character(obj.user, obj)
+        db.add_character(obj.__puppeteer.name, obj)
       else
         p:send("You step away from the mirror and shake your head. That can't be right, let's try again...")
       end

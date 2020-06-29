@@ -1,3 +1,4 @@
+-- Compatibility with 5.3
 unpack = unpack or table.unpack
 socket = require "socket"
 
@@ -91,9 +92,9 @@ end
 loadHelpFiles()
 
 function broadcast(s)
-  for _,v in pairs(clients) do
-    if v.state == "chat" then
-      v:send(s)
+  for _,client in pairs(clients) do
+    if client.state == "chat" then
+      client:send(s)
     end
   end
 end
@@ -238,18 +239,19 @@ function main()
     
     sock:settimeout(0.01)
     print(tostring(sock:getpeername()).." has connected")
-    local user = {__sock=sock, state="login1"}
-    user.scripts = {
-      "object",
-      "socket",
-      "playerState",
-      "highlight"
+    local client = {
+      sock=sock,
+      state="login1",
+      scripts = {
+        "client",
+        "socket",
+        "playerState",
+        "highlight"
+      },
+      identifier = 0
     }
-    user.identifier = 0
-    user = Object:new(user)
-    user.name = nil
-    user.user = nil
-    clients[sock] = user
+    client = Object:new(client)
+    clients[sock] = client
     IDLE_TIME[sock] = TIME
   end
   end)
@@ -258,7 +260,7 @@ function main()
     error("There was an error trying to accept a new connection: "..NEWL..err)
   end
   
-  local ready = socket.select(utils.keys(clients), nil, 0.01)
+  local ready = socket.select(utils.keys(clients), nil, 0)
   
   for sock, time in pairs(IDLE_TIME) do
     if TIME-time >= 1000 and not utils.contains(ready, sock) then
@@ -266,40 +268,34 @@ function main()
     end
   end
 
-  for i,sock in ipairs(ready) do
+  for i, sock in ipairs(ready) do
     IDLE_TIME[sock] = TIME
-    local v = clients[sock]
-    local data, err = sock:receive()
-    if data then
-      
-      --print("Got Data from ("..tostring(v.name or v.sock)..") : "..data.." of length "..#data)
-      
-      data = utils.stripControlChars(data)
-      local handler = handlers[v.state]
-      
-      if handler then
-        for i, obj in pairs(objects) do
-          backupDb.store_object(obj)
+    local client = clients[sock]
+    if client then
+      local data, err = sock:receive()
+      if data then
+        data = utils.stripControlChars(data)
+        local handler = handlers[client.state]
+        
+        if handler then
+          for i, obj in pairs(objects) do
+            backupDb.store_object(obj)
+          end
+          -- Run command
+          handler.f(client, data)
+          -- state may have changed
+          client:send(client:getPrompt() or handlers[client.state].prompt, "")
         end
-        -- Run command
-        handler.f(v, data)
-        -- state may have changed
-        v:send(v:getPrompt() or handlers[v.state].prompt, "")
-      end
-    else
-      print(tostring(v.user or v.name or v.sock).." had an error: "..tostring(err))
-      if err == "closed" then
-      	print(tostring(v.user or v.name or v.sock).." has disconnected")
-        if not v.state:find("login") then
-          verbs.quit.f(v)
-        else
-          clients[v.__sock] = nil
+      else
+        if err == "closed" then
+          clients[client.sock] = nil
+          client:close()
         end
       end
     end
   end
-  -- Do game ticks
 
+  -- Do game ticks
   for id, object in pairs(objects) do
     -- only tick objects that are not lazy loaded
     if getmetatable(object) ~= lazy_mt then
@@ -307,6 +303,7 @@ function main()
     end
   end
 
+  -- Handle deferred events
   while #_deferred > 0 do
     local event = table.remove(_deferred)
     event[1]:call(event[2], event[3])

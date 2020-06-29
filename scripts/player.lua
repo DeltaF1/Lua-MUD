@@ -5,9 +5,9 @@ return {
 
   dependencies = {
     "object",
-    "playerState",
     "container",
     "character",
+    "vanishAfterDisconnect",
   },
 
   methods = {
@@ -28,6 +28,41 @@ return {
 
 				self.cmdset = CommandSet:new(self.cmdset)
 				self.cmdset = self.cmdset:union(cmdsets.Default)
+      end
+    },
+    send = {
+      function(self, args, ret)
+        if self.__puppeteer then
+          return self.__puppeteer:call("send", args)
+        end
+      end
+    },
+    setState = {
+      function(self, args, ret)
+        if self.__puppeteer then
+          return self.__puppeteer:call("setState", args)
+        end
+      end
+    },
+    setMenu = {
+      function(self, args, ret)
+        if self.__puppeteer then
+          return self.__puppeteer:call("setMenu", args)
+        end
+      end
+    },
+    pushMenu = {
+      function(self, args, ret)
+        if self.__puppeteer then
+          return self.__puppeteer:call("pushMenu", args)
+        end
+      end
+    },
+    popMenu = {
+      function(self, args, ret)
+        if self.__puppeteer then
+          return self.__puppeteer:call("popMenu", args)
+        end
       end
     },
   }

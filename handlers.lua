@@ -3,68 +3,68 @@ local colours = {"red","green","yellow","blue","magenta","cyan"}
 
 return {
   login1 = {
-    f = function(user, data)
-      print((user.__sock:getpeername() or "nil")..": Initial text: "..(data or "nil"))
-      -- Can't set user's name to a 0-length string
+    f = function(client, data)
+      print((client.sock:getpeername() or "nil")..": Initial text: "..(data or "nil"))
+      -- Can't set client's name to a 0-length string
       if #data == 0 then
         return
       end
       -- If there are any non alphanumeric characters in the data
       if data:find("%W") then
-        user.__sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)
+        client.sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)
         return
       end
       
       if data == "new" then
-        user:setState("newAccount1")
+        client:setState("newAccount1")
       else
-        user.name = data
-        user:setState("login2")
+        client.name = data
+        client:setState("login2")
       end
     end,
     prompt = colour("%{green}Please enter your username (new to create a new account):")
   },
   newAccount1 = {
-    f = function(user, data)
+    f = function(client, data)
       if data:find("%W") then
-        user.__sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)
+        client.sock:send("Invalid name, name must only contain alphanumeric characters (a-z, A-Z, 0-9)"..NEWL)
       elseif db.get_user(data) or data == "new" then
-        user.__sock:send("Account with that name already exists!"..NEWL)
+        client.sock:send("Account with that name already exists!"..NEWL)
       else
-        user.name = data
-        user:setState("newAccount2")
+        client.name = data
+        client:setState("newAccount2")
       end
     end,
     prompt = "New account name: "
   },
   newAccount2 = {
-    f = function(user, data)
+    f = function(client, data)
       if #data < 8 then
-        user.__sock:send("Please enter a password that is at least 8 characters long"..NEWL)
+        client.sock:send("Please enter a password that is at least 8 characters long"..NEWL)
       else
-        user.password = data
-        user:setState("newAccount3")
+        client.password = data
+        client:setState("newAccount3")
       end
     end,
-    before = function(user) user:send(IAC..WILL..ECHO, "") end,
+    before = function(client) client:send(IAC..WILL..ECHO, "") end,
     prompt = "Enter your password (DO NOT REUSE ANY OTHER PASSWORDS): ",
   },
   newAccount3 = {
-    f = function(user, data)
-      if data == user.password then
-        user.password = nil
-        db.add_user(user.name, data)
-        user:setState("login1")
+    f = function(client, data)
+      if data == client.password then
+        client.password = nil
+        db.add_user(client.name, data)
+        client:setState("login1")
       else
-        user.__sock:send("Password doesn't match!"..NEWL)
+        client.sock:send("Password doesn't match!"..NEWL)
       end
     end,
     prompt = "Confirm your password: ",
-    after = function(user) user:send(IAC..WONT..ECHO, "") end,
+    after = function(client) client:send(IAC..WONT..ECHO, "") end,
   },
   login2 = {
-    before = function(user) user:send(IAC..WILL..ECHO, "") end,
-    f = function(user, data)
+    before = function(client) client:send(IAC..WILL..ECHO, "") end,
+    f = function(client, data)
     
       -- Get hash of user.name..data..salt
     
@@ -73,51 +73,52 @@ return {
       --FOR THE LOVE OF GOD DON'T USE MD5
       -- TODO use salt, and sha256
 
-      userData = db.get_user(user.name)
+      userData = db.get_user(client.name)
 
       hash = md5.sumhexa(data)
 
       if not userData or userData.passhash:lower() ~= hash:lower() then
-        user:send("Incorrect login!")
-        user:setState("login1")
+        client:send("Incorrect login!")
+        client:setState("login1")
         return
       end
       
       for k,v in pairs(clients) do
-        if v ~= user and ((v.state:find("login3") and v.name == user.name) or (v.user and v.user == user.name)) then
-          user:send("Error: Already logged in!")
-          user:setState("login1")
-
-          return
+        if v ~= client and v.name == client.name then
+          v:close()
+          clients[k] = nil
         end
       end
 
-      user:setState("login3")
+      client:setState("login3")
     end,
-    after = function(user) user:send(IAC..WONT..ECHO, "") end,
+    after = function(client) client:send(IAC..WONT..ECHO, "") end,
     prompt = colour("%{red}Please enter your password: ")
   },
   login3 = {
-    before = function(user)
-      local characters = db.get_user(user.name).characters 
-      user.characters = {} 
+    before = function(client)
+      local characters = db.get_user(client.name).characters
+      client.characters = {}
       for i = 1, #characters do
         local char = db.get_or_load(characters[i])
-        user.characters[char.name] = char
+        client.characters[char.name] = char
       end
       
       if #characters > 0 then
-        user:send(NEWL.."Your characters:")
-        for k,v in pairs(user.characters) do
-          user:send(colour("%{yellow}"..k))  
+        client:send(NEWL.."Your characters:")
+        for k,v in pairs(client.characters) do
+          client:send(colour("%{yellow}"..k))
         end  
       end
     end,
-    f = function(user, data)
+    f = function(client, data)
       if data == "quit" then
-        verbs.quit.f(user)
+        clients[client.sock] = nil
+        client:close()
+        return
       end
 
+      local player
       if data == "new" then
         user._editing_obj = Object:new()
         user._editing_obj.user = user.name
@@ -127,17 +128,14 @@ return {
         --player = db.load_object(194)
         --player.identifier = nil
       else
-        player = user.characters[data]
+        player = client.characters[data]
       end
       if not player then
-        user:send("Invalid character name")
+        client:send("Invalid character name")
         return
       end
 
-      -- player.user = user
-      player.__sock = user.__sock
-      player.user = user.name
-      clients[user.__sock] = player
+      client:puppet(player)
       
       -- TODO: Move this to world_load
       if not player.cmdset then
@@ -164,15 +162,13 @@ return {
       -- Announce the player entering the server
       player.room:broadcast(player.name.." steps through the looking glass and appears here", player)
 
-      -- To make sure the prompt is properly updated
-      user:setState("chat")
-      player.state = "login3"
-      player:setState("chat")
+      client:setState("chat")
     end,
     prompt = "Select a character, or type 'new' or 'quit': "
   },
   chat = {
-    f = function(player, data)
+    f = function(client, data)
+      local player = client.puppeting
       -- Don't do anything
       if #data == 0 then
         return
@@ -224,13 +220,15 @@ return {
     prompt = "%{green}> %{reset}"
   },
   menu = {
-    f = function(player, data)
-      player.__menu(player, data)
+    f = function(client, data)
+      local player = client.puppeting
+      client.__menu(player, data)
     end,
     prompt = "menu> "
   },
   edit = {
-    f = function(player, data)
+    f = function(client, data)
+      local player = client.puppeting
       local parts = utils.split(data)
       local key = parts[1]
       if #parts < 1 then

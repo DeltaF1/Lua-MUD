@@ -2,13 +2,9 @@ local t = {
   who={
     f = function(player, parts)
       local s = "Online:"..NEWL
-      for k,player in pairs(clients) do
-        if not player.state:match("^login") then 
-          if not player.user then
-            print(ser(player))
-          else
-            s = s..player.user..NEWL
-          end
+      for k, client in pairs(clients) do
+        if (not client.state:match("^login")) and client.name then
+          s = s..tostring(client.name)..NEWL
         end
       end
       player:send(s, "")

@@ -120,9 +120,19 @@ return {
 
       local player
       if data == "new" then
-        user._editing_obj = Object:new()
-        user._editing_obj.user = user.name
-        user:pushMenu(unpack(menus.char_gender))
+        -- TODO: replace with template
+        player = Object:new({
+          scripts = {
+            "object",
+            "player",
+            "socket",
+            "highlight"
+          }
+        })
+        client:puppet(player)
+        -- TOOD: move editing into the client
+        player._editing_obj = player
+        player:pushMenu(unpack(menus.char_gender))
         return
         -- TODO: Drop into the world here
         --player = db.load_object(194)

@@ -95,13 +95,6 @@ return {
       p:send("")
       if i == 1 then
         local obj = p._editing_obj
-        
-        obj.scripts = {
-          "object",
-          "player",
-          "socket",
-          "highlight"
-        }
         obj:updateScripts()
         objects[db.store_object(obj)] = obj
         db.add_character(obj.__puppeteer.name, obj)

@@ -145,7 +145,7 @@ return {
       player.cmdset = CommandSet:new(player.cmdset)
       player.cmdset = player.cmdset:union(cmdsets.Default)
       
-      if player.user == config.admin_name then
+      if client.name == config.admin_name then
         player.cmdset = player.cmdset:union(cmdsets.All)
       end
 

@@ -42,8 +42,8 @@ return {
       function(self, args, res, next)
         local msg = res
         msg = msg:gsub("([^\r])(\n)", "%1\r\n")
-        if self.__sock then
-          self.__sock:send(msg)
+        if self.sock then
+          self.sock:send(msg)
         end
         return msg
       end,

@@ -8,10 +8,6 @@ return {
       function(self, args, res, next)
         for i = #self.objects, 1, -1 do
           local obj = self.objects[i]
-
-          if obj.ephemeral and not obj.__loaded then
-            table.remove(self.objects, i)
-          end
         end
       end,
     },

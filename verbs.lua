@@ -2,13 +2,9 @@ local t = {
   who={
     f = function(player, parts)
       local s = "Online:"..NEWL
-      for k,player in pairs(clients) do
-        if not player.state:match("^login") then 
-          if not player.user then
-            print(ser(player))
-          else
-            s = s..player.user..NEWL
-          end
+      for k, client in pairs(clients) do
+        if (not client.state:match("^login")) and client.name then
+          s = s..tostring(client.name)..NEWL
         end
       end
       player:send(s, "")
@@ -16,17 +12,9 @@ local t = {
   },
   quit = {
     f = function(player, parts)
-      player.__sock:send("Goodbye!"..NEWL)
-      player.__sock:close()
-      clients[player.__sock] = nil
-      player.__loaded = false    
-      if player.state == "chat" then
-        player.room:broadcast(player.name.." vanishes in a puff of smoke. The scent of cinnamon lingers in the air", player)
-      end
-      if player:getRoom() then
-        utils.tremove(player.room.objects, player)
-      end
-      db.store_object(player)
+      player:send("Goodbye!"..NEWL)
+      -- TODO: Some commands should be intercepted by the client first
+      player.__puppeteer:close()
     end,
     aliases = { "exit" }
   },

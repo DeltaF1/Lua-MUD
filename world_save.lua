@@ -10,7 +10,6 @@ local EDITOR_KEYWORDS = {"and", "break", "do", "else", "elseif",
      "in", "local", "nil", "not", "or",
      "repeat", "return", "then", "true", "until", "while"}
 
-
 -- Serialize a table
 function t.ser(obj, newl, indent, tables)
   if getmetatable(obj) and getmetatable(obj) == CommandSet then
@@ -76,44 +75,6 @@ function t.ser(obj, newl, indent, tables)
   end
   s = s..string.rep("  ",indent-1).."}"
   return s
-end
-
-function t.save()
-  for dir, tbl in pairs{["rooms"]=rooms, ["objects"]=objects, ["players"]=players} do
-    saveTable(tbl, dir)
-  end
-  
-  
-  
-end
-
-local function saveTable(tbl, dir)
-  local files = {}
-  for k,v in pairs(tbl) do
-    files[v.filename] = files[v.filename] or {}
-    table.insert(files[v.filename], v)
-  end
-  
-  for k,v in pairs(files) do
-    print("Saving to file "..k)
-    local s = "-- "..k.."\n\n"
-    -- s = s.."-- Generated "..os.time()
-    for _, object in ipairs(v) do
-      if object.sock then
-        local oldsock = object.sock
-        object.sock = nil
-      end
-      s = s..object.identifier.." = "..ser(object).."\n\n"
-      if oldsock then object.sock = oldsock end
-    end
-    s = s.."--[[END OF FILE]]--"
-    
-    -- Need to find way to create empty file
-    local f = io.open("world"..DIR_SEP..dir..DIR_SEP..k, "w")
-    f:write(s)
-    f:close()
-  end
-  --print(ser(keys))
 end
 
 return t

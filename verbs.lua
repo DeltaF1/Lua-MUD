@@ -14,6 +14,7 @@ local t = {
     f = function(player, parts)
       player:send("Goodbye!"..NEWL)
       -- TODO: Some commands should be intercepted by the client first
+      clients[player.__puppeteer.sock] = nil
       player.__puppeteer:close()
     end,
     aliases = { "exit" }

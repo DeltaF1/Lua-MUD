@@ -32,7 +32,7 @@ local t = {
       player:send(obj:getDesc(player))
     end,
     aliases = {
-      "ex", "x", "examine"
+      "ex", "exa", "exam", "exami", "examin", "examine", "l", "lo", "loo" 
     }
   },
   go = {
@@ -47,16 +47,16 @@ local t = {
       end
     end,
     aliases = {
-      "north", "n",
-      "south", "s",
-      "east", "e",
-      "west", "w",
-      "up", "u",
-      "down", "d",
-      "southeast", "se",
-      "southwest", "sw",
-      "northeast", "ne",
-      "northwest", "nw",
+      "d", "down",
+      "e", "ea", "eas", "east",
+      "n", "no", "nor", "nort", "north",
+      "ne", "northe", "northea", "northeas", "northeast",
+      "nw", "northw", "northwe", "northwes", "northwest",
+      "s", "so", "sou", "sout", "south",
+      "se", "southe", "southea", "southeas", "southeast",
+      "sw", "southw", "southwe", "southwes", "southwest",
+      "u", "up",
+      "w", "we", "wes", "west",
       "walk", "climb"
     }
   },
